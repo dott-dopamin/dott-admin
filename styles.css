@@ -1,0 +1,1834 @@
+:root{
+  --bg:#f8f4ec;--paper:#fffdf9;--paper2:#fcf8f1;--ink:#2f2a25;--muted:#7e7469;
+  --line:#eadfce;--accent:#e95d20;--accent-soft:#ffe0d1;--green:#4e9f67;--green-soft:#e8f7ec;
+  --blue:#6d7fd1;--shadow:0 8px 30px rgba(83,61,35,.08);--radius:18px
+}
+*{box-sizing:border-box}html{background:var(--bg)}body{margin:0;font-family:Pretendard,"Noto Sans KR",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink);background:var(--bg)}a{color:inherit;text-decoration:none}button,input,select,textarea{font:inherit;color:inherit}button{cursor:pointer}
+.shell{max-width:1180px;margin:22px auto;background:var(--paper);border:1px solid var(--line);border-radius:22px;overflow:hidden;box-shadow:var(--shadow);min-height:calc(100vh - 44px)}
+.topbar{height:72px;display:flex;align-items:center;gap:24px;padding:0 28px;border-bottom:1px solid var(--line);background:#fffefa;position:sticky;top:0;z-index:40}.brand{display:flex;align-items:center;gap:12px;min-width:220px}.brand-mark{width:38px;height:38px;border-radius:10px;background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:900}.brand strong{display:block;font-size:15px}.brand small{display:block;color:var(--muted);margin-top:2px}.nav{display:flex;gap:6px;align-items:center;flex:1;justify-content:center;flex-wrap:wrap}.nav a{padding:10px 12px;border-radius:10px;color:#5d554d;font-size:14px}.nav a:hover,.nav a.active{background:var(--accent-soft);color:#8d3714;font-weight:700}.admin-link{font-size:13px;border:1px solid var(--line);padding:9px 11px;border-radius:10px;background:#fff}.page{padding:46px 30px 60px}.hero{padding:10px 0 34px;border-bottom:1px solid var(--line)}.eyebrow{display:inline-flex;align-items:center;gap:7px;background:var(--accent-soft);color:#a14118;border-radius:999px;padding:6px 10px;font-size:12px;font-weight:700}.hero h1{font-family:inherit;font-size:42px;line-height:1.18;margin:18px 0 14px;font-weight:500;letter-spacing:-1.6px}.hero p{margin:0;max-width:760px;color:var(--muted);line-height:1.75}.stat-row{display:flex;gap:8px;margin-top:18px;flex-wrap:wrap}.stat-pill{border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 10px;font-size:12px}.stat-pill b{color:var(--accent)}
+.section{margin-top:28px}.grid-2{display:grid;grid-template-columns:1.55fr .75fr;gap:18px}.today-box{border:1px solid #9ed4ad;background:var(--green-soft);border-radius:14px;padding:15px 18px;display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:start}.today-icon{width:34px;height:34px;border-radius:9px;background:var(--green);color:#fff;display:grid;place-items:center}.today-head{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:7px}.today-head strong{font-size:14px}.today-head small{color:#607565}.count-badge{background:var(--green);color:#fff;border-radius:999px;padding:4px 8px;font-size:11px;font-weight:700}.mini-events{display:flex;flex-direction:column;gap:6px}.mini-event{font-size:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}.cat-tag{display:inline-flex;align-items:center;gap:5px;border-radius:6px;padding:3px 7px;font-size:11px;font-weight:700;background:#eee}.legend{border:1px solid var(--line);border-radius:14px;padding:18px;background:#fffefa}.legend-title{font-size:13px;margin-bottom:12px}.legend-row{display:flex;gap:8px;flex-wrap:wrap}.legend-chip{display:flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:5px 8px;font-size:11px;background:#fff}.dot{width:7px;height:7px;border-radius:50%}
+.card{border:1px solid var(--line);border-radius:16px;background:#fffefa;overflow:hidden}.card-head{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:15px 18px;border-bottom:1px solid var(--line)}.card-head h2{font-family:inherit;font-size:21px;font-weight:500;margin:0}.toolbar{display:flex;gap:7px;flex-wrap:wrap}.btn{border:1px solid var(--line);background:#fff;border-radius:9px;padding:9px 12px;font-size:13px}.btn:hover{background:#fff8f2}.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}.btn.danger{color:#b44242}.btn.ghost{background:transparent}.calendar-grid{display:grid;grid-template-columns:repeat(7,1fr)}.dow{padding:10px;text-align:center;font-size:11px;font-weight:700;border-bottom:1px solid var(--line);background:#fff}.dow:first-child{color:#d04f29}.dow:last-child{color:#5171b6}.day{min-height:118px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:10px;position:relative;background:#fffefa}.day:nth-child(7n){border-right:0}.day.muted{background:#fbf9f4;color:#bbb}.day.today{box-shadow:inset 0 0 0 2px var(--accent)}.day.has-events{background:#fff7f2}.day-num{font-size:12px;font-weight:700;margin-bottom:7px}.day-events{display:flex;flex-direction:column;gap:4px}.day-event{font-size:10.5px;padding:5px 6px;border-radius:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:#f3eee6}.day-event:hover{filter:brightness(.98)}.empty{padding:35px;text-align:center;color:var(--muted)}
+.notice-list{display:flex;flex-direction:column}.notice{padding:17px 18px;border-bottom:1px solid var(--line);display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:start}.notice:last-child{border-bottom:0}.notice-badge{font-size:11px;background:#f6ead9;padding:4px 7px;border-radius:6px}.notice-badge.pin{background:#ffe0d1;color:#a33f16}.notice h3{font-size:14px;margin:0 0 6px}.notice p{font-size:12px;color:var(--muted);margin:0;line-height:1.55}.notice-content{font-size:12px;color:var(--muted);margin:0;line-height:1.65;overflow-wrap:anywhere}.notice-content b,.notice-content strong{font-weight:700}.notice time{font-size:11px;color:#a49a90}
+.filters{display:grid;grid-template-columns:1.5fr repeat(3,minmax(130px,.65fr));gap:10px;margin:20px 0}.field{width:100%;border:1px solid var(--line);background:#fff;border-radius:10px;padding:11px 12px;outline:none}.field:focus{border-color:#dca37e;box-shadow:0 0 0 3px #fde9db}.catalog-meta{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:18px 0}.catalog-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}.game-card{border:1px solid var(--line);background:#fff;border-radius:15px;overflow:hidden}.game-img{aspect-ratio:4/3;background:#f0ebe4;display:grid;place-items:center;color:#aaa;overflow:hidden}.game-img img{width:100%;height:100%;object-fit:cover}.game-body{padding:13px}.game-body h3{margin:0 0 9px;font-size:15px}.meta-line{display:flex;gap:6px;flex-wrap:wrap;color:var(--muted);font-size:11px;margin-bottom:7px}.meta-chip{background:#f7f2ea;border-radius:999px;padding:4px 7px}.note{font-size:11px;line-height:1.55;color:#777;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.status{display:inline-flex;padding:4px 7px;border-radius:999px;font-size:10.5px;background:#edf7ef;color:#3c8152;font-weight:700}.status.out{background:#f7eded;color:#9e4d4d}
+.admin-wrap{padding:34px 30px 60px}.admin-hero{display:flex;justify-content:space-between;gap:20px;align-items:end;padding-bottom:22px;border-bottom:1px solid var(--line)}.admin-hero h1{font-family:inherit;font-size:36px;font-weight:500;margin:12px 0 8px}.admin-hero p{margin:0;color:var(--muted);font-size:13px}.tabs{display:flex;gap:6px;margin:26px 0 16px;flex-wrap:wrap}.tab{border:1px solid var(--line);background:#fff;border-radius:999px;padding:9px 12px;font-size:12px}.tab.active{background:var(--accent);border-color:var(--accent);color:#fff}.admin-tools{display:flex;justify-content:space-between;gap:12px;margin-bottom:12px;flex-wrap:wrap}.search{max-width:300px}.table-wrap{border:1px solid var(--line);border-radius:14px;overflow:auto;background:#fff}.table{width:100%;border-collapse:collapse;min-width:760px}.table th,.table td{padding:12px 13px;border-bottom:1px solid var(--line);font-size:12px;text-align:left;vertical-align:middle}.table th{background:#fbf7f0;color:#756a60;font-size:11px}.table tr:last-child td{border-bottom:0}.actions{display:flex;gap:6px}.icon-btn{width:32px;height:32px;border:1px solid var(--line);background:#fff;border-radius:8px}.info-box{border:1px solid #a8d6b2;background:#edf9ef;padding:12px 14px;border-radius:10px;color:#4e6f56;font-size:12px;margin:16px 0}.login-box{max-width:430px;margin:90px auto;padding:28px;border:1px solid var(--line);border-radius:18px;background:#fff;box-shadow:var(--shadow)}.login-box h1{font-family:inherit;font-weight:500}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.form-grid .full{grid-column:1/-1}.label{font-size:11px;color:var(--muted);display:block;margin:0 0 6px}.modal-backdrop{position:fixed;inset:0;background:rgba(40,32,24,.32);display:none;align-items:center;justify-content:center;padding:20px;z-index:100}.modal-backdrop.open{display:flex}.modal{width:min(640px,100%);max-height:90vh;overflow:auto;background:#fff;border-radius:18px;border:1px solid var(--line);box-shadow:0 24px 70px rgba(0,0,0,.18)}.modal-head{display:flex;justify-content:space-between;align-items:center;padding:18px 20px;border-bottom:1px solid var(--line)}.modal-head h3{margin:0}.modal-body{padding:20px}.modal-foot{display:flex;justify-content:flex-end;gap:8px;padding:16px 20px;border-top:1px solid var(--line)}.toast{position:fixed;right:18px;bottom:18px;background:#2f2a25;color:#fff;padding:12px 15px;border-radius:10px;font-size:12px;z-index:200;opacity:0;transform:translateY(8px);transition:.2s}.toast.show{opacity:1;transform:none}.error{color:#b24545;font-size:12px;margin-top:10px}.footer{padding:22px 28px;border-top:1px solid var(--line);font-size:11px;color:#9a9086;display:flex;justify-content:space-between;background:#fbf3e6}.loading{padding:45px;text-align:center;color:var(--muted)}
+@media(max-width:900px){.shell{margin:0;border-radius:0;border-left:0;border-right:0}.topbar{height:auto;padding:13px 15px;flex-wrap:wrap}.brand{min-width:auto}.nav{order:3;width:100%;justify-content:flex-start;overflow:auto;flex-wrap:nowrap}.nav a{white-space:nowrap}.admin-link{margin-left:auto}.page,.admin-wrap{padding:28px 16px 45px}.hero h1{font-size:34px}.grid-2{grid-template-columns:1fr}.catalog-grid{grid-template-columns:repeat(2,1fr)}.filters{grid-template-columns:1fr 1fr}.filters .search-field{grid-column:1/-1}.day{min-height:92px;padding:7px}.day-event{font-size:9px}.admin-hero{align-items:flex-start;flex-direction:column}.form-grid{grid-template-columns:1fr}.form-grid .full{grid-column:auto}}
+@media(max-width:560px){.hero h1{font-size:30px}.catalog-grid{grid-template-columns:1fr 1fr;gap:9px}.game-body{padding:10px}.filters{grid-template-columns:1fr}.filters .search-field{grid-column:auto}.calendar-grid{font-size:10px}.day{min-height:74px;padding:5px}.day-event{height:7px;padding:0;color:transparent;border-radius:4px}.today-box{grid-template-columns:1fr}.today-icon{display:none}.notice{grid-template-columns:auto 1fr}.notice time{grid-column:2}.footer{flex-direction:column;gap:6px}}
+
+/* ===== DOTT v3 요청사항 반영 ===== */
+/* 캘린더 일정은 카테고리 색상을 배경으로만 사용하고, 글자는 검정으로 통일 */
+.calendar-scroll{overflow-x:auto;overscroll-behavior-inline:contain}
+.day{min-height:142px;background:#fffefa}
+.day.has-events{background:#fffefa}
+.day-events{gap:6px}
+.day-event{
+  min-height:40px;
+  padding:6px 7px;
+  border-radius:7px;
+  color:#1f1f1f;
+  white-space:normal;
+  overflow:hidden;
+  font-size:11.5px;
+  line-height:1.3;
+}
+.event-line{display:flex;align-items:center;gap:5px;min-width:0}
+.event-main{font-weight:500;font-size:12px}
+.event-time{flex:0 0 auto}
+.event-title{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.event-sub{margin-top:4px;font-size:10.5px;font-weight:500;color:#292929;justify-content:space-between}
+.day-more{font-size:10.5px;color:var(--muted);padding:2px 3px}
+.cancel-label{display:inline-flex;align-items:center;flex:0 0 auto;border:1px solid #ad4b4b;background:#fff;color:#9e3b3b;border-radius:999px;padding:1px 5px;font-size:9px;font-weight:800;text-decoration:none!important}
+.day-event.is-cancelled .event-line span:not(.cancel-label),
+.mini-event.is-cancelled > *:not(.cancel-label){text-decoration:line-through;text-decoration-thickness:1px}
+.schedule-status{display:inline-flex;padding:4px 8px;border-radius:999px;background:#edf7ef;color:#3d7d50;font-weight:700;font-size:11px}
+.schedule-status.cancelled{background:#f8e9e9;color:#a14444}
+.cancelled-row td:not(:last-child){color:#8f8982}
+.cancelled-row td:nth-child(4) b{text-decoration:line-through}
+
+/* 공지는 textarea에서 입력한 줄바꿈/공백을 그대로 표시 */
+.notice p{white-space:pre-wrap;overflow-wrap:anywhere}
+.admin-notice-preview{
+  display:block;
+  max-width:100%;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  color:var(--muted);
+}
+/* 관리자 공지 목록만 게시판형으로 압축 */
+.admin-notice-table{table-layout:fixed;width:100%}
+.admin-notice-table th:nth-child(1),.admin-notice-table td:nth-child(1){width:7%}
+.admin-notice-table th:nth-child(2),.admin-notice-table td:nth-child(2){width:24%}
+.admin-notice-table th:nth-child(3),.admin-notice-table td:nth-child(3){width:auto}
+.admin-notice-table th:nth-child(4),.admin-notice-table td:nth-child(4){width:10%}
+.admin-notice-table th:nth-child(5),.admin-notice-table td:nth-child(5){width:9%}
+.admin-notice-table tbody tr{height:52px}
+.admin-notice-table tbody td{vertical-align:middle}
+.admin-notice-table td:nth-child(1){text-align:center}
+.admin-notice-table td:nth-child(2){
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.admin-notice-table td:nth-child(4){white-space:nowrap}
+@media(max-width:700px){
+  .admin-notice-table th:nth-child(3),.admin-notice-table td:nth-child(3){display:none}
+  .admin-notice-table th:nth-child(1),.admin-notice-table td:nth-child(1){width:16%}
+  .admin-notice-table th:nth-child(2),.admin-notice-table td:nth-child(2){width:auto}
+  .admin-notice-table th:nth-child(4),.admin-notice-table td:nth-child(4){width:22%}
+  .admin-notice-table th:nth-child(5),.admin-notice-table td:nth-child(5){width:20%}
+}
+
+/* 보유목록 보기 방식 전환 */
+.view-toggle{display:inline-flex;gap:4px;padding:4px;border:1px solid var(--line);background:#fff;border-radius:10px}
+.view-btn{border:0;background:transparent;border-radius:7px;padding:7px 10px;font-size:12px;color:var(--muted)}
+.view-btn.active{background:var(--accent-soft);color:#8d3714;font-weight:800}
+.catalog-list{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#fff}
+.catalog-list-item{display:grid;grid-template-columns:minmax(220px,1.15fr) 2fr;gap:22px;align-items:center;padding:15px 17px;border-bottom:1px solid var(--line)}
+.catalog-list-item:last-child{border-bottom:0}
+.catalog-list-title{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.catalog-list-title h3{font-size:15px;margin:0}
+.catalog-list-note{font-size:11px;color:var(--muted);margin-top:6px;line-height:1.5;white-space:pre-wrap}
+.catalog-list-meta{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;font-size:11px;color:var(--muted)}
+.catalog-list-meta span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.catalog-list-meta b{display:block;color:#4e4740;margin-bottom:3px;font-size:10px}
+
+@media(max-width:900px){
+  .calendar-grid{min-width:900px}
+  .day{min-height:132px;padding:8px}
+  .day-event{font-size:11.5px;min-height:42px;padding:6px 7px}
+  .event-sub{font-size:10.5px}
+  .catalog-list-item{grid-template-columns:1fr;gap:10px}
+  .catalog-list-meta{grid-template-columns:repeat(3,1fr)}
+}
+@media(max-width:560px){
+  .calendar-card .card-head{position:sticky;left:0;z-index:2;background:#fffefa}
+  .calendar-grid{min-width:850px}
+  .day{min-height:126px;padding:7px}
+  .day-event{height:auto;min-height:42px;padding:6px 7px;color:#1f1f1f;font-size:11.5px;border-radius:7px}
+  .event-sub{font-size:10.5px}
+  .catalog-meta{align-items:center}
+  .view-toggle{margin-left:auto}
+  .catalog-list-meta{grid-template-columns:repeat(2,1fr)}
+}
+
+
+/* ===== DOTT v4 세부 조정 ===== */
+/* 메인 화면의 상단 작은 문구: 기존 포인트 배경보다 약 30% 더 옅게 */
+.calendar-page .hero .eyebrow{background:#fff4ee;color:#a14118}
+/* 메인 설명 문구는 긴 안내도 부담 없도록 한 단계 축소 */
+.calendar-page .hero p{font-size:14px;line-height:1.7}
+/* PC 갤러리는 한 줄 5개 */
+@media(min-width:901px){.catalog-grid{grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}.game-body{padding:11px}.game-body h3{font-size:14px}.meta-line{font-size:10.5px}}
+
+/* ===== DOTT v6 보유목록 단일 리스트 ===== */
+.catalog-page .hero p{white-space:normal}
+.catalog-table-wrap{border:1px solid var(--line);border-radius:14px;overflow-x:auto;background:#fff}
+.catalog-table{width:100%;min-width:940px;border-collapse:collapse;table-layout:auto}
+.catalog-table th,.catalog-table td{padding:12px 14px;border-bottom:1px solid var(--line);font-size:12px;text-align:left;vertical-align:middle;white-space:nowrap}
+.catalog-table th{background:#fbf7f0;color:#756a60;font-size:11px;font-weight:600}
+.catalog-table tbody tr:last-child td{border-bottom:0}
+.catalog-table tbody tr:hover{background:#fffaf4}
+.catalog-name{font-weight:600;color:#2e2924;min-width:170px}
+.catalog-note{max-width:260px;overflow:hidden;text-overflow:ellipsis;color:var(--muted)}
+.catalog-admin-desc{margin:0 0 18px;padding:16px;border:1px solid var(--line);border-radius:14px;background:#fff}
+.catalog-admin-desc-row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end}
+.catalog-admin-desc textarea{resize:vertical;min-height:68px}
+@media(max-width:700px){.catalog-admin-desc-row{grid-template-columns:1fr}.catalog-admin-desc-row .btn{justify-self:start}.catalog-table th,.catalog-table td{padding:10px 11px}}
+
+/* ===== DOTT v8 모바일 캘린더 한 화면 맞춤 ===== */
+@media(max-width:700px){
+  /* 모바일에서는 달력을 가로 스크롤하지 않고 화면 폭 안에 7열로 맞춤 */
+  .calendar-scroll{overflow-x:visible;width:100%}
+  .calendar-grid{min-width:0!important;width:100%;grid-template-columns:repeat(7,minmax(0,1fr))}
+  .calendar-card{overflow:hidden}
+  .calendar-card .card-head{position:static}
+  .calendar-card .card-head{padding:12px 10px}
+  .calendar-card .card-head h2{font-size:18px}
+  .calendar-card .toolbar{gap:4px}
+  .calendar-card .toolbar .btn{padding:7px 8px;font-size:11px}
+  .dow{padding:8px 2px;font-size:10px}
+  .day{min-width:0;min-height:122px;padding:4px 3px}
+  .day-num{font-size:11px;margin-bottom:4px}
+  .day-events{gap:4px}
+  .day-event{min-width:0;min-height:0;height:auto;padding:4px 3px;border-radius:6px;font-size:10px;line-height:1.22;white-space:normal}
+  .event-line{display:block;min-width:0}
+  .event-main{font-size:10px;font-weight:500}
+  .event-time{display:block;white-space:nowrap}
+  .event-title{display:-webkit-box;white-space:normal;overflow:hidden;text-overflow:ellipsis;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow-wrap:anywhere;word-break:keep-all}
+  .event-sub{display:block;margin-top:3px;font-size:8.8px;line-height:1.25;color:#292929}
+  .event-sub span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .cancel-label{display:inline-flex;margin-top:2px;padding:1px 3px;font-size:8px}
+  .day-more{font-size:8.5px;padding:1px 0}
+}
+
+@media(max-width:390px){
+  .page{padding-left:8px;padding-right:8px}
+  .day{min-height:116px;padding:3px 2px}
+  .day-event{padding:3px 2px}
+  .event-main{font-size:9.5px}
+  .event-sub{font-size:8.4px}
+}
+
+/* ===== DOTT v9 모바일 상단 메뉴 한 화면 맞춤 ===== */
+@media(max-width:700px){
+  .topbar{
+    padding:10px 12px 9px;
+    gap:8px 10px;
+  }
+  .brand{flex:1 1 auto;min-width:0;gap:9px}
+  .brand-mark{width:34px;height:34px;border-radius:9px;flex:0 0 34px}
+  .brand strong{font-size:14px}
+  .brand small{font-size:10px;white-space:nowrap}
+  .admin-link{margin-left:auto;padding:8px 9px;font-size:11px;white-space:nowrap}
+  .nav{
+    order:3;
+    width:100%;
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:4px;
+    overflow:visible;
+    flex-wrap:initial;
+    justify-content:stretch;
+  }
+  .nav a{
+    min-width:0;
+    padding:8px 2px;
+    font-size:10.5px;
+    line-height:1.2;
+    text-align:center;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:clip;
+  }
+}
+
+@media(max-width:390px){
+  .topbar{padding-left:8px;padding-right:8px;gap:7px 8px}
+  .brand{gap:7px}
+  .brand-mark{width:32px;height:32px;flex-basis:32px}
+  .brand strong{font-size:13px}
+  .brand small{font-size:9.5px}
+  .admin-link{padding:7px 8px;font-size:10px}
+  
+  .nav a{padding:7px 1px;font-size:9.5px;letter-spacing:-.2px}
+}
+
+/* ===== DOTT v10 모바일 헤더/보유목록 한 화면 맞춤 ===== */
+@media(max-width:700px){
+  /* 상단 메뉴는 브랜드/관리 버튼 아래의 한 줄 전체 폭으로 고정한다.
+     flex-shrink 때문에 메뉴가 첫 줄에 끼어들어 작아지는 현상을 방지. */
+  .topbar{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    padding:10px 12px 8px;
+    gap:8px 10px;
+  }
+  .brand{order:1;flex:1 1 auto;min-width:0}
+  .admin-link{order:2;flex:0 0 auto;margin-left:auto}
+  .nav{
+    order:3;
+    flex:0 0 100%;
+    width:100%;
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:5px;
+    margin:0;
+    overflow:visible;
+  }
+  .nav a{
+    min-width:0;
+    padding:9px 4px;
+    font-size:12px;
+    line-height:1.15;
+    text-align:center;
+    white-space:nowrap;
+    overflow:visible;
+    text-overflow:clip;
+  }
+
+  /* 보유목록: 모바일에서도 가로 스크롤 없이 8개 항목을 한 화면에 표시 */
+  .catalog-page{padding-left:7px;padding-right:7px}
+  .catalog-table-wrap{width:100%;overflow-x:hidden;border-radius:10px}
+  .catalog-table{
+    width:100%;
+    min-width:0!important;
+    table-layout:fixed;
+  }
+  .catalog-table th,
+  .catalog-table td{
+    padding:7px 2px;
+    font-size:9px;
+    line-height:1.2;
+    white-space:normal;
+    overflow-wrap:anywhere;
+    word-break:keep-all;
+    text-align:center;
+  }
+  .catalog-table th{font-size:8.7px;letter-spacing:-.25px}
+  .catalog-table th:nth-child(1),.catalog-table td:nth-child(1){width:24%;text-align:left;padding-left:5px}
+  .catalog-table th:nth-child(2),.catalog-table td:nth-child(2){width:9%}
+  .catalog-table th:nth-child(3),.catalog-table td:nth-child(3){width:10%}
+  .catalog-table th:nth-child(4),.catalog-table td:nth-child(4){width:10%}
+  .catalog-table th:nth-child(5),.catalog-table td:nth-child(5){width:12%}
+  
+  .catalog-table th:nth-child(7),.catalog-table td:nth-child(7){width:10%}
+  .catalog-table th:nth-child(8),.catalog-table td:nth-child(8){width:15%;padding-right:4px}
+  .catalog-name{min-width:0;font-size:9.5px;font-weight:600}
+  .catalog-note{max-width:none;overflow:visible;text-overflow:clip;color:var(--muted)}
+  .catalog-table .status{padding:3px 4px;font-size:8px;white-space:nowrap}
+}
+
+@media(max-width:390px){
+  .topbar{padding-left:8px;padding-right:8px}
+  .nav{gap:3px}
+  .nav a{font-size:11px;padding:8px 2px;letter-spacing:-.25px}
+  .catalog-page{padding-left:4px;padding-right:4px}
+  .catalog-table th,.catalog-table td{font-size:8.4px;padding:6px 1px}
+  .catalog-table th{font-size:8.1px}
+  .catalog-name{font-size:8.8px}
+  .catalog-table .status{font-size:7.6px;padding:2px 3px}
+}
+
+/* ===== DOTT v11 주말 날짜 색상 + 게임리스트 위치 제거/폭 재조정 ===== */
+.day.sunday .day-num{color:#d94a4a}
+.day.saturday .day-num{color:#3f67c6}
+.day.muted.sunday .day-num{color:#e5a0a0}
+.day.muted.saturday .day-num{color:#a9b8e5}
+
+/* 위치 컬럼 제거 후 PC에서도 표가 과하게 넓어지지 않도록 7개 컬럼 폭 재배분 */
+.catalog-table{min-width:760px;table-layout:fixed}
+.catalog-table th:nth-child(1),.catalog-table td:nth-child(1){width:27%}
+.catalog-table th:nth-child(2),.catalog-table td:nth-child(2){width:10%}
+.catalog-table th:nth-child(3),.catalog-table td:nth-child(3){width:12%}
+.catalog-table th:nth-child(4),.catalog-table td:nth-child(4){width:11%}
+.catalog-table th:nth-child(5),.catalog-table td:nth-child(5){width:15%}
+.catalog-table th:nth-child(6),.catalog-table td:nth-child(6){width:10%}
+.catalog-table th:nth-child(7),.catalog-table td:nth-child(7){width:15%}
+
+@media(max-width:700px){
+  .catalog-table{min-width:0!important;width:100%;table-layout:fixed}
+  .catalog-table th:nth-child(1),.catalog-table td:nth-child(1){width:28%;text-align:left;padding-left:5px}
+  
+  .catalog-table th:nth-child(3),.catalog-table td:nth-child(3){width:11%}
+  
+  .catalog-table th:nth-child(5),.catalog-table td:nth-child(5){width:15%}
+  .catalog-table th:nth-child(6),.catalog-table td:nth-child(6){width:10%}
+  .catalog-table th:nth-child(7),.catalog-table td:nth-child(7){width:15%;padding-right:4px}
+}
+
+/* ===== DOTT v12 위치 제거 후 게임리스트 7열 정렬 보정 ===== */
+/* 공용 리스트는 위치 제거 후 남은 7개 항목을 표 전체 폭에 균형 있게 배치 */
+.catalog-table{
+  width:100%;
+  min-width:0;
+  table-layout:fixed;
+}
+.catalog-table th,
+.catalog-table td{
+  text-align:center;
+  vertical-align:middle;
+}
+.catalog-table th:nth-child(1),.catalog-table td:nth-child(1){width:28%;text-align:left;padding-left:16px}
+.catalog-table th:nth-child(5),.catalog-table td:nth-child(5){width:16%}
+.catalog-table th:nth-child(7),.catalog-table td:nth-child(7){width:13%;padding-right:16px}
+
+@media(max-width:700px){
+  .catalog-table-wrap{overflow-x:hidden}
+  .catalog-table{width:100%;min-width:0!important;table-layout:fixed}
+  .catalog-table th,.catalog-table td{
+    text-align:center;
+    white-space:normal;
+    overflow-wrap:anywhere;
+  }
+  .catalog-table th:nth-child(1),.catalog-table td:nth-child(1){width:25%;text-align:left;padding-left:5px}
+  .catalog-table th:nth-child(2),.catalog-table td:nth-child(2){width:10%}
+  .catalog-table th:nth-child(3),.catalog-table td:nth-child(3){width:12%}
+  .catalog-table th:nth-child(4),.catalog-table td:nth-child(4){width:11%}
+  .catalog-table th:nth-child(5),.catalog-table td:nth-child(5){width:14%}
+  .catalog-table th:nth-child(6),.catalog-table td:nth-child(6){width:11%}
+  .catalog-table th:nth-child(7),.catalog-table td:nth-child(7){width:17%;padding-right:4px}
+}
+
+.rich-toolbar{display:flex;align-items:center;gap:7px;flex-wrap:wrap;padding:8px;border:1px solid var(--line);border-bottom:0;border-radius:10px 10px 0 0;background:#fbf7f0}
+.rich-tool{border:1px solid var(--line);background:#fff;border-radius:7px;padding:6px 9px;font-size:11px;cursor:pointer;color:#443b33}
+.rich-tool:hover{background:#fff7ef}.rich-color{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:#fff;border-radius:7px;padding:4px 7px;font-size:11px;color:#665b52}.rich-color input{width:26px;height:24px;border:0;background:transparent;padding:0;cursor:pointer}.rich-help{font-size:10.5px;color:#94887e;margin-left:auto}.rich-editor{min-height:170px;border:1px solid var(--line);background:#fff;border-radius:0 0 10px 10px;padding:12px;outline:none;font-size:13px;line-height:1.7;overflow-wrap:anywhere}.rich-editor:focus{border-color:#dca37e;box-shadow:0 0 0 3px #fde9db}.rich-editor:empty:before{content:attr(data-placeholder);color:#b2aaa2;pointer-events:none}.rich-editor b,.rich-editor strong{font-weight:700}
+@media(max-width:560px){.rich-help{width:100%;margin-left:0}.rich-editor{min-height:150px}}
+
+/* ===== DOTT v15 주말 요일 헤더 색상 보정 ===== */
+/* calendar-grid 안에는 요일 뒤에 날짜 셀이 이어지므로 :last-child 대신 7번째 요일을 직접 지정 */
+.dow:nth-child(1){color:#d04f29!important}
+.dow:nth-child(7){color:#5171b6!important}
+
+
+/* ===== DOTT v16 일정 시간 직접입력 + 모바일 일정 팝업 스크롤 제거 ===== */
+body.modal-open{overflow:hidden;touch-action:none}
+.modal-backdrop{overflow:hidden;box-sizing:border-box}
+.modal{max-width:100%;box-sizing:border-box}
+.modal-body{min-width:0}
+
+@media(max-width:700px){
+  .modal-backdrop{padding:8px;align-items:center;justify-content:center}
+  .schedule-modal{
+    width:calc(100vw - 16px);
+    max-width:560px;
+    max-height:calc(100dvh - 16px);
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+    border-radius:14px;
+  }
+  .schedule-modal .modal-head{padding:11px 13px;flex:0 0 auto}
+  .schedule-modal .modal-head h3{font-size:16px}
+  .schedule-modal .modal-head .icon-btn{width:30px;height:30px}
+  .schedule-modal .modal-body{padding:11px 13px;overflow:hidden;min-height:0;flex:1 1 auto}
+  .schedule-modal .modal-foot{padding:9px 13px;flex:0 0 auto}
+  .schedule-modal .modal-foot .btn{padding:8px 12px}
+  .schedule-modal .schedule-form{
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+    gap:8px 10px;
+  }
+  .schedule-modal .schedule-form .full{grid-column:1/-1!important}
+  .schedule-modal .label{margin-bottom:4px;font-size:10.5px}
+  .schedule-modal .field{padding:8px 9px;border-radius:8px;font-size:13px;min-width:0}
+  .schedule-modal textarea.field{resize:none;min-height:52px;max-height:52px}
+}
+
+@media(max-width:360px){
+  .schedule-modal .schedule-form{gap:7px 7px}
+  .schedule-modal .field{padding:7px 7px;font-size:12px}
+  .schedule-modal .modal-body{padding:9px 10px}
+}
+
+
+/* ===== DOTT v17 운영진 전용 출석관리 ===== */
+.attendance-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;margin-bottom:14px}
+.attendance-summary{display:flex;gap:8px;flex-wrap:wrap}
+.attendance-summary span{border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 10px;font-size:11px;color:#6f655d}
+.attendance-summary span.keep{background:#eff9f1;border-color:#cfe7d4;color:#3b7550}
+.attendance-summary span.overdue{background:#fff0ee;border-color:#f1cbc5;color:#b8483d}
+.attendance-summary span.grace{background:#fff8e7;border-color:#efdfb5;color:#8b6b19}
+.attendance-help{margin:9px 0 0;color:var(--muted);font-size:11px;line-height:1.55}
+.attendance-controls{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}
+.attendance-filters{display:flex;gap:6px;flex-wrap:wrap}
+.attendance-filter{border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 11px;font-size:11px;cursor:pointer}
+.attendance-filter.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.attendance-search{width:190px;flex:0 0 190px;padding:8px 10px}
+.attendance-table-wrap{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#fff}
+.attendance-table{width:100%;border-collapse:collapse;table-layout:fixed}
+.attendance-table th,.attendance-table td{padding:11px 10px;border-bottom:1px solid var(--line);font-size:11.5px;text-align:left;vertical-align:middle}
+.attendance-table th{background:#fbf7f0;color:#756a60;font-size:10.5px;font-weight:600}
+.attendance-table th:nth-child(1){width:12%}.attendance-table th:nth-child(2){width:13%}.attendance-table th:nth-child(3){width:14%}.attendance-table th:nth-child(4){width:14%}.attendance-table th:nth-child(5){width:9%}.attendance-table th:nth-child(6){width:20%}.attendance-table th:nth-child(7){width:18%}
+.attendance-table tbody tr:last-child td{border-bottom:0}
+.attendance-row.overdue{background:#fffafa}.attendance-row.left{opacity:.62;background:#fafafa}
+.attendance-status{display:inline-flex;border-radius:999px;padding:5px 8px;font-size:10px;font-weight:700;white-space:nowrap}
+.attendance-status.keep{background:#e8f7ec;color:#327348}.attendance-status.overdue{background:#ffe8e5;color:#b63f35}.attendance-status.grace{background:#fff1c9;color:#88640c}.attendance-status.left{background:#efefef;color:#777}
+.attendance-actions{display:flex;gap:5px;align-items:center;flex-wrap:wrap}.attendance-today{padding:7px 9px;font-size:10.5px;background:#eff9f1;border-color:#cfe7d4;color:#346d48}.attendance-reason{overflow-wrap:anywhere}.attendance-empty{text-align:center!important;color:var(--muted);padding:30px!important}.attendance-check{display:flex;align-items:center;gap:7px;font-size:12px;height:100%}.attendance-grace-box{display:flex;align-items:end;padding-bottom:9px}.attendance-setup code{background:#fff;border:1px solid #cee4d3;border-radius:5px;padding:2px 5px}
+
+@media(max-width:700px){
+  .attendance-head{align-items:stretch}.attendance-head .btn{align-self:flex-start;white-space:nowrap}
+  .attendance-controls{align-items:stretch;flex-direction:column}.attendance-search{width:100%;flex:auto}
+  .attendance-table-wrap{border:0;background:transparent;overflow:visible}.attendance-table,.attendance-table tbody{display:block;width:100%}.attendance-table thead{display:none}.attendance-table tr{display:block;border:1px solid var(--line);border-radius:12px;background:#fff;margin-bottom:9px;overflow:hidden}.attendance-table td{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;width:100%!important;padding:8px 10px;border-bottom:1px solid #f1e7da;font-size:11px;text-align:right}.attendance-table td:last-child{border-bottom:0}.attendance-table td::before{content:attr(data-label);flex:0 0 82px;text-align:left;color:#8a7d72;font-size:10px;font-weight:600}.attendance-table td:first-child{background:#fbf7f0;font-size:12px}.attendance-table td:first-child::before{color:#675d54}.attendance-reason{max-width:none}.attendance-actions{justify-content:flex-end}.attendance-empty{display:block!important;text-align:center!important}.attendance-empty::before{display:none}.attendance-grace-box{padding-bottom:0;align-items:center}
+}
+
+/* ===== DOTT v19 일정관리 디자인 통일 + 장소이동 + 모바일 출석 1줄 ===== */
+.schedule-control-panel{
+  margin:0 0 13px;
+  padding:12px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:#fffefa;
+}
+.schedule-manage-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin:0 0 11px;
+}
+.schedule-view-tabs{
+  display:inline-flex;
+  align-items:center;
+  gap:3px;
+  padding:3px;
+  border:1px solid var(--line);
+  border-radius:999px;
+  background:#fbf3e6;
+}
+.schedule-view-btn{
+  border:0;
+  background:transparent;
+  color:#6d6258;
+  border-radius:999px;
+  padding:8px 12px;
+  font-size:11.5px;
+  line-height:1;
+  cursor:pointer;
+  transition:.15s ease;
+}
+.schedule-view-btn:hover{background:#fff8f2;color:#9b421c}
+.schedule-view-btn.active{
+  background:var(--accent);
+  color:#fff;
+  font-weight:700;
+  box-shadow:0 2px 8px rgba(233,93,32,.16);
+}
+.schedule-add-btn{white-space:nowrap;box-shadow:0 2px 8px rgba(233,93,32,.10)}
+.schedule-monthbar{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:9px 10px;
+  margin:0;
+  border-top:1px solid #f0e5d7;
+  border-bottom:1px solid #f0e5d7;
+  background:#fff;
+}
+.schedule-month-nav{
+  display:flex;
+  align-items:center;
+  overflow:hidden;
+  border:1px solid var(--line);
+  border-radius:10px;
+  background:#fff;
+}
+.schedule-month-nav strong{
+  min-width:105px;
+  padding:0 10px;
+  text-align:center;
+  font-size:13px;
+  font-weight:700;
+  white-space:nowrap;
+}
+.schedule-month-arrow{
+  width:34px;
+  height:32px;
+  padding:0!important;
+  border:0!important;
+  border-radius:0!important;
+  background:#fff!important;
+  font-size:17px!important;
+  line-height:1;
+  display:grid;
+  place-items:center;
+}
+.schedule-month-arrow:first-child{border-right:1px solid var(--line)!important}
+.schedule-month-arrow:last-child{border-left:1px solid var(--line)!important}
+.schedule-month-arrow:hover{background:#fff8f2!important}
+.schedule-month-today{
+  padding:8px 10px;
+  font-size:11px;
+  background:#fff;
+  white-space:nowrap;
+}
+.schedule-count{
+  margin-left:auto;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:44px;
+  padding:5px 9px;
+  border-radius:999px;
+  background:#fbf3e6;
+  color:#7c6f63;
+  font-size:10.5px;
+  font-weight:700;
+}
+.schedule-bulkbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  padding:10px 2px 0;
+  margin:0;
+}
+.schedule-select-all{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  min-width:0;
+  font-size:11px;
+  color:#6f655d;
+  cursor:pointer;
+}
+.schedule-select-all input,.schedule-check{accent-color:var(--accent)}
+.schedule-bulk-actions{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  color:var(--muted);
+  font-size:10.5px;
+  white-space:nowrap;
+}
+.schedule-bulk-actions .btn{padding:7px 9px;font-size:10.5px}
+.schedule-bulk-actions .btn:disabled{opacity:.38;cursor:not-allowed;background:#fff}
+.schedule-table .check-col{width:34px!important;text-align:center;padding-left:7px;padding-right:7px}
+.schedule-check{width:15px;height:15px}
+.label-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}
+.label-row .label{margin:0}
+.venue-flex-check{display:inline-flex;align-items:center;gap:4px;font-size:10px;color:#6f655d;white-space:nowrap}
+.venue-flex-check input{margin:0;accent-color:#6558d8}
+.venue-flex-mark,.venue-flex-public{color:#6558d8;font-weight:800;text-decoration:none!important}
+.att-head-mobile,.att-date-mobile,.att-action-mobile{display:none}
+
+@media(max-width:700px){
+  .schedule-control-panel{padding:9px;border-radius:12px}
+  .schedule-manage-head{gap:8px;margin-bottom:9px}
+  .schedule-view-tabs{flex:1;min-width:0;display:grid;grid-template-columns:repeat(3,1fr);padding:3px}
+  .schedule-view-btn{padding:8px 4px;font-size:10.5px;text-align:center;white-space:nowrap}
+  .schedule-add-btn{padding:9px 10px;font-size:11px}
+  .schedule-monthbar{gap:6px;padding:8px 0}
+  .schedule-month-nav{flex:1;min-width:0}
+  .schedule-month-nav strong{flex:1;min-width:0;padding:0 5px;font-size:11.5px}
+  .schedule-month-arrow{width:30px;height:30px;font-size:15px!important}
+  .schedule-month-today{padding:7px 8px;font-size:10px}
+  .schedule-count{min-width:38px;padding:5px 7px;font-size:9.5px}
+  .schedule-bulkbar{padding-top:8px;gap:6px}
+  .schedule-select-all{font-size:9.5px;gap:5px}
+  .schedule-select-all input{width:14px;height:14px;margin:0}
+  .schedule-bulk-actions{gap:5px;font-size:9.5px}
+  .schedule-bulk-actions .btn{padding:6px 7px;font-size:9.5px}
+
+  /* 출석관리: 모바일에서도 회원 1명 = 표 1줄, 가로 스크롤 없이 표시 */
+  .attendance-table-wrap{border:1px solid var(--line)!important;border-radius:10px!important;overflow:hidden!important;background:#fff!important}
+  .attendance-table{display:table!important;width:100%!important;table-layout:fixed!important;border-collapse:collapse!important}
+  .attendance-table thead{display:table-header-group!important}
+  .attendance-table tbody{display:table-row-group!important;width:auto!important}
+  .attendance-table tr{display:table-row!important;border:0!important;border-radius:0!important;margin:0!important;background:transparent!important}
+  .attendance-table th,.attendance-table td{display:table-cell!important;width:auto!important;padding:6px 2px!important;border-bottom:1px solid var(--line)!important;font-size:8.2px!important;line-height:1.15!important;text-align:center!important;vertical-align:middle!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+  .attendance-table th{font-size:7.8px!important;letter-spacing:-.35px!important;background:#fbf7f0!important;color:#756a60!important}
+  .attendance-table td::before{display:none!important}
+  .attendance-table th:nth-child(1),.attendance-table td:nth-child(1){width:14%!important;text-align:left!important;padding-left:4px!important}
+  .attendance-table th:nth-child(2),.attendance-table td:nth-child(2){width:12.5%!important}
+  .attendance-table th:nth-child(3),.attendance-table td:nth-child(3){width:12.5%!important}
+  .attendance-table th:nth-child(4),.attendance-table td:nth-child(4){width:12.5%!important}
+  .attendance-table th:nth-child(5),.attendance-table td:nth-child(5){width:9.5%!important}
+  .attendance-table th:nth-child(6),.attendance-table td:nth-child(6){width:17%!important}
+  .attendance-table th:nth-child(7),.attendance-table td:nth-child(7){width:22%!important;padding-right:3px!important}
+  .attendance-status{padding:3px 4px!important;font-size:7.5px!important}
+  .attendance-actions{display:flex!important;justify-content:center!important;align-items:center!important;gap:2px!important;flex-wrap:nowrap!important}
+  .attendance-actions .btn,.attendance-actions .icon-btn{width:19px!important;height:19px!important;min-width:19px!important;padding:0!important;border-radius:5px!important;font-size:8.5px!important;display:inline-grid!important;place-items:center!important}
+  .attendance-reason{max-width:none!important}
+  .att-head-desktop,.att-date-desktop,.att-action-desktop{display:none!important}
+  .att-head-mobile,.att-date-mobile,.att-action-mobile{display:inline!important}
+  .attendance-empty{display:table-cell!important;text-align:center!important;padding:20px!important}
+  .attendance-empty::before{display:none!important}
+}
+
+@media(max-width:390px){
+  .schedule-view-btn{font-size:10px}
+  .schedule-add-btn{padding-left:8px;padding-right:8px}
+  .schedule-month-today{display:none}
+  .attendance-table th,.attendance-table td{font-size:7.7px!important;padding-left:1px!important;padding-right:1px!important}
+  .attendance-table th{font-size:7.2px!important}
+  .attendance-actions .btn,.attendance-actions .icon-btn{width:18px!important;height:18px!important;min-width:18px!important;font-size:8px!important}
+}
+
+
+/* ===== DOTT v20 출석관리 운영진 상단 고정 ===== */
+.attendance-name-wrap{display:inline-flex;align-items:center;gap:6px;min-width:0}
+.attendance-staff-badge{display:inline-flex;align-items:center;border-radius:999px;padding:3px 6px;background:#fff0e7;border:1px solid #ffd1bd;color:#c84d1d;font-size:9px;font-weight:700;line-height:1;white-space:nowrap}
+.attendance-row.staff{background:#fffdf9}
+.attendance-row.staff td:first-child{box-shadow:inset 3px 0 0 var(--accent)}
+.attendance-check-group{gap:16px;flex-wrap:wrap}
+@media(max-width:700px){
+  .attendance-name-wrap{gap:3px}
+  .attendance-staff-badge{padding:2px 3px;font-size:6.8px}
+  .attendance-row.staff td:first-child{box-shadow:inset 2px 0 0 var(--accent)}
+  .attendance-check-group{gap:10px}
+}
+
+/* ===== DOTT v23 캘린더: 기존 일정 카드 디자인 유지 + 요일 7칸만 균등 고정 ===== */
+/* 일정 카드의 기존 높이/패딩/배경은 건드리지 않고, 열 너비만 정확히 1/7로 맞춤 */
+/* 1fr의 min-content 영향으로 일정 제목이 긴 열만 넓어지던 현상 방지 */
+.calendar-card,
+.calendar-scroll,
+.calendar-grid{width:100%;max-width:100%}
+.calendar-scroll{overflow-x:hidden!important}
+.calendar-grid{
+  min-width:0!important;
+  grid-template-columns:repeat(7,minmax(0,1fr))!important;
+}
+.calendar-grid > .dow,
+.calendar-grid > .day{
+  min-width:0!important;
+  width:auto!important;
+  max-width:none!important;
+}
+.calendar-grid > .day{overflow:hidden}
+.calendar-grid > .day .day-events,
+.calendar-grid > .day .day-event,
+.calendar-grid > .day .event-line,
+.calendar-grid > .day .event-title,
+.calendar-grid > .day .event-sub,
+.calendar-grid > .day .event-sub span{
+  min-width:0!important;
+  max-width:100%;
+}
+
+/* 태블릿/모바일에서도 과거 min-width 규칙이 다시 살아나지 않도록 고정 */
+@media(max-width:900px){
+  .calendar-grid{min-width:0!important;width:100%!important;grid-template-columns:repeat(7,minmax(0,1fr))!important}
+  .calendar-scroll{overflow-x:hidden!important}
+}
+@media(max-width:700px){
+  .calendar-grid{min-width:0!important;width:100%!important;grid-template-columns:repeat(7,minmax(0,1fr))!important}
+}
+
+/* ===== DOTT v24 캘린더 일정 카드 원복 + 가독성 보강 ===== */
+/* 요일 7칸 균등 폭은 유지하고, 일정 카드 자체는 기존 크기/여백으로 복원 */
+.calendar-grid > .day .day-events{
+  gap:6px;
+}
+.calendar-grid > .day .day-event{
+  width:100%;
+  box-sizing:border-box;
+  min-height:42px;
+  height:auto;
+  padding:6px 7px;
+  border-radius:7px;
+  color:#1f1f1f;
+  font-size:12px;
+  line-height:1.3;
+  white-space:normal;
+  overflow:hidden;
+}
+.calendar-grid > .day .event-line{
+  display:flex;
+  align-items:center;
+  gap:5px;
+  min-width:0;
+}
+.calendar-grid > .day .event-main{
+  display:flex;
+  align-items:center;
+  gap:5px;
+  min-width:0;
+  font-size:12.5px;
+  font-weight:500;
+  line-height:1.25;
+}
+.calendar-grid > .day .event-time{
+  flex:0 0 auto;
+  white-space:nowrap;
+}
+.calendar-grid > .day .event-title{
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.calendar-grid > .day .event-sub{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:6px;
+  margin-top:4px;
+  font-size:10.5px;
+  font-weight:500;
+  line-height:1.2;
+  color:#292929;
+}
+.calendar-grid > .day .event-sub span{
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+/* 모바일: 7칸 한눈에 보기 유지 + 카드가 너무 납작/작아지지 않게 */
+@media(max-width:700px){
+  .calendar-grid > .day .day-events{gap:4px}
+  .calendar-grid > .day .day-event{
+    min-height:36px;
+    height:auto;
+    padding:4px 3px;
+    border-radius:6px;
+    font-size:10px;
+    line-height:1.18;
+  }
+  .calendar-grid > .day .event-line{display:block}
+  .calendar-grid > .day .event-main{
+    display:block;
+    font-size:10.2px;
+    line-height:1.15;
+  }
+  .calendar-grid > .day .event-time{display:inline;white-space:nowrap}
+  .calendar-grid > .day .event-title{
+    display:inline;
+    white-space:normal;
+    overflow-wrap:anywhere;
+    word-break:keep-all;
+  }
+  .calendar-grid > .day .event-sub{
+    display:flex;
+    justify-content:space-between;
+    gap:2px;
+    margin-top:3px;
+    font-size:8.7px;
+    line-height:1.15;
+  }
+}
+
+@media(max-width:390px){
+  .calendar-grid > .day .day-event{min-height:34px;padding:3px 2px}
+  .calendar-grid > .day .event-main{font-size:9.8px}
+  .calendar-grid > .day .event-sub{font-size:8.2px}
+}
+
+
+/* ===== DOTT v41 PC 일정 클릭 인터랙션: 심플 hover ===== */
+@media(min-width:701px){
+  .calendar-grid > .day .day-event[role="button"]{
+    cursor:pointer !important;
+    position:relative;
+    z-index:1;
+    transition:transform .14s ease,filter .14s ease;
+    will-change:transform,filter;
+  }
+  .calendar-grid > .day .day-event[role="button"]:hover{
+    transform:translateY(-1px);
+    filter:brightness(.96);
+    z-index:2;
+  }
+  .calendar-grid > .day .day-event[role="button"]:active{
+    transform:translateY(0);
+    filter:brightness(.92);
+  }
+  .calendar-grid > .day .day-event[role="button"]:focus-visible{
+    outline:2px solid rgba(233,93,32,.72);
+    outline-offset:2px;
+  }
+}
+
+/* ===== DOTT v25 모바일 캘린더/일정관리 최적화 ===== */
+.schedule-date-mobile{display:none}
+
+/* 모바일 일정 상세 팝업 */
+.calendar-detail-backdrop{position:fixed;inset:0;z-index:300;display:none;align-items:center;justify-content:center;padding:16px;background:rgba(35,29,24,.42)}
+.calendar-detail-backdrop.open{display:flex}
+body.calendar-detail-open{overflow:hidden}
+.calendar-detail{width:min(420px,100%);max-height:calc(100dvh - 32px);overflow:auto;border:1px solid var(--line);border-radius:16px;background:#fffefa;box-shadow:0 24px 70px rgba(0,0,0,.22)}
+.calendar-detail-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:16px 16px 13px;border-bottom:1px solid var(--line)}
+.calendar-detail-head h3{margin:8px 0 0;font-size:18px;line-height:1.35;font-weight:650;color:#2b2622}
+.calendar-detail-category{display:inline-flex;padding:4px 8px;border-radius:999px;font-size:10px;font-weight:700;color:#222}
+.calendar-detail-close{width:32px;height:32px;display:grid;place-items:center;flex:0 0 32px;border:1px solid var(--line);border-radius:9px;background:#fff;font-size:14px;color:#5d544d}
+.calendar-detail-body{padding:14px 16px 17px}
+.calendar-detail-row{display:grid;grid-template-columns:54px 1fr;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid #f0e7dc;font-size:12px}
+.calendar-detail-row>span{color:#8a7f76;font-size:10.5px}
+.calendar-detail-row>b{font-weight:600;color:#2d2824;min-width:0;overflow-wrap:anywhere}
+.calendar-detail-note{padding-top:12px}
+.calendar-detail-note>span{display:block;color:#8a7f76;font-size:10.5px;margin-bottom:6px}
+.calendar-detail-note p{margin:0;padding:10px 11px;border-radius:10px;background:#fbf7f0;font-size:12px;line-height:1.6;color:#3c3530;overflow-wrap:anywhere}
+.calendar-detail .detail-cancelled{color:#b34a42}
+.calendar-detail .is-cancelled-text{text-decoration:line-through;text-decoration-thickness:1px;color:#8b7f76}
+
+@media(max-width:700px){
+  /* 캘린더 날짜칸을 정확한 정사각형으로 고정 */
+  .calendar-grid>.day{
+    aspect-ratio:1 / 1!important;
+    min-height:0!important;
+    height:auto!important;
+    padding:3px 2px!important;
+  }
+  .calendar-grid>.day .day-num{
+    margin-bottom:2px!important;
+    font-size:9px!important;
+    line-height:1!important;
+  }
+  .calendar-grid>.day .day-events{
+    gap:1px!important;
+  }
+  /* 모바일은 카테고리 배경 + 시간만 노출. 상세는 탭 팝업에서 확인 */
+  .calendar-grid>.day .day-event{
+    min-height:11px!important;
+    height:11px!important;
+    padding:0 2px!important;
+    border-radius:3px!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    cursor:pointer;
+    overflow:hidden!important;
+  }
+  .calendar-grid>.day .event-main{
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    width:100%!important;
+    font-size:8.3px!important;
+    line-height:1!important;
+    font-weight:600!important;
+  }
+  .calendar-grid>.day .event-time{
+    display:block!important;
+    width:auto!important;
+    text-align:center!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:clip!important;
+  }
+  .calendar-grid>.day .day-event.venue-flexible .event-main::after{
+    content:'✓';
+    display:inline-block;
+    margin-left:2px;
+    color:#6558d8;
+    font-size:8px;
+    line-height:1;
+    font-weight:800;
+    flex:0 0 auto;
+  }
+  .calendar-grid>.day .event-title,
+  .calendar-grid>.day .event-sub,
+  .calendar-grid>.day .cancel-label{display:none!important}
+  .calendar-grid>.day .day-more{
+    height:9px!important;
+    padding:0!important;
+    font-size:7.5px!important;
+    line-height:9px!important;
+    text-align:center!important;
+    overflow:hidden!important;
+  }
+  .calendar-grid>.day.today{box-shadow:inset 0 0 0 1.5px var(--accent)!important}
+
+  /* 관리자 일정관리: 모바일 한 줄 전체 표시 + 가로스크롤 제거 */
+  .schedule-table-wrap{overflow:hidden!important;border-radius:10px!important}
+  .schedule-table{
+    width:100%!important;
+    min-width:0!important;
+    table-layout:fixed!important;
+  }
+  .schedule-table th,.schedule-table td{
+    padding:6px 1.5px!important;
+    font-size:7.6px!important;
+    line-height:1.1!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+    vertical-align:middle!important;
+  }
+  .schedule-table th{font-size:7px!important;letter-spacing:-.3px!important;text-align:center!important}
+  .schedule-table td{text-align:center!important}
+  .schedule-table .check-col{width:4%!important;padding:0!important}
+  .schedule-table .schedule-check{width:11px!important;height:11px!important;margin:0!important}
+  .schedule-table th:nth-child(2),.schedule-table td:nth-child(2){width:14%!important}
+  .schedule-table th:nth-child(3),.schedule-table td:nth-child(3){width:9%!important}
+  .schedule-table th:nth-child(4),.schedule-table td:nth-child(4){width:10%!important}
+  .schedule-table th:nth-child(5),.schedule-table td:nth-child(5){width:25%!important;text-align:left!important}
+  .schedule-table th:nth-child(6),.schedule-table td:nth-child(6){width:7%!important}
+  .schedule-table th:nth-child(7),.schedule-table td:nth-child(7){width:12%!important}
+  .schedule-table th:nth-child(8),.schedule-table td:nth-child(8){width:8%!important}
+  .schedule-table th:nth-child(9),.schedule-table td:nth-child(9){width:11%!important}
+  .schedule-date-desktop{display:none!important}
+  .schedule-date-mobile{display:inline!important}
+  .schedule-table .cat-tag{padding:2px 3px!important;font-size:6.8px!important;border-radius:4px!important}
+  .schedule-table td:nth-child(5) b{font-weight:600!important}
+  .schedule-table .schedule-status{padding:2px 3px!important;font-size:6.8px!important}
+  .schedule-table .venue-flex-mark{font-size:7px!important}
+  .schedule-table .actions{display:flex!important;justify-content:center!important;gap:1px!important;flex-wrap:nowrap!important}
+  .schedule-table .icon-btn{width:16px!important;height:16px!important;min-width:16px!important;border-radius:4px!important;padding:0!important;font-size:7px!important;display:grid!important;place-items:center!important}
+}
+
+@media(max-width:390px){
+  .calendar-grid>.day{padding:2px 1px!important}
+  .calendar-grid>.day .day-num{font-size:8.5px!important}
+  .calendar-grid>.day .day-event{height:10px!important;min-height:10px!important;padding:0 1px!important}
+  .calendar-grid>.day .event-main{font-size:7.8px!important}
+  .calendar-grid>.day .day-event.venue-flexible .event-main::after{font-size:7.4px!important;margin-left:1px}
+  .schedule-table th,.schedule-table td{font-size:7.1px!important;padding-left:1px!important;padding-right:1px!important}
+  .schedule-table th{font-size:6.6px!important}
+}
+
+/* mobile/network resilience */
+.public-load-warning{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 14px;padding:10px 12px;border:1px solid #ead7c4;background:#fff8ef;border-radius:12px;color:#765c43;font-size:12px;line-height:1.45}
+.public-load-warning button{flex:0 0 auto;border:0;background:#fff;border:1px solid #ddc6b0;border-radius:9px;padding:6px 9px;color:#765c43;font-weight:700;cursor:pointer}
+.public-fatal{text-align:center;line-height:1.65}.public-fatal small{color:#999}.public-fatal .btn{margin-top:12px}
+@media(max-width:700px){.public-load-warning{font-size:11px;padding:8px 10px}.public-load-warning button{padding:5px 7px;font-size:11px}}
+
+/* 머더미스터리 전용 리스트 / 숫자+회 입력 */
+.number-suffix-field{position:relative;display:flex;align-items:center}
+.number-suffix-field .field{padding-right:34px}
+.number-suffix-field>span{position:absolute;right:12px;color:var(--muted);font-size:12px;pointer-events:none}}
+.admin-load-warning{margin-top:-6px;background:#fff8e8;border-color:#f1dca8;color:#725b24}
+
+
+/* v30.1: 머더미스터리 온라인머미 체크/배지 */
+.murder-online-check-wrap{display:flex;align-items:end;padding-bottom:9px}
+.murder-online-check{display:inline-flex;align-items:center;gap:7px;font-size:12px;color:#5e554d;white-space:nowrap;cursor:pointer}
+.murder-online-check input{margin:0;accent-color:#8b70c7}
+.online-murder-badge{display:inline-flex;align-items:center;margin-left:7px;padding:3px 7px;border-radius:999px;background:#eee7fb;color:#6d55a0;font-size:9.5px;font-weight:700;line-height:1;vertical-align:middle;white-space:nowrap}
+.catalog-name-text{vertical-align:middle}
+@media(max-width:700px){
+  .online-murder-badge{margin-left:3px;padding:2px 4px;font-size:7px}
+  .catalog-table.murder-table .catalog-name{white-space:normal;line-height:1.15}
+  .murder-online-check-wrap{padding-bottom:4px}
+}
+
+/* v30 FINAL: 머더미스터리 최종 등록폼 / 리스트 */
+.murder-name-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:end}
+.murder-online-check-name{margin-bottom:10px;padding:0 2px}
+.catalog-table.murder-table th:nth-child(1),.catalog-table.murder-table td:nth-child(1){width:29%}
+.catalog-table.murder-table th:nth-child(2),.catalog-table.murder-table td:nth-child(2){width:12%}
+.catalog-table.murder-table th:nth-child(3),.catalog-table.murder-table td:nth-child(3){width:13%}
+.catalog-table.murder-table th:nth-child(4),.catalog-table.murder-table td:nth-child(4){width:13%}
+.catalog-table.murder-table th:nth-child(5),.catalog-table.murder-table td:nth-child(5){width:14%}
+.catalog-table.murder-table th:nth-child(6),.catalog-table.murder-table td:nth-child(6){width:19%}
+@media(max-width:700px){
+  .murder-name-row{grid-template-columns:minmax(0,1fr) auto;gap:7px}
+  .murder-online-check-name{margin-bottom:9px;font-size:10px}
+  .catalog-table.murder-table th:nth-child(1),.catalog-table.murder-table td:nth-child(1){width:30%;text-align:left;padding-left:5px}
+  .catalog-table.murder-table th:nth-child(2),.catalog-table.murder-table td:nth-child(2){width:11%}
+  .catalog-table.murder-table th:nth-child(3),.catalog-table.murder-table td:nth-child(3){width:12%}
+  .catalog-table.murder-table th:nth-child(4),.catalog-table.murder-table td:nth-child(4){width:13%}
+  .catalog-table.murder-table th:nth-child(5),.catalog-table.murder-table td:nth-child(5){width:15%}
+  .catalog-table.murder-table th:nth-child(6),.catalog-table.murder-table td:nth-child(6){width:19%;padding-right:4px}
+}
+
+
+/* ===== v31 머더미스터리 최종 7열 + 온라인머미 우회 저장 ===== */
+.catalog-table.murder-table{min-width:820px!important;table-layout:fixed!important}
+.catalog-table.murder-table th:nth-child(1),.catalog-table.murder-table td:nth-child(1){width:25%!important}
+.catalog-table.murder-table th:nth-child(2),.catalog-table.murder-table td:nth-child(2){width:10%!important}
+.catalog-table.murder-table th:nth-child(3),.catalog-table.murder-table td:nth-child(3){width:11%!important}
+.catalog-table.murder-table th:nth-child(4),.catalog-table.murder-table td:nth-child(4){width:11%!important}
+.catalog-table.murder-table th:nth-child(5),.catalog-table.murder-table td:nth-child(5){width:14%!important}
+.catalog-table.murder-table th:nth-child(6),.catalog-table.murder-table td:nth-child(6){width:12%!important}
+.catalog-table.murder-table th:nth-child(7),.catalog-table.murder-table td:nth-child(7){width:17%!important;padding-right:14px}
+.catalog-table.murder-table .catalog-owner,.catalog-table.murder-table .catalog-note{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.catalog-table.murder-table .catalog-owner{color:var(--muted)}
+.catalog-table.murder-table .catalog-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.catalog-table.murder-table .catalog-name-text{display:inline;max-width:100%;overflow:hidden;text-overflow:ellipsis;vertical-align:middle}
+@media(max-width:700px){
+  .catalog-table.murder-table{min-width:0!important;width:100%!important;table-layout:fixed!important}
+  .catalog-table.murder-table th,.catalog-table.murder-table td{font-size:7.9px!important;padding:6px 1px!important;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .catalog-table.murder-table th{font-size:7.6px!important;letter-spacing:-.35px}
+  .catalog-table.murder-table th:nth-child(1),.catalog-table.murder-table td:nth-child(1){width:25%!important;text-align:left;padding-left:4px!important}
+  .catalog-table.murder-table th:nth-child(2),.catalog-table.murder-table td:nth-child(2){width:10%!important}
+  .catalog-table.murder-table th:nth-child(3),.catalog-table.murder-table td:nth-child(3){width:10%!important}
+  .catalog-table.murder-table th:nth-child(4),.catalog-table.murder-table td:nth-child(4){width:11%!important}
+  .catalog-table.murder-table th:nth-child(5),.catalog-table.murder-table td:nth-child(5){width:14%!important}
+  .catalog-table.murder-table th:nth-child(6),.catalog-table.murder-table td:nth-child(6){width:12%!important}
+  .catalog-table.murder-table th:nth-child(7),.catalog-table.murder-table td:nth-child(7){width:18%!important;padding-right:3px!important}
+  .catalog-table.murder-table .online-murder-badge{font-size:6.4px!important;padding:2px 3px!important;margin-left:2px!important}
+}
+
+/* ===== DOTT v36 월별 단독 캘린더 + PC 일정 상세 팝업 ===== */
+.day.empty-day{
+  background:#fbf8f2;
+  min-height:142px;
+}
+.day.empty-day::after{content:none}
+.day-event[role="button"]{cursor:pointer}
+.day-event[role="button"]:focus-visible{outline:2px solid #d98a61;outline-offset:2px}
+@media(max-width:900px){.day.empty-day{min-height:132px}}
+@media(max-width:700px){.day.empty-day{min-height:122px}}
+@media(max-width:390px){.day.empty-day{min-height:116px}}
+
+/* 보드게임 확장 배지 */
+.boardgame-expansion-badge{
+  display:inline-flex;
+  align-items:center;
+  margin-left:7px;
+  padding:3px 7px;
+  border-radius:999px;
+  background:#fde8e8;
+  color:#b33f45;
+  border:1px solid #f3c6c8;
+  font-size:9.5px;
+  font-weight:700;
+  line-height:1;
+  vertical-align:middle;
+  white-space:nowrap;
+}
+@media(max-width:700px){
+  .boardgame-expansion-badge{margin-left:3px;padding:2px 4px;font-size:7px}
+  .catalog-name{white-space:normal;line-height:1.15}
+}
+
+/* 관리자 카탈로그 플래그 */
+.catalog-flag-check{display:inline-flex;align-items:center;gap:7px;font-size:12px;color:#5e554d;white-space:nowrap;cursor:pointer}
+.catalog-flag-check input{margin:0;accent-color:#c55358}
+@media(max-width:700px){.catalog-flag-check{font-size:10px}}
+
+
+/* DOTT catalog layout exact-sync 2026-09-25 */
+.catalog-page .stat-pill{display:inline-flex;align-items:center;justify-content:center;gap:4px;width:80px;height:30px;padding:0 8px;line-height:1;white-space:nowrap}.catalog-page .stat-pill .stat-label{display:inline-block;flex:0 0 auto}
+.catalog-page>.section{margin-top:28px}
+.catalog-page .filters{margin-top:20px;margin-bottom:20px}
+.catalog-page .catalog-meta{margin-top:18px;margin-bottom:18px}
+
+/* ===== 회비 · 회계 관리자 ===== */
+.accounting-subtabs{display:flex;gap:7px;margin:0 0 18px;flex-wrap:wrap}.accounting-subtab{border:1px solid var(--line);background:#fff;border-radius:10px;padding:10px 14px;font-size:12px;font-weight:700}.accounting-subtab.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.accounting-monthbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;flex-wrap:wrap}.accounting-monthnav{display:flex;align-items:center;gap:8px}.accounting-monthtitle{font-size:20px;font-weight:800;min-width:135px;text-align:center}.accounting-summary{display:grid;grid-template-columns:repeat(5,1fr);gap:9px;margin:14px 0}.accounting-stat{border:1px solid var(--line);border-radius:12px;background:#fff;padding:13px}.accounting-stat small{display:block;color:var(--muted);font-size:11px}.accounting-stat b{display:block;font-size:18px;margin-top:6px}.accounting-stat.green{background:#eff9f1}.accounting-stat.red{background:#fff1ef}.accounting-stat.purple{background:#f6f0ff}.accounting-stat.yellow{background:#fff7e9}
+.accounting-controls{display:flex;justify-content:space-between;gap:10px;align-items:center;margin:14px 0;flex-wrap:wrap}.accounting-filters{display:flex;gap:6px;flex-wrap:wrap}.accounting-chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 11px;font-size:11px}.accounting-chip.active{background:var(--accent);border-color:var(--accent);color:#fff}.accounting-search{max-width:260px}.money-in{color:#28764a;font-weight:800}.money-out{color:#d94841;font-weight:800}.money-payable{color:#7c3aed;font-weight:800}.fee-paid{background:#eaf7ee;color:#28764a}.fee-unpaid{background:#fff0ef;color:#c64a42}.fee-exempt{background:#fff6df;color:#9b741c}.fee-manage{border:0;border-radius:8px;padding:7px 9px;font-size:11px;font-weight:800}.accounting-lockbar{border:1px solid #e6d7c5;background:#fffaf4;border-radius:12px;padding:13px 14px;display:flex;justify-content:space-between;gap:10px;align-items:center;margin:12px 0}.accounting-lock{background:#f1eee9;border-radius:8px;padding:6px 9px;font-size:11px;font-weight:800}.receipt-link{border:1px solid #d8cdf7;background:#f7f3ff;color:#6d4cc7;border-radius:8px;padding:6px 8px;font-size:11px;font-weight:800}.receipt-preview{max-width:100%;max-height:55vh;display:block;margin:auto}.accounting-report{background:#fff;border:1px solid var(--line);border-radius:14px;padding:22px}.report-title{text-align:center;margin:0}.report-period{text-align:center;color:var(--muted);font-size:12px}.report-cats{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:14px 0}.report-cat{text-align:center;border:1px solid var(--line);border-radius:10px;padding:10px}.report-payable-total{border:1px solid #ead5ff;background:#faf6ff;border-radius:10px;padding:12px;margin:12px 0}.accounting-note{font-size:11px;color:var(--muted);line-height:1.55;margin-top:9px}
+@media(max-width:900px){.accounting-summary{grid-template-columns:repeat(2,1fr)}.accounting-summary .accounting-stat:last-child{grid-column:1/-1}.report-cats{grid-template-columns:repeat(2,1fr)}.accounting-controls{align-items:stretch;flex-direction:column}.accounting-search{max-width:none}}
+@media print{body *{visibility:hidden}.accounting-report,.accounting-report *{visibility:visible}.accounting-report{position:absolute;left:0;top:0;width:100%;border:0}.topbar,.tabs,.accounting-subtabs,.accounting-monthbar,.info-box,.footer{display:none!important}}
+
+
+/* ===== 회비·회계 UI 보정 2026-09-25 ===== */
+.accounting-modal{width:min(390px,calc(100vw - 28px))!important;border-radius:14px!important}
+.accounting-modal .modal-head{padding:13px 15px}.accounting-modal .modal-body{padding:14px 15px}.accounting-modal .modal-foot{padding:11px 15px}
+.accounting-modal .form-grid{gap:8px}.accounting-modal .field{padding:8px 9px}.accounting-modal .label{margin-bottom:4px}
+.accounting-modal-ledger{width:min(430px,calc(100vw - 28px))!important}
+.ledger-table th,.ledger-table td{height:41px!important;padding:8px 13px!important;line-height:1.2!important;vertical-align:middle!important}
+.ledger-table tbody tr{height:41px!important}.ledger-table .btn,.ledger-table .receipt-link{padding:6px 8px!important;line-height:1.1!important}
+
+/* 월별 보고서: 승인된 '도파민 2026년 9월 회계 보고서' 시안 기준 */
+.accounting-report.final-report{background:#fff;border:0;border-radius:0;padding:46px 48px;color:#262321;box-shadow:0 8px 30px #0002;max-width:900px;margin:18px auto 50px}
+.final-report .fr-header{text-align:center;border-bottom:2px solid #2e2a27;padding-bottom:20px}.final-report .fr-header h2{font-size:30px;margin:0 0 8px}.final-report .fr-header p{margin:3px;color:#786f67;font-size:13px}
+.final-report .fr-sec{margin-top:27px}.final-report .fr-sec>h3{font-size:18px;border-left:4px solid #f45b22;padding-left:10px;margin:0 0 12px}
+.final-report .fr-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}.final-report .fr-card{border:1px solid #e5dbcf;border-radius:10px;padding:14px;background:#fcfaf7}.final-report .fr-card small{display:block;color:#7c736b;margin-bottom:6px}.final-report .fr-card b{font-size:19px}.final-report .fr-card.green{background:#eff9f1}.final-report .fr-card.red{background:#fff1ef}.final-report .fr-card.orange{background:#fff4e9}
+.final-report .fr-total{border:2px solid #f45b22;border-radius:12px;padding:0 18px;margin-top:12px;display:flex;justify-content:space-between;align-items:center;min-height:78px}.final-report .fr-total strong{font-size:24px}
+.final-report .fr-cats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}.final-report .fr-cat{border:1px solid #e5dbcf;border-radius:9px;padding:11px;text-align:center}.final-report .fr-cat b{display:block;margin-top:5px}
+.final-report table{width:100%;border-collapse:collapse;font-size:12px;min-width:0}.final-report th{background:#f8f4ee}.final-report th,.final-report td{border:1px solid #e3d9cd;padding:8px 7px;text-align:left;vertical-align:middle}.final-report td.num{text-align:right}
+.final-report .fr-unpaidbox{border:1px solid #edc7a9;border-radius:12px;overflow:hidden}.final-report .fr-unpaidhead{display:flex;justify-content:space-between;align-items:center;background:#fff5eb;padding:13px 15px}.final-report .fr-unpaidhead strong{font-size:18px;color:#c5521e}.final-report .fr-unpaidbox table{border:0}.final-report .fr-unpaidbox th,.final-report .fr-unpaidbox td{border-left:0;border-right:0}.final-report .fr-sumrow td{font-weight:800;background:#fff9f3}.final-report .fr-note{font-size:11px;color:#81776f;line-height:1.5;margin-top:9px}.final-report .payable-table th,.final-report .payable-table td{text-align:center!important}
+@media(max-width:700px){.accounting-report.final-report{padding:26px 18px}.final-report .fr-header h2{font-size:24px}.final-report .fr-cards{grid-template-columns:repeat(2,1fr)}.final-report .fr-cats{grid-template-columns:repeat(2,1fr)}.final-report table{font-size:10px}.final-report th,.final-report td{padding:6px 4px}}
+@media print{.accounting-report.final-report{width:100%;max-width:none;margin:0;box-shadow:none;padding:12mm}.accounting-report.final-report,.accounting-report.final-report *{visibility:visible}}
+
+/* DOTT unified catalog owner UI — boardgame / murder / deduction */
+
+
+.owner-count{appearance:none;border:1px solid #dfd2c5;background:#fff8f1;border-radius:999px;padding:2px 5px;font:inherit;font-weight:700;color:#6d6258;line-height:1.1;cursor:pointer;vertical-align:middle}
+
+.owner-popup{position:relative;width:min(260px,calc(100vw - 40px));background:#fffdf9;border:1px solid #e4d7c8;border-radius:14px;padding:20px 16px 15px;box-shadow:0 14px 40px #0002;text-align:center}
+.owner-popup b{display:block;font-size:15px;margin-bottom:12px}.owner-popup-x{position:absolute;right:9px;top:7px;border:0;background:transparent;font-size:21px;color:#81766c;cursor:pointer}.owner-popup-ok{margin-top:15px;border:0;border-radius:9px;background:#ef632d;color:#fff;font-weight:800;padding:7px 20px;cursor:pointer}
+.status-owned,.status-dott{background:#e8f1ff!important;color:#3567a8!important}.status-workshop{background:#eee7fb!important;color:#6d55a0!important}.status-rented{background:#fff2d8!important;color:#9b6a12!important}.status-lost{background:#ffe9e7!important;color:#c64a40!important}
+.notice-open-btn{appearance:none;border:1px solid #e8a27f;border-radius:10px;background:var(--accent-soft);padding:5px 10px;line-height:1.2;color:#9a3f18;font-size:12px;font-weight:800;cursor:pointer;box-shadow:none}
+
+@media(max-width:700px){
+ .catalog-owner .owner-desktop{display:none!important}.catalog-owner .owner-mobile{display:inline-block!important}
+ .catalog-owner .owner-count{padding:1px 3px!important;font-size:inherit!important;line-height:1!important;min-width:0!important;height:auto!important;vertical-align:baseline!important}
+ .catalog-table tbody tr:hover{background:transparent!important}
+ .notice-open-btn{padding:5px 9px;font-size:11px}
+}
+@media(hover:none),(pointer:coarse){.catalog-table tbody tr:hover{background:transparent!important}.owner-count:hover{filter:none!important;transform:none!important;background:#fff8f1!important}}
+
+/* 관리자 > 머더미스터리 상단 편집영역: PC 2열 / 모바일 1열 */
+.murder-admin-editors{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+  gap:16px;
+  align-items:stretch;
+}
+.murder-admin-editors>.catalog-admin-desc{
+  margin:0;
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+}
+.murder-admin-editors>.catalog-admin-desc .catalog-admin-desc-row{
+  margin-top:auto;
+}
+
+
+@media(max-width:700px){
+  .murder-admin-editors{grid-template-columns:1fr;gap:14px}
+  .murder-admin-editors #catalogDesc{min-height:80px;height:auto}
+  .murder-admin-editors #murderNotice{min-height:150px;height:auto}
+}
+
+/* 관리자 머더 편집 카드: 저장 버튼 우측 상단, 입력영역 전폭 */
+.murder-admin-editors .catalog-admin-card-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:10px;
+}
+.murder-admin-editors .catalog-admin-card-head .label{margin:0}
+.murder-admin-editors .catalog-admin-card-head .btn{
+  flex:0 0 auto;
+  white-space:nowrap;
+}
+.murder-admin-editors .catalog-admin-desc-row{
+  display:block!important;
+  width:100%;
+  margin-top:0!important;
+}
+.murder-admin-editors .catalog-admin-desc-row .field{
+  width:100%!important;
+  max-width:none!important;
+}
+.murder-admin-editors #catalogDesc{
+  min-height:156px;
+  height:156px;
+}
+.murder-admin-editors #murderNotice{
+  min-height:96px;
+  height:96px;
+}
+@media(max-width:700px){
+  .murder-admin-editors .catalog-admin-card-head{align-items:flex-start}
+}
+
+/* 관리자 > 머더미스터리: 상단 카드/등록도구/목록 간격 보정 */
+.murder-admin-editors{
+  margin-bottom:18px!important;
+}
+.murder-admin-editors + .admin-tools{
+  margin-top:0!important;
+  margin-bottom:14px!important;
+  min-height:38px;
+  align-items:center;
+}
+.murder-admin-editors + .admin-tools + .table-wrap{
+  margin-top:0!important;
+}
+@media(max-width:700px){
+  .murder-admin-editors{margin-bottom:14px!important}
+  .murder-admin-editors + .admin-tools{margin-bottom:12px!important}
+}
+
+
+/* ===== 공개 보유목록 공통 구조: boardgame / murder / deduction ===== */
+/* 보유 리스트 설명문 폰트 - 머더미스터리와 동일 */
+.catalog-page .hero p{font-size:14px!important;line-height:1.7!important}
+
+/* 확장 배지 */
+.boardgame-expansion-badge{display:inline-flex;align-items:center;padding:3px 7px;border-radius:999px;background:#fde8e8;border:1px solid #f3b9b9;color:#b83232;font-size:9.5px;font-weight:800;line-height:1;white-space:nowrap}
+
+
+/* 모바일 표 폰트/비율을 머더미스터리 기준에 맞춰 재정리 */
+.catalog-kind-table{table-layout:fixed!important}
+.catalog-kind-table th,.catalog-kind-table td{text-align:center!important;vertical-align:middle}
+.catalog-kind-table th{text-align:center!important}
+.catalog-kind-table td:first-child{text-align:left!important}
+.catalog-kind-table .catalog-name{min-width:0}
+.catalog-name-inner{display:flex;align-items:center;gap:6px;min-width:0}
+.catalog-kind-table .catalog-name-text{display:block;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.catalog-kind-table .boardgame-expansion-badge{flex:0 0 auto}
+.catalog-kind-table .catalog-note{text-align:center!important;max-width:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.catalog-status{border:1px solid transparent}
+.catalog-status.status-owned{background:#edf7ef;color:#3c8152;border-color:#d7eadc}
+.catalog-status.status-rented{background:#fff1df;color:#b96b22;border-color:#f4d7b5}
+.catalog-status.status-lost{background:#fde9e9;color:#b13b3b;border-color:#f1c8c8}
+.catalog-status.status-dott{background:#eaf3ff;color:#3c6fa8;border-color:#d0e2f7}
+.catalog-status.status-workshop{background:#f1ebfb;color:#6c53a3;border-color:#ddd1f0}
+
+/* DOTT v61 PC 비율 - 시간 범위와 5칸 난이도 게이지를 한 줄로 보여주도록 재배분 */
+@media(max-width:700px){
+  .catalog-kind-table{width:100%!important;min-width:0!important;table-layout:fixed!important}
+  .catalog-kind-table th,.catalog-kind-table td{padding:7px 2px!important;font-size:7.2px!important;overflow:hidden;vertical-align:middle!important}
+  .catalog-kind-table th{font-size:6.7px!important;letter-spacing:-.28px;text-align:center!important;white-space:nowrap!important}
+  .catalog-kind-table .catalog-name{padding-left:4px!important}
+  .catalog-name-inner{display:flex!important;align-items:center!important;gap:2px!important;min-width:0!important;width:100%!important;max-width:100%!important}
+  .catalog-kind-table .catalog-name-text{display:-webkit-box!important;min-width:0!important;overflow:hidden!important;text-overflow:clip!important;white-space:normal!important;-webkit-box-orient:vertical!important;-webkit-line-clamp:2!important;line-height:1.22!important;overflow-wrap:anywhere!important;font-size:7.2px!important}
+  .catalog-kind-table td:nth-child(2),.catalog-kind-table td:nth-child(3),.catalog-kind-table td:nth-child(4),.catalog-kind-table td:nth-child(5),.catalog-kind-table td:nth-child(6),.catalog-kind-table td:nth-child(7){letter-spacing:-.18px}
+  .catalog-kind-table .boardgame-expansion-badge{margin-left:0;padding:2px 4px;font-size:6.8px;line-height:1;flex:0 0 auto;align-self:center}
+  .catalog-kind-table .catalog-status{font-size:6.9px;padding:2px 4px;white-space:nowrap!important}
+  .catalog-kind-table .catalog-owner{font-size:7px!important}
+
+  /* v72 mobile columns: game-name font size synced to murder list and widths rebalanced for 2-line titles + 5-box meter */
+  }
+
+
+/* 플레이시간은 60~90분 같은 범위도 한 줄 고정 */
+.catalog-kind-table th:nth-child(3),.catalog-kind-table td:nth-child(3){white-space:nowrap!important;word-break:keep-all!important}
+
+/* 보드게임/추리게임 난이도 5칸 게이지 + 모바일 5칸 보장 */
+.catalog-kind-table .catalog-difficulty{text-align:center!important;white-space:nowrap!important}
+.difficulty-meter{display:inline-flex;align-items:center;gap:3px;vertical-align:middle;white-space:nowrap}
+.difficulty-box{display:inline-block;width:11px;height:11px;box-sizing:border-box;border:1px solid #dccdc0;border-radius:2px;background:linear-gradient(90deg,#e46f3a 0 var(--fill),#fffaf6 var(--fill) 100%)}
+@media(max-width:700px){
+  .catalog-kind-table .catalog-difficulty{padding-left:1px!important;padding-right:1px!important;overflow:visible!important}
+  .difficulty-meter{gap:1.5px;max-width:100%}
+  .difficulty-box{width:8px;height:8px;border-radius:1.5px;flex:0 0 8px}
+}
+
+/* mobile filters synced to murder page sizing */
+@media(max-width:700px){
+  .catalog-page .filters{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+    gap:7px!important;
+    margin:16px 0!important;
+  }
+  .catalog-page .filters .search-field{
+    grid-column:1/-1!important;
+  }
+  .catalog-page .filters .field{
+    width:100%!important;
+    min-width:0!important;
+    box-sizing:border-box!important;
+    padding:9px 8px!important;
+    min-height:36px!important;
+    border-radius:10px!important;
+    font-size:11px!important;
+    line-height:1.2!important;
+  }
+}
+
+
+/* 상태 및 위치 5색 통일 — 요청 외 레이아웃 변경 없음 */
+.catalog-status.status-dott{background:#eaf3ff!important;color:#356aa6!important;border-color:#cbdff6!important}
+.catalog-status.status-workshop{background:#eaf7ee!important;color:#347a4a!important;border-color:#cfe8d7!important}
+.catalog-status.status-rented{background:#fff7d9!important;color:#9a7415!important;border-color:#eedf9f!important}
+.catalog-status.status-owned{background:#f1e9fb!important;color:#7350a5!important;border-color:#ddd1f0!important}
+.catalog-status.status-lost{background:#fde9e9!important;color:#b13b3b!important;border-color:#f1c8c8!important}
+
+/* 추리게임: 데이터가 적어도 공용 리스트 폭 유지 */
+html{overflow-y:scroll;scrollbar-gutter:stable}
+.catalog-kind-table.deduction-table{width:100%!important}
+@media(max-width:900px){html{scrollbar-gutter:auto}}
+
+
+/* ===== 머더미스터리 전용 기능만 ===== */
+.murder-page #desc{white-space:pre-line}
+
+/* 공지 버튼/팝업 */
+.notice-open-btn{appearance:none;border:1px solid #e8a27f;border-radius:10px;background:var(--accent-soft);padding:5px 10px;line-height:1.2;color:#9a3f18;font-size:12px;font-weight:800;cursor:pointer;box-shadow:none;transition:background .16s ease,border-color .16s ease,transform .16s ease;text-align:center;white-space:nowrap;align-self:center}
+.notice-open-btn.is-loading{visibility:hidden}
+.notice-open-btn:hover{background:#ffdccc;border-color:#df8458;transform:translateY(-1px)}
+.notice-open-btn:focus-visible{outline:3px solid rgba(233,93,32,.20);outline-offset:2px}
+.murder-notice-backdrop{position:fixed;inset:0;z-index:400;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(35,29,24,.46)}
+.murder-notice-backdrop.open{display:flex}
+.murder-notice-modal{width:min(560px,100%);max-height:calc(100dvh - 36px);overflow:auto;border:1px solid var(--line);border-radius:18px;background:#fffefa;box-shadow:0 24px 70px rgba(0,0,0,.22)}
+.murder-notice-head{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:18px 20px;border-bottom:1px solid var(--line)}
+.murder-notice-head h3{margin:0;font-size:19px}
+.murder-notice-close{width:34px;height:34px;border:1px solid var(--line);border-radius:10px;background:#fff;color:#5d544d;cursor:pointer}
+.murder-notice-content{padding:20px;font-size:13px;line-height:1.8;white-space:pre-wrap;overflow-wrap:anywhere;color:#3b342e}
+.murder-notice-empty{color:var(--muted)}
+body.murder-notice-open{overflow:hidden}
+
+/* 온라인 배지 */
+.murder-page .online-murder-badge{display:inline-flex;align-items:center;flex:0 0 auto;margin:0;padding:3px 7px;border-radius:999px;background:#f1e9fb;border:1px solid #ddd1f0;color:#7350a5;font-size:9.5px;font-weight:800;line-height:1;white-space:nowrap}
+
+/* 소유주 팝업 */
+.owner-mobile{display:none}
+.owner-desktop{white-space:normal;word-break:keep-all}
+.owner-count{border:1px solid #dfd2c5;background:#fff8f1;border-radius:999px;padding:4px 7px;font:inherit;font-weight:800;color:#6d6258;cursor:pointer}
+.owner-popup-overlay{position:fixed;inset:0;z-index:9999;background:rgba(38,32,27,.28);display:flex;align-items:center;justify-content:center;padding:20px}
+.owner-popup{position:relative;width:min(280px,calc(100vw - 40px));background:#fffdf9;border:1px solid #e4d7c8;border-radius:16px;padding:22px 18px 16px;box-shadow:0 14px 40px #0002;text-align:center}
+.owner-popup b{display:block;font-size:15px;margin-bottom:13px}
+.owner-popup-names{font-size:14px;font-weight:700;line-height:1.7;word-break:keep-all}
+.owner-popup-x{position:absolute;right:10px;top:8px;border:0;background:transparent;font-size:22px;color:#81766c;cursor:pointer}
+.owner-popup-ok{margin-top:16px;border:0;border-radius:9px;background:#ef632d;color:#fff;font-weight:800;padding:8px 22px;cursor:pointer}
+
+/* 비고: 모바일 공백 제외 최대 8글자 */
+.murder-note-mobile{display:none}
+
+/* PC hover만 */
+@media (hover:hover) and (pointer:fine){
+  .murder-page .catalog-table tbody tr:hover{background:#fffaf4}
+}
+
+/* 머더 모바일에서만 필요한 차이 */
+@media(max-width:700px){
+  .murder-page .notice-open-btn{padding:5px 9px!important;font-size:11px!important;line-height:1.2!important;transform:none!important}
+
+  .murder-page .catalog-owner .owner-desktop{display:none!important}
+  .murder-page .catalog-owner .owner-mobile{display:inline-block!important}
+  .murder-page .catalog-owner .owner-count{padding:1px 4px!important;font-size:7px!important;line-height:1.15!important;min-width:0!important;height:auto!important;border-radius:999px!important;vertical-align:middle!important}
+
+  .murder-page .catalog-name-inner{gap:2px!important}
+  .murder-page .catalog-name-inner .catalog-name-text{display:-webkit-box!important;flex:0 1 auto!important;min-width:0!important;max-width:calc(100% - 30px)!important;overflow:hidden!important;text-overflow:clip!important;white-space:normal!important;-webkit-box-orient:vertical!important;-webkit-line-clamp:2!important;overflow-wrap:anywhere!important;font-size:7.2px!important;line-height:1.22!important}
+  .murder-page .online-murder-badge{padding:2px 4px!important;font-size:6.8px!important}
+
+  .murder-page .murder-note-full{display:none!important}
+  .murder-page .murder-note-mobile{display:inline!important;white-space:nowrap!important}
+
+  /* 사용자가 지정한 머더 모바일 열 비율 */
+  .murder-page .murder-table{table-layout:fixed!important;width:100%!important;min-width:0!important}
+  .murder-page .murder-table th,.murder-page .murder-table td{padding:7px 2px!important;font-size:7.2px!important;line-height:1.2!important;vertical-align:middle!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+  .murder-page .murder-table th{font-size:6.7px!important;letter-spacing:-.28px!important;text-align:center!important}
+  .murder-page .murder-table th:nth-child(1),.murder-page .murder-table td:nth-child(1){width:34%!important}
+  .murder-page .murder-table th:nth-child(2),.murder-page .murder-table td:nth-child(2){width:9%!important}
+  .murder-page .murder-table th:nth-child(3),.murder-page .murder-table td:nth-child(3){width:9%!important}
+  .murder-page .murder-table th:nth-child(4),.murder-page .murder-table td:nth-child(4){width:9%!important}
+  .murder-page .murder-table th:nth-child(5),.murder-page .murder-table td:nth-child(5){width:12%!important}
+  .murder-page .murder-table th:nth-child(6),.murder-page .murder-table td:nth-child(6){width:11%!important}
+  .murder-page .murder-table th:nth-child(7),.murder-page .murder-table td:nth-child(7){width:16%!important}
+  .murder-page .murder-table td:nth-child(1){text-align:left!important;padding-left:4px!important}
+  .murder-page .murder-table td:nth-child(n+2):nth-child(-n+7){text-align:center!important}
+  .murder-page .murder-table td.catalog-note{font-size:7px!important;letter-spacing:-.12px!important;padding-left:1px!important;padding-right:1px!important}
+}
+@media(hover:none),(pointer:coarse){
+  .murder-page .catalog-table tbody tr:hover{background:transparent!important}
+  .murder-page .owner-count:hover{filter:none!important;transform:none!important}
+  .murder-page .notice-open-btn:hover{background:var(--accent-soft)!important;border-color:#e8a27f!important;transform:none!important}
+}
+
+
+/* ===== DOTT 공개 보유목록 최종 공통 규격 =====
+   보드게임 / 머더미스터리 / 추리게임 PC 구조는 이 규칙 하나만 사용 */
+
+@media(min-width:701px){
+  .catalog-page .catalog-table-wrap{
+    width:100%;
+  }
+  .catalog-page .catalog-kind-table{
+    width:100%!important;
+    min-width:0!important;
+    table-layout:fixed!important;
+  }
+  .catalog-page .catalog-kind-table th,
+  .catalog-page .catalog-kind-table td{
+    padding:12px 14px!important;
+    font-size:12px!important;
+    line-height:1.2!important;
+    vertical-align:middle!important;
+  }
+  .catalog-page .catalog-kind-table th{
+    font-size:11px!important;
+    text-align:center!important;
+  }
+  .catalog-page .catalog-kind-table th:nth-child(1),
+  .catalog-page .catalog-kind-table td:nth-child(1){width:27%!important}
+  .catalog-page .catalog-kind-table th:nth-child(2),
+  .catalog-page .catalog-kind-table td:nth-child(2){width:9%!important}
+  .catalog-page .catalog-kind-table th:nth-child(3),
+  .catalog-page .catalog-kind-table td:nth-child(3){width:12%!important}
+  .catalog-page .catalog-kind-table th:nth-child(4),
+  .catalog-page .catalog-kind-table td:nth-child(4){width:14%!important}
+  .catalog-page .catalog-kind-table th:nth-child(5),
+  .catalog-page .catalog-kind-table td:nth-child(5){width:12%!important}
+  .catalog-page .catalog-kind-table th:nth-child(6),
+  .catalog-page .catalog-kind-table td:nth-child(6){width:13%!important}
+  .catalog-page .catalog-kind-table th:nth-child(7),
+  .catalog-page .catalog-kind-table td:nth-child(7){width:13%!important}
+  .catalog-page .catalog-kind-table td:first-child{
+    text-align:left!important;
+  }
+  .catalog-page .catalog-kind-table td:not(:first-child){
+    text-align:center!important;
+  }
+}
+
+
+/* ===== DOTT 대여 관리대장 ===== */
+.rental-guide p{margin:7px 0 0;color:var(--muted);font-size:12px;line-height:1.6}
+.rental-section{margin-top:18px}
+.rental-section-head{display:flex;align-items:center;justify-content:space-between;margin:0 0 8px;font-size:13px}
+.rental-section-head span{color:var(--muted);font-size:12px}
+.rental-table th,.rental-table td{text-align:center}
+.rental-table td:first-child{text-align:left}
+.rental-status{display:inline-flex;padding:4px 8px;border-radius:999px;font-size:11px;font-weight:800}
+.rental-active{background:#fff3cd;color:#856404}
+.rental-done{background:#eef1f4;color:#59636e}
+.rental-return-btn{padding:6px 10px;font-size:11px}
+.rental-fields{grid-template-columns:1fr 1fr;gap:12px;margin-top:2px;padding:12px;border:1px solid var(--line);border-radius:12px;background:#fafafa}
+@media(max-width:700px){.rental-fields{grid-template-columns:1fr}.rental-table th,.rental-table td{font-size:10px;padding:8px 5px}.rental-return-btn{padding:5px 7px;font-size:9px}}
+
+
+/* PC 대여중 배지는 상세 확인 가능함을 포인터로 표시 */
+@media (hover:hover) and (pointer:fine) and (min-width:769px){
+  .catalog-status.status-rented[data-rental-tooltip]{cursor:pointer}
+}
+
+/* PC 대여중 대여자 말풍선 - body 레벨이라 테이블 overflow에 잘리지 않음 */
+.rental-hover-tooltip{
+  position:fixed;z-index:99999;pointer-events:none;white-space:nowrap;
+  background:#2f2f2f;color:#fff;border-radius:7px;padding:6px 9px;
+  font-size:11px;font-weight:700;line-height:1.25;
+  box-shadow:0 3px 10px rgba(0,0,0,.16)
+}
+.rental-hover-tooltip::after{
+  content:'';position:absolute;left:50%;bottom:-5px;transform:translateX(-50%);
+  border-left:5px solid transparent;border-right:5px solid transparent;border-top:5px solid #2f2f2f
+}
+@media (hover:none),(pointer:coarse),(max-width:768px){.rental-hover-tooltip{display:none!important}}
+
+
+/* v66 오늘 뭐하지? 보드게임 랜덤 추천기 */
+.recommend-open-btn{display:inline-flex;align-items:center;justify-content:center;width:auto;min-width:80px;height:30px;box-sizing:border-box;border:0;border-radius:999px;padding:0 12px;background:#4f7cff;color:#fff;font-size:12px;font-weight:800;line-height:1;white-space:nowrap;cursor:pointer;box-shadow:0 4px 12px rgba(79,124,255,.22)}
+.recommend-open-btn:hover{transform:translateY(-1px)}
+.recommend-backdrop{position:fixed;inset:0;z-index:5000;background:rgba(15,23,42,.45);display:flex;align-items:center;justify-content:center;padding:18px}
+.recommend-modal{width:min(620px,100%);max-height:90vh;overflow:auto;background:#fff;border-radius:22px;padding:22px;box-shadow:0 24px 70px rgba(15,23,42,.24)}
+.recommend-head{display:flex;justify-content:space-between;gap:16px;align-items:flex-start}.recommend-head h3{margin:0;font-size:22px}.recommend-head p{margin:6px 0 0;color:var(--muted);font-size:13px}.recommend-close{border:0;background:transparent;font-size:20px;cursor:pointer;padding:3px 6px}
+.recommend-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:20px}.recommend-fields label{font-size:12px;font-weight:800;color:#475569}.recommend-fields .field{width:100%;margin-top:6px}
+.recommend-result{margin-top:18px;min-height:150px}.recommend-placeholder,.recommend-empty{min-height:150px;border:1px dashed #cbd5e1;border-radius:16px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:5px;text-align:center;color:#64748b;font-size:13px}.recommend-empty b{color:#111827;font-size:16px}
+.recommend-result-card{position:relative;border:1px solid #e2e8f0;border-radius:18px;padding:20px;background:#f8fafc;text-align:center}.recommend-result-kicker{font-size:11px;color:#64748b;font-weight:700}.recommend-result-name{font-size:25px;font-weight:900;margin:8px 0 12px;color:#111827}.recommend-result-info{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;margin-bottom:12px}.recommend-result-info span{background:#fff;border:1px solid #e2e8f0;border-radius:999px;padding:5px 9px;font-size:11px;font-weight:700;color:#475569}
+.recommend-actions{display:flex;gap:9px;margin-top:16px;justify-content:flex-end}.recommend-actions .btn{border:0;border-radius:12px;padding:11px 15px;font-weight:800;cursor:pointer}.recommend-primary{background:#4f7cff;color:#fff}.recommend-secondary{background:#eef2f7;color:#334155}
+body.recommend-open{overflow:hidden}
+@media(max-width:768px){.recommend-open-btn{width:auto;min-width:80px;height:30px;padding:0 12px;font-size:12px}.recommend-modal{padding:18px;border-radius:18px}.recommend-fields{grid-template-columns:1fr 1fr;gap:10px}.recommend-actions{flex-direction:column-reverse}.recommend-actions .btn{width:100%}.recommend-result-name{font-size:22px}}
+
+/* 2026-09-30: 머더미스터리 상단 공지 버튼 = 보드게임 '오늘 뭐하지?' 동일 규격 / 옐로우 */
+.murder-page .notice-open-btn{
+  appearance:none!important;
+  border:0!important;
+  border-radius:999px!important;
+  padding:8px 13px!important;
+  background:#f6c84f!important;
+  color:#5f4700!important;
+  font-size:12px!important;
+  font-weight:800!important;
+  line-height:1!important;
+  cursor:pointer!important;
+  box-shadow:0 4px 12px rgba(246,200,79,.26)!important;
+  white-space:nowrap!important;
+  transform:none;
+  transition:transform .16s ease,background .16s ease,box-shadow .16s ease!important;
+}
+@media (hover:hover) and (pointer:fine){
+  .murder-page .notice-open-btn:hover{
+    background:#efbd3d!important;
+    border:0!important;
+    transform:translateY(-1px)!important;
+    box-shadow:0 5px 14px rgba(239,189,61,.30)!important;
+  }
+}
+.murder-page .notice-open-btn:focus-visible{
+  outline:3px solid rgba(246,200,79,.30)!important;
+  outline-offset:2px!important;
+}
+@media(max-width:768px){
+  .murder-page .notice-open-btn{
+    padding:7px 11px!important;
+    font-size:12px!important;
+  }
+}
+@media(hover:none),(pointer:coarse){
+  .murder-page .notice-open-btn:hover{
+    background:#f6c84f!important;
+    transform:none!important;
+    box-shadow:0 4px 12px rgba(246,200,79,.26)!important;
+  }
+}
+
+
+/* 출석관리: 2개월 경과일 14일 전 사전고지 표시 */
+.attendance-warning-guide{
+  color:#9a6a00;
+  font-weight:800;
+}
+.attendance-row.due-soon{
+  background:#fff2c7;
+}
+.attendance-row.due-soon td{
+  background:#fff2c7;
+}
+.attendance-due-cell.due-soon{
+  color:#805900;
+  font-weight:900;
+}
+.attendance-due-badge{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  margin-left:5px;
+  padding:3px 6px;
+  border:1px solid #dfa900;
+  border-radius:999px;
+  background:#ffdf78;
+  color:#704d00;
+  font-size:9px;
+  line-height:1;
+  font-weight:900;
+  white-space:nowrap;
+}
+@media(max-width:700px){
+  .attendance-due-badge{
+    margin-left:2px;
+    padding:2px 3px;
+    font-size:6.8px;
+  }
+}
+
+
+/* ===== 2026-10-01 iPhone 일정 추가/수정 팝업 보정 ===== */
+@media(max-width:700px){
+  .schedule-modal .schedule-form > div{
+    min-width:0!important;
+    max-width:100%!important;
+  }
+
+  .schedule-modal .field{
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    box-sizing:border-box!important;
+  }
+
+  /* iOS date input의 고유 최소폭 때문에 옆 칸을 침범하는 현상 방지 */
+  .schedule-modal input[type="date"].field{
+    display:block!important;
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    height:42px!important;
+    padding:7px 9px!important;
+    text-align:left!important;
+    overflow:hidden!important;
+  }
+
+  .schedule-modal input[type="date"]::-webkit-date-and-time-value{
+    text-align:left!important;
+    min-width:0!important;
+  }
+
+  /* iPhone Safari는 16px 미만 input 포커스 시 자동 확대하므로
+     일정 팝업 입력 요소만 16px로 고정 */
+  .schedule-modal input.field,
+  .schedule-modal select.field,
+  .schedule-modal textarea.field{
+    font-size:16px!important;
+  }
+
+  .schedule-modal textarea.field{
+    line-height:1.3!important;
+  }
+}
+
+@media(max-width:360px){
+  .schedule-modal input.field,
+  .schedule-modal select.field,
+  .schedule-modal textarea.field{
+    font-size:16px!important;
+  }
+}
+
+
+/* 관리자 패널 공통 폭 */
+#panel{width:100%;min-width:0}
+#panel>.catalog-admin-desc,#panel>.admin-tools,#panel>.table-wrap{width:100%;max-width:none}
+#panel>.table-wrap>.table{width:100%!important}
+
+
+/* 회계 영수증 다중 첨부 */
+.receipt-preview-area{
+  min-height:220px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.receipt-pdf-preview{
+  width:100%;
+  height:55vh;
+  border:0;
+}
+.receipt-number-list{
+  display:flex;
+  justify-content:center;
+  gap:7px;
+  flex-wrap:wrap;
+  margin-top:14px;
+}
+.receipt-number{
+  min-width:42px;
+  height:34px;
+  padding:0 11px;
+  border:1px solid var(--line);
+  border-radius:999px;
+  background:#fff;
+  color:#574c40;
+  font-size:12px;
+  font-weight:800;
+  cursor:pointer;
+}
+.receipt-number.active{
+  border-color:#e85d1f;
+  background:#e85d1f;
+  color:#fff;
+}
+
+/* ===== 2026-10-03 관리자 모바일 전체보기 + iPhone 입력폼 보정 ===== */
+.acct-date-mobile,.receipt-mobile{display:none}
+
+@media(max-width:700px){
+  .admin-catalog-table-wrap,
+  .fee-table-wrap,
+  .ledger-table-wrap,
+  .rental-section .table-wrap{overflow:hidden!important}
+
+  .admin-catalog-table,
+  .rental-table,
+  .fee-table,
+  .ledger-table{
+    width:100%!important;
+    min-width:0!important;
+    table-layout:fixed!important;
+  }
+
+  .admin-catalog-table th,.admin-catalog-table td,
+  .rental-table th,.rental-table td,
+  .fee-table th,.fee-table td,
+  .ledger-table th,.ledger-table td{
+    padding:6px 1.5px!important;
+    font-size:7.4px!important;
+    line-height:1.1!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+    text-align:center!important;
+    vertical-align:middle!important;
+  }
+
+  .admin-catalog-table th,
+  .rental-table th,
+  .fee-table th,
+  .ledger-table th{
+    font-size:6.7px!important;
+    letter-spacing:-.25px!important;
+  }
+
+  .admin-catalog-table th:nth-child(1),.admin-catalog-table td:nth-child(1){width:24%!important;text-align:left!important;padding-left:4px!important}
+  .admin-catalog-table th:nth-child(2),.admin-catalog-table td:nth-child(2){width:9%!important}
+  .admin-catalog-table th:nth-child(3),.admin-catalog-table td:nth-child(3){width:10%!important}
+  .admin-catalog-table th:nth-child(4),.admin-catalog-table td:nth-child(4){width:11%!important}
+  .admin-catalog-table th:nth-child(5),.admin-catalog-table td:nth-child(5){width:13%!important}
+  .admin-catalog-table th:nth-child(6),.admin-catalog-table td:nth-child(6){width:12%!important}
+  .admin-catalog-table th:nth-child(7),.admin-catalog-table td:nth-child(7){width:12%!important}
+  .admin-catalog-table th:nth-child(8),.admin-catalog-table td:nth-child(8){width:9%!important;padding-right:2px!important}
+  .admin-catalog-table .actions{gap:1px!important;justify-content:center!important;flex-wrap:nowrap!important}
+  .admin-catalog-table .icon-btn{
+    width:16px!important;height:16px!important;min-width:16px!important;
+    padding:0!important;border-radius:4px!important;font-size:7px!important;
+    display:grid!important;place-items:center!important
+  }
+  .admin-catalog-table .boardgame-expansion-badge,
+  .admin-catalog-table .online-murder-badge{
+    padding:1px 2px!important;margin-left:2px!important;font-size:5.8px!important;vertical-align:middle!important
+  }
+  .admin-catalog-table td:nth-child(4) span[title^="난이도"] span{
+    width:5px!important;height:6px!important;margin-right:1px!important;border-radius:1px!important
+  }
+
+  .rental-table th:nth-child(1),.rental-table td:nth-child(1){width:32%!important;text-align:left!important;padding-left:4px!important}
+  .rental-table th:nth-child(2),.rental-table td:nth-child(2){width:16%!important}
+  .rental-table th:nth-child(3),.rental-table td:nth-child(3){width:18%!important}
+  .rental-table th:nth-child(4),.rental-table td:nth-child(4){width:15%!important}
+  .rental-table th:nth-child(5),.rental-table td:nth-child(5){width:19%!important}
+  .rental-status{padding:2px 3px!important;font-size:6.8px!important}
+  .rental-return-btn{padding:3px!important;min-width:0!important;font-size:6.5px!important;border-radius:5px!important}
+
+  .fee-table th:nth-child(1),.fee-table td:nth-child(1){width:5%!important;padding:0!important}
+  .fee-table th:nth-child(2),.fee-table td:nth-child(2){width:15%!important;text-align:left!important;padding-left:3px!important}
+  .fee-table th:nth-child(3),.fee-table td:nth-child(3){width:15%!important}
+  .fee-table th:nth-child(4),.fee-table td:nth-child(4){width:14%!important}
+  .fee-table th:nth-child(5),.fee-table td:nth-child(5){width:15%!important}
+  .fee-table th:nth-child(6),.fee-table td:nth-child(6){width:14%!important}
+  .fee-table th:nth-child(7),.fee-table td:nth-child(7){width:10%!important}
+  .fee-table th:nth-child(8),.fee-table td:nth-child(8){width:12%!important}
+  .fee-table input[type="checkbox"]{width:11px!important;height:11px!important;margin:0!important}
+  .fee-table .fee-manage{max-width:100%!important;padding:3px 2px!important;border-radius:5px!important;font-size:6.4px!important;white-space:nowrap!important}
+  .acct-date-desktop{display:none!important}
+  .acct-date-mobile{display:inline!important}
+
+  .ledger-table th:nth-child(1),.ledger-table td:nth-child(1){width:10%!important}
+  .ledger-table th:nth-child(2),.ledger-table td:nth-child(2){width:10%!important}
+  .ledger-table th:nth-child(3),.ledger-table td:nth-child(3){width:11%!important}
+  .ledger-table th:nth-child(4),.ledger-table td:nth-child(4){width:17%!important;text-align:left!important}
+  .ledger-table th:nth-child(5),.ledger-table td:nth-child(5){width:14%!important}
+  .ledger-table th:nth-child(6),.ledger-table td:nth-child(6){width:11%!important}
+  .ledger-table th:nth-child(7),.ledger-table td:nth-child(7){width:11%!important}
+  .ledger-table th:nth-child(8),.ledger-table td:nth-child(8){width:8%!important}
+  .ledger-table th:nth-child(9),.ledger-table td:nth-child(9){width:8%!important}
+  .ledger-table .receipt-link,.ledger-table .btn{
+    max-width:100%!important;padding:3px 2px!important;min-width:0!important;
+    font-size:6.3px!important;border-radius:4px!important;white-space:nowrap!important
+  }
+  .receipt-desktop{display:none!important}
+  .receipt-mobile{display:inline!important}
+
+  .modal input[type="date"].field{
+    display:block!important;
+    -webkit-appearance:none!important;
+    appearance:none!important;
+    box-sizing:border-box!important;
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    height:44px!important;
+    min-height:44px!important;
+    max-height:44px!important;
+    margin:0!important;
+    padding:0 10px!important;
+    border-radius:9px!important;
+    line-height:1.2!important;
+    text-align:left!important;
+    overflow:hidden!important
+  }
+
+  .modal input[type="date"].field::-webkit-date-and-time-value{
+    display:block!important;width:100%!important;min-width:0!important;
+    margin:0!important;padding:0!important;line-height:42px!important;text-align:left!important
+  }
+
+  .modal input[type="date"].field::-webkit-datetime-edit{
+    padding:0!important;margin:0!important;min-width:0!important
+  }
+
+  .modal input.field,.modal select.field,.modal textarea.field{
+    font-size:16px!important;box-sizing:border-box!important;min-width:0!important;max-width:100%!important
+  }
+
+  .schedule-modal .schedule-form{
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+    gap:10px!important
+  }
+  .schedule-modal .schedule-form>div{min-width:0!important;max-width:100%!important;overflow:hidden!important}
+  .schedule-modal .schedule-form .full{grid-column:1/-1!important}
+  .schedule-modal .field:not(textarea){
+    height:44px!important;min-height:44px!important;max-height:44px!important;padding:0 10px!important
+  }
+  .schedule-modal textarea.field{
+    min-height:64px!important;max-height:64px!important;padding:9px 10px!important
+  }
+
+  .attendance-modal{
+    width:calc(100vw - 16px)!important;
+    max-width:560px!important;
+    max-height:calc(100dvh - 16px)!important
+  }
+  .attendance-modal .modal-head{padding:13px 14px!important}
+  .attendance-modal .modal-body{padding:14px!important}
+  .attendance-modal .modal-foot{padding:11px 14px!important}
+  .attendance-modal .attendance-form{
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+    gap:10px!important
+  }
+  .attendance-modal .attendance-form>div{min-width:0!important;max-width:100%!important}
+  .attendance-modal .attendance-form .full{grid-column:1/-1!important}
+  .attendance-modal .field:not(textarea){
+    height:44px!important;min-height:44px!important;max-height:44px!important;padding:0 10px!important
+  }
+  .attendance-modal textarea.field{
+    min-height:72px!important;max-height:72px!important;padding:10px!important
+  }
+  .attendance-modal .attendance-check-group{
+    display:flex!important;flex-direction:column!important;align-items:flex-start!important;
+    justify-content:center!important;gap:5px!important;padding:0!important
+  }
+  .attendance-modal .attendance-check{
+    font-size:10.5px!important;gap:5px!important;white-space:nowrap!important
+  }
+}
+
+@media(max-width:390px){
+  .admin-catalog-table th,.admin-catalog-table td,
+  .rental-table th,.rental-table td,
+  .fee-table th,.fee-table td,
+  .ledger-table th,.ledger-table td{
+    font-size:6.8px!important;padding-left:1px!important;padding-right:1px!important
+  }
+  .admin-catalog-table th,.rental-table th,.fee-table th,.ledger-table th{font-size:6.2px!important}
+}
+
+
+/* ===== 2026-10-26 공개 게임목록 소유주 검색 ===== */
+/* 보드게임/추리게임: 게임명 + 소유주 + 인원 + 난이도 + 장르 */
+.catalog-page:not(.murder-page) .filters{
+  grid-template-columns:minmax(220px,1.45fr) minmax(160px,1fr) repeat(3,minmax(105px,.62fr));
+}
+/* 머더미스터리: 게임명 + 소유주 + 인원 + 난이도 */
+.murder-page .filters{
+  grid-template-columns:minmax(220px,1.5fr) minmax(160px,1fr) repeat(2,minmax(115px,.65fr));
+}
+
+@media(max-width:900px){
+  .catalog-page .filters{
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+  }
+  .catalog-page .filters .search-field,
+  .catalog-page .filters .owner-search-field{
+    grid-column:1/-1!important;
+  }
+}
+
+@media(max-width:700px){
+  .catalog-page .filters{
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+  }
+  .catalog-page .filters .search-field,
+  .catalog-page .filters .owner-search-field{
+    grid-column:1/-1!important;
+  }
+}

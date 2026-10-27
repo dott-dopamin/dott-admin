@@ -1,0 +1,352 @@
+/* DOTT ADMIN — independent management front-end. Original feature CSS is retained. */
+body.dott-admin {background:#eff3f8;color:#1d2c40;}
+.dott-admin .shell{max-width:none;margin:0;min-height:100vh;border:0;border-radius:0;box-shadow:none;background:#f6f8fc;overflow:visible;}
+.dott-admin .admin-topbar {background:#172a43;color:#fff;min-height:76px;height:auto;padding:14px clamp(18px,3vw,42px);gap:20px;border:0;}
+.dott-admin .admin-topbar .brand {text-decoration:none;color:#fff;min-width:0;}
+.dott-admin .admin-topbar .brand-mark {background:#567af4;color:white;border-radius:12px;font-weight:900;}
+.dott-admin .admin-topbar .brand strong {color:white;font-size:16px;letter-spacing:.5px;}
+.dott-admin .admin-topbar .brand small{color:#bbcadc;}
+.dott-admin .admin-top-hint{margin:auto;color:#8fa4c1;font-size:11px;font-weight:800;letter-spacing:1.7px;}
+.dott-admin .admin-topbar .admin-link{margin-left:0;color:#e5ecfb;background:#2b425e;border:1px solid #456080;border-radius:10px;padding:10px 13px;text-decoration:none;white-space:nowrap;font-size:12px;}
+.dott-admin .admin-layout{display:grid;grid-template-columns:232px minmax(0,1fr);min-height:calc(100vh - 136px);}
+.dott-admin .admin-sidebar{background:#fff;border-right:1px solid #e3e9f2;padding:28px 13px 18px;display:flex;flex-direction:column;}
+.dott-admin .sidebar-label{font-weight:900;font-size:10px;letter-spacing:1.5px;color:#9aa8bd;padding:0 16px 24px;}
+.dott-admin .sidebar-nav{display:flex;flex-direction:column;gap:18px;}
+.dott-admin .nav-group-title{font-size:10px;font-weight:800;color:#92a0b2;padding:0 13px;margin-bottom:7px;letter-spacing:.4px;}
+.dott-admin .nav-group{display:flex;flex-direction:column;gap:3px;}
+.dott-admin .admin-sidebar .tab{width:100%;display:flex;align-items:center;justify-content:flex-start;text-align:left;border:0;border-radius:10px;background:transparent;padding:12px 13px;font-size:13px;font-weight:650;color:#5d6a7f;margin:0;white-space:nowrap;}
+.dott-admin .admin-sidebar .tab:hover{background:#f2f5fa;}
+.dott-admin .admin-sidebar .tab.active{background:#edf2ff;color:#315bde;font-weight:850;}
+.dott-admin .sidebar-bottom{margin-top:auto;padding:22px 13px 6px;color:#8491a3;font-size:11px;display:flex;align-items:center;gap:8px;}
+.dott-admin .status-dot,.dott-admin .dash-live i{display:inline-block;background:#36b685;border-radius:50%;width:7px;height:7px;}
+.dott-admin .admin-wrap{min-width:0;padding:34px clamp(16px,3vw,44px) 60px;}
+.dott-admin .admin-hero{border:0;align-items:center;padding:0 0 24px;}
+.dott-admin .admin-hero .eyebrow{font-size:10px;letter-spacing:1.4px;color:#617fae;font-weight:900;}
+.dott-admin .admin-hero h1{font-weight:850;font-size:clamp(24px,2.5vw,32px);color:#182d48;margin:8px 0;}
+.dott-admin .admin-hero p{font-size:13px;color:#79889d;}
+.dott-admin .btn{border-color:#d8e1ed;color:#354860;cursor:pointer;}
+.dott-admin .btn.primary{background:#3d64dc;border-color:#3d64dc;color:#fff;}
+.dott-admin .btn:hover{background:#f2f6ff;}
+.dott-admin .btn.primary:hover{background:#2e51c9;color:#fff;}
+.dott-admin .info-box{background:#fff8e8;border-color:#e7d6a3;color:#786131;}
+.dott-admin .footer{background:#fff;border-top:1px solid #e4ebf3;}
+.dott-admin .login-box{background:#fff;box-shadow:0 12px 45px rgba(26,45,80,.08);border-color:#e2e7f1;margin:clamp(40px,8vh,90px) auto;}
+.dott-admin .login-box .eyebrow{color:#476fdd;font-weight:800;}
+.dott-admin .login-box h1{font-weight:850;color:#1f3550;}
+.dott-admin .field:focus,.dott-admin input:focus{outline-color:#4e73df;}
+.dott-admin .table-wrap{border-color:#e0e7f1;background:#fff;}
+.dott-admin .table th{background:#f3f6fb;color:#6e7f98;}
+.dott-admin #panel {min-width:0;}
+/* Dashboard */
+.dott-admin .dash-welcome{background:#213a61;border-radius:18px;padding:28px 30px;color:#fff;display:flex;align-items:center;justify-content:space-between;gap:14px;box-shadow:0 7px 24px rgba(26,58,108,.08);}
+.dott-admin .dash-overline{color:#acbfed;font-size:10px;font-weight:900;letter-spacing:2px;}
+.dott-admin .dash-welcome h2{color:white;font-size:23px;font-weight:850;margin:9px 0 7px;}
+.dott-admin .dash-welcome p{color:#c4d1e4;font-size:12px;margin:0;}
+.dott-admin .dash-live{border:1px solid #6884a5;color:#d1deed;display:flex;align-items:center;gap:8px;white-space:nowrap;border-radius:999px;padding:8px 12px;font-size:10px;font-weight:800;}
+.dott-admin .dash-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px;margin:18px 0;}
+.dott-admin .dash-stat{border-radius:15px;background:white;padding:22px 20px;border:1px solid #e4eaf3;min-width:0;display:flex;flex-direction:column;gap:7px;box-shadow:0 3px 9px rgba(26,58,100,.025);}
+.dott-admin .dash-stat-label{font-size:12px;font-weight:750;color:#687a93;}
+.dott-admin .dash-stat strong{font-size:clamp(20px,2.8vw,30px);line-height:1.25;font-weight:900;color:#1b3154;overflow-wrap:anywhere;}
+.dott-admin .dash-stat small{font-size:10px;color:#9ba8ba;}
+.dott-admin .dash-cols{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:15px;}
+.dott-admin .dash-card{border:1px solid #e4eaf3;border-radius:16px;background:white;padding:22px;min-width:0;}
+.dott-admin .dash-card-head{display:flex;align-items:start;justify-content:space-between;gap:12px;margin-bottom:18px;}
+.dott-admin .dash-card-head h3{margin:0;font-size:16px;color:#1a3150;}
+.dott-admin .dash-card-head p{margin:6px 0 0;font-size:11px;color:#9aa7b8;}
+.dott-admin .dash-link{color:#4365bf;border:0;background:transparent;font-weight:750;font-size:11px;cursor:pointer;white-space:nowrap;padding:6px 0;}
+.dott-admin .dash-schedule{display:flex;align-items:center;gap:12px;padding:13px 2px;border-bottom:1px solid #edf1f6;}
+.dott-admin .dash-schedule:last-child{border:0;}
+.dott-admin .dash-date{color:#4767a4;font-weight:850;font-size:12px;background:#edf3ff;border-radius:9px;padding:10px 8px;min-width:64px;text-align:center;white-space:nowrap;}
+.dott-admin .dash-event{display:flex;flex-direction:column;gap:6px;flex:1;min-width:0;}
+.dott-admin .dash-event b{font-size:12px;color:#2f415b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.dott-admin .dash-event small{color:#8b9aad;font-size:10px;}
+.dott-admin .dash-dot{width:7px;height:7px;background:#6897f3;border-radius:50%;}
+.dott-admin .dash-empty{font-size:12px;color:#8292a8;padding:32px 4px;}
+.dott-admin .dash-shortcuts{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.dott-admin .dash-shortcut{border:1px solid #e1e9f3;background:#f9fbfe;border-radius:12px;padding:15px;cursor:pointer;display:flex;flex-direction:column;gap:7px;position:relative;text-align:left;min-height:86px;}
+.dott-admin .dash-shortcut:hover{border-color:#9bb2f4;background:#f2f6ff;}
+.dott-admin .dash-shortcut strong{color:#314760;font-size:13px;}
+.dott-admin .dash-shortcut span{color:#93a1b2;font-size:10px;}
+.dott-admin .dash-shortcut b{position:absolute;right:13px;top:13px;color:#6b83bb;font-size:13px;}
+.dott-admin .dash-footnote{font-size:11px;line-height:1.6;color:#8190a7;margin-top:15px;}
+@media (max-width:1080px){.dott-admin .admin-layout{grid-template-columns:186px minmax(0,1fr)}.dott-admin .dash-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.dott-admin .dash-cols{grid-template-columns:1fr}}
+@media (max-width:730px){.dott-admin .admin-top-hint{display:none}.dott-admin .admin-topbar{min-height:64px;padding:12px 16px}.dott-admin .admin-topbar .admin-link{font-size:11px;padding:8px}.dott-admin .admin-layout{display:flex;flex-direction:column}.dott-admin .admin-sidebar{padding:9px 14px;border-bottom:1px solid #e1e8f3;border-right:0}.dott-admin .sidebar-label,.dott-admin .nav-group-title,.dott-admin .sidebar-bottom{display:none}.dott-admin .sidebar-nav{display:flex;flex-direction:row;overflow-x:auto;gap:5px;scrollbar-width:thin;padding-bottom:2px}.dott-admin .nav-group{display:contents}.dott-admin .admin-sidebar .tab{width:auto;flex:0 0 auto;font-size:12px;padding:10px 12px}.dott-admin .admin-wrap{padding:24px 14px 50px}.dott-admin .admin-hero{align-items:flex-start;gap:12px}.dott-admin .admin-hero .toolbar{gap:5px;flex-wrap:wrap}.dott-admin .admin-hero .toolbar .btn{font-size:11px;padding:8px}.dott-admin .dash-welcome{padding:22px 18px}.dott-admin .dash-welcome h2{font-size:20px}.dott-admin .dash-live{font-size:9px;padding:7px}.dott-admin .dash-stats{gap:9px}.dott-admin .dash-stat{padding:17px 14px}.dott-admin .dash-card{padding:17px}.dott-admin .dash-shortcuts{gap:8px}.dott-admin .dash-shortcut{padding:13px 10px}.dott-admin .dash-shortcut b{right:10px;top:9px}}
+@media print{.dott-admin .admin-sidebar,.dott-admin .admin-topbar,.dott-admin .admin-hero{display:none!important}.dott-admin .admin-layout{display:block!important}.dott-admin .admin-wrap{padding:0!important}}
+
+
+/* ===============================================================
+   DOTT ADMIN v2 — consistent blue/gray theme across ALL modules
+   Scoped to administrator app. State/category colors intentionally retained.
+   =============================================================== */
+.dott-admin{
+  --bg:#f2f5fa;--paper:#ffffff;--paper2:#f8fafd;--ink:#21334b;
+  --muted:#6e7e92;--line:#dce4ef;--accent:#4168b1;
+  --accent-soft:#eaf1fc;--green:#467f6b;--green-soft:#eaf5f1;
+  --blue:#4a6eaa;--shadow:0 8px 28px rgba(38,63,96,.055);
+  --dott-navy:#1d314d;--dott-blue:#4168b1;--dott-soft:#edf3fb;
+  --dott-border:#dce4ef;--dott-surface:#fff;--dott-gray:#718197;
+  color:var(--ink);background:var(--bg);
+}
+html:has(body.dott-admin){background:#f2f5fa}
+.dott-admin .shell{background:#f4f7fb}
+.dott-admin .admin-topbar{background:#1d314d;}
+.dott-admin .admin-topbar .brand-mark{background:#5578b5}
+.dott-admin .admin-sidebar{border-color:#dce4ef}
+.dott-admin .admin-sidebar .tab{transition:background .14s ease,color .14s ease}
+.dott-admin .admin-sidebar .tab:hover{background:#f2f6fc;color:#264e81}
+.dott-admin .admin-sidebar .tab.active{background:#e8f0fc;color:#315b98}
+.dott-admin .admin-hero h1{color:#21334b}
+.dott-admin .admin-hero .eyebrow{background:none;color:#6580aa;padding:0;border-radius:0}
+.dott-admin .admin-hero p{color:#78899e}
+.dott-admin #panel{color:#2a3c54}
+.dott-admin .card,.dott-admin .catalog-admin-card,.dott-admin .dash-card,
+.dott-admin .accounting-report,.dott-admin .game-card,
+.dott-admin .murder-notice-modal{background:#fff;border-color:#dce4ef;box-shadow:0 3px 16px rgba(33,53,85,.025)}
+.dott-admin .card-head{border-color:#e1e8f2;background:#fafbfd}
+.dott-admin .card-head h2{color:#273b56;font-weight:750;font-size:18px}
+.dott-admin .btn{background:#fff;border-color:#d4deeb;color:#38516f;font-weight:700;transition:background .15s ease,border-color .15s ease}
+.dott-admin .btn:hover:not(:disabled){background:#eff4fb;border-color:#9db5d6;color:#254979}
+.dott-admin .btn.primary,.dott-admin .btn.primary:hover:not(:disabled){background:#4168b1;border-color:#4168b1;color:#fff}
+.dott-admin .btn.primary:hover:not(:disabled){background:#345995;border-color:#345995}
+.dott-admin .btn.danger{color:#b4464d}
+.dott-admin .tab:not(.active){background:#fff;color:#576f89;border-color:#d8e2ee}
+.dott-admin .tabs .tab.active,.dott-admin .accounting-subtab.active,.dott-admin .accounting-chip.active{background:#4168b1;border-color:#4168b1;color:#fff}
+.dott-admin .tabs .tab:hover:not(.active),.dott-admin .accounting-subtab:hover:not(.active),.dott-admin .accounting-chip:hover:not(.active){background:#eff4fb;border-color:#9db5d6}
+.dott-admin .accounting-subtab,.dott-admin .accounting-chip{border-color:#d8e2ee;background:#fff;color:#4d6680}
+.dott-admin .field,.dott-admin input.field,.dott-admin textarea.field,.dott-admin select.field{border:1px solid #d6e0ec;background:#fff;color:#263b52}
+.dott-admin .field::placeholder{color:#a0afbf}
+.dott-admin .field:focus,.dott-admin input:focus-visible,.dott-admin textarea:focus-visible,.dott-admin select:focus-visible{border-color:#5a80ba;outline:0;box-shadow:0 0 0 3px rgba(74,112,177,.13)}
+.dott-admin .label{color:#586e88;font-weight:750}
+.dott-admin .table-wrap,.dott-admin .catalog-table-wrap,.dott-admin .catalog-grid{border-color:#dce4ef;background:#fff}
+.dott-admin .table th{background:#f1f5fa;color:#536a86;border-color:#dce4ef}
+.dott-admin .table td{border-color:#e7edf4;color:#33455d}
+.dott-admin .table tbody tr:hover{background:#f8fafd}
+.dott-admin .icon-btn{border-color:#d8e2ec;background:#fff;color:#58708e}
+.dott-admin .icon-btn:hover{background:#eef4fb}
+.dott-admin .info-box:not(.admin-load-warning){border-color:#ccdaeb;background:#f0f5fc;color:#4b6483}
+.dott-admin .admin-load-warning{border-color:#e9d8ad;background:#fff9ec;color:#715d3c}
+.dott-admin .toast{background:#223852;color:#fff}
+.dott-admin .modal-backdrop{background:rgba(22,40,66,.43)}
+.dott-admin .modal,.dott-admin .modal-head,.dott-admin .modal-foot{border-color:#dce4ef}
+.dott-admin .modal-head,.dott-admin .modal-foot{background:#f8fafd}
+.dott-admin .footer{background:#fff;border-color:#e1e8f2;color:#8695a8}
+.dott-admin .catalog-meta,.dott-admin .meta-line,.dott-admin .note{color:#708299}
+.dott-admin .meta-chip,.dott-admin .stat-pill{background:#f0f4f9;color:#405c79;border:1px solid #e0e8f2}
+.dott-admin .catalog-status:not(.status-dott):not(.status-workshop):not(.status-rented):not(.status-owned):not(.status-lost),
+.dott-admin .status:not(.out){background:#e8f1fb;color:#315f95}
+.dott-admin .notice-badge:not(.pin){background:#eaf1fb;color:#436a9b}
+.dott-admin .notice-badge.pin{background:#dceafd;color:#315a91}
+.dott-admin .notice-open-btn{background:#eaf1fc!important;border:1px solid #b9cce6!important;color:#365e96!important;box-shadow:none}
+.dott-admin .notice-open-btn:hover{background:#dfeafb!important;border-color:#89add5!important;color:#274d80!important}
+.dott-admin .notice-open-btn:focus-visible{outline:3px solid rgba(65,104,177,.2)}
+.dott-admin .catalog-admin-desc,.dott-admin .catalog-admin-card,.dott-admin .rental-guide,.dott-admin .rental-fields{background:#f7f9fc;border-color:#dde5ef;color:#4e6380}
+.dott-admin .catalog-admin-card-head,.dott-admin .rental-section-head{color:#2c4563}
+.dott-admin .accounting-stat{border-color:#dce4ef;background:#fff}
+.dott-admin .accounting-stat:not(.green):not(.red):not(.purple):not(.yellow){background:#f9fbfe}
+/* Financial status color semantics are retained (paid/unpaid/payable/etc.). */
+.dott-admin .accounting-lockbar{border-color:#dbe4f0;background:#f6f8fc}
+.dott-admin .accounting-lock{background:#e7edf5;color:#536c88}
+.dott-admin .accounting-report{background:#fff}
+.dott-admin .receipt-link{background:#edf1fa;color:#5266a2;border-color:#cdd8eb}
+.dott-admin .report-cat{background:#f9fbfe;border-color:#e1e8f2}
+.dott-admin .day,.dott-admin .day.has-events,.dott-admin .day.muted{background:#fff}
+.dott-admin .day.muted{background:#f4f6fa;color:#a0adbc}
+.dott-admin .day.today{box-shadow:inset 0 0 0 2px #4168b1}
+.dott-admin .dow{background:#f1f5fa;color:#5d7490}
+.dott-admin .day-event:not([style]){background:#eaf1fb;color:#375a85}
+.dott-admin .calendar-grid,.dott-admin .calendar-scroll{border-color:#dce4ef}
+.dott-admin .rental-status.rental-done{background:#ebeff5;color:#596c83}
+/* Maintain public semantics: status-dott blue, workshop green, rented yellow, owned purple, lost red. */
+.dott-admin .status-dott{background:#e8f1ff!important;color:#3567a8!important}
+.dott-admin .status-workshop{background:#e6f5ed!important;color:#358265!important}
+.dott-admin .status-rented{background:#fff2d8!important;color:#9b6a12!important}
+.dott-admin .status-owned{background:#f0e9fc!important;color:#7054aa!important}
+.dott-admin .status-lost{background:#ffe9e7!important;color:#c64a40!important}
+/* Settings redesign */
+.dott-admin .settings-layout{display:grid;grid-template-columns:224px minmax(0,1fr);align-items:start;gap:22px}
+.dott-admin .settings-index{position:sticky;top:100px;background:#fff;border:1px solid #dde5ef;border-radius:15px;padding:18px 12px;display:flex;flex-direction:column;gap:5px}
+.dott-admin .settings-index-title{color:#405878;font-size:11px;font-weight:900;letter-spacing:1.2px;padding:4px 9px 13px;display:flex;justify-content:space-between}
+.dott-admin .settings-index-title span{color:#a2afbf;font-size:10px;letter-spacing:0}
+.dott-admin .settings-index-link{display:flex;gap:11px;align-items:center;border-radius:10px;padding:12px 10px;color:#36516f}
+.dott-admin .settings-index-link:hover,.dott-admin .settings-index-link:focus-visible{background:#eef4fb;outline:none}
+.dott-admin .settings-index-icon{border-radius:8px;background:#eaf1fa;color:#5577a2;width:31px;height:31px;flex:0 0 31px;display:grid;place-items:center;font-size:11px;font-weight:850}
+.dott-admin .settings-index-link b{display:block;font-size:12px}
+.dott-admin .settings-index-link small{display:block;font-size:10px;margin-top:4px;color:#8d9caf}
+.dott-admin .settings-index-note{border-top:1px solid #e6edf4;margin-top:15px;padding:15px 9px 4px;color:#8596ab;font-size:11px;line-height:1.7}
+.dott-admin .settings-index-note strong{color:#516b8a}
+.dott-admin .settings-main{min-width:0;display:flex;flex-direction:column;gap:22px}
+.dott-admin .settings-section{background:#fff;border:1px solid #dce4ef;border-radius:16px;overflow:hidden;scroll-margin-top:100px;box-shadow:0 4px 16px rgba(32,53,79,.025)}
+.dott-admin .settings-section-head{padding:24px 26px;display:flex;align-items:center;justify-content:space-between;gap:18px;border-bottom:1px solid #e5ecf4;background:#fbfcfe}
+.dott-admin .settings-section-head h2{font-size:19px;font-weight:850;margin:8px 0;color:#253b58}
+.dott-admin .settings-section-head p{font-size:12px;color:#7d8da0;margin:0;line-height:1.6}
+.dott-admin .settings-kicker{font-size:10px;letter-spacing:1.2px;color:#597cac;font-weight:850}
+.dott-admin .settings-section-mark{background:#eaf1fb;color:#5074a2;font-size:10px;font-weight:800;border-radius:999px;padding:7px 10px;white-space:nowrap}
+.dott-admin .settings-section-body{padding:26px;display:grid;grid-template-columns:minmax(0,1fr) minmax(250px,.8fr);gap:25px}
+.dott-admin .settings-fields{min-width:0}
+.dott-admin .settings-field + .settings-field{margin-top:18px}
+.dott-admin .settings-field .label{font-size:12px;margin-bottom:9px}
+.dott-admin .settings-field textarea{resize:vertical;line-height:1.65;min-height:72px}
+.dott-admin .settings-help{display:block;color:#9aa6b6;font-size:10px;line-height:1.65;margin-top:8px}
+.dott-admin .settings-action-row{display:flex;justify-content:space-between;gap:14px;align-items:center;margin-top:21px}
+.dott-admin .settings-save-hint{font-size:10px;color:#8e9caf;line-height:1.5}
+.dott-admin .settings-action-row .btn{white-space:nowrap}
+.dott-admin .settings-preview-col{border-left:1px solid #e7edf4;padding-left:24px;min-width:0}
+.dott-admin .settings-preview-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:1px 0 12px;font-size:12px;font-weight:800;color:#465f7e}
+.dott-admin .settings-preview-head span{font-size:10px;font-weight:500;color:#9aa9ba}
+.dott-admin .settings-preview{min-height:235px;border-radius:13px;padding:25px 21px;background:linear-gradient(145deg,#eaf0f9,#f5f8fd);border:1px solid #dce5f1;overflow-wrap:anywhere;display:flex;flex-direction:column;justify-content:center}
+.dott-admin .settings-preview-badge{border-radius:99px;background:#dbe7f7;color:#4d6fa1;font-size:10px;font-weight:800;padding:7px 11px;align-self:flex-start}
+.dott-admin .settings-preview h3{white-space:pre-wrap;font-size:clamp(17px,1.5vw,22px);color:#263e5d;line-height:1.35;margin:17px 0 12px;font-weight:850}
+.dott-admin .settings-preview p{font-size:11px;color:#6e829e;line-height:1.7;margin:0;white-space:pre-wrap}
+.dott-admin .settings-backup-body{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.dott-admin .settings-backup-option{border:1px solid #dfe7f1;background:#f9fbfe;border-radius:12px;padding:20px;display:flex;gap:15px;min-width:0}
+.dott-admin .settings-option-symbol{font-size:20px;font-weight:800;background:#e9f1fc;color:#4c71a4;border-radius:10px;display:grid;place-items:center;width:40px;height:40px;flex:0 0 40px}
+.dott-admin .settings-backup-option h3{font-size:14px;color:#304b6c;margin:1px 0 9px}
+.dott-admin .settings-backup-option p{color:#71849c;font-size:11px;line-height:1.7;margin:0 0 18px}
+.dott-admin .settings-restore-option{background:#fff;border-color:#dce4ef}
+.dott-admin .settings-restore-option .settings-option-symbol{background:#f0f3f8;color:#6d7e92}
+.dott-admin .settings-backup-footnote{grid-column:1/-1;padding:11px 13px;border-radius:9px;background:#f2f5fa;color:#75869b;font-size:11px;line-height:1.7}
+.dott-admin .settings-backup-body .error{grid-column:1/-1}
+.dott-admin .settings-password-form{padding:26px}
+.dott-admin .settings-security-note{display:flex;gap:7px;flex-direction:column;border-radius:11px;background:#f0f5fb;padding:14px 16px;margin-bottom:20px;font-size:11px;color:#70829b}
+.dott-admin .settings-security-note b{color:#36577d;font-size:12px}
+.dott-admin .settings-password-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+.dott-admin .settings-password-grid .settings-field{margin:0}
+.dott-admin .settings-password-form .settings-action-row{justify-content:flex-end}
+.dott-admin .settings-password-form .error{margin-top:10px}
+@media(max-width:1250px){.dott-admin .settings-layout{grid-template-columns:190px minmax(0,1fr);gap:15px}.dott-admin .settings-section-body{grid-template-columns:1fr}.dott-admin .settings-preview-col{border-left:0;border-top:1px solid #e8eef5;padding:21px 0 0}}
+@media(max-width:900px){.dott-admin .settings-layout{grid-template-columns:1fr}.dott-admin .settings-index{position:static;display:flex;flex-direction:row;align-items:stretch;flex-wrap:wrap;padding:10px;gap:6px}.dott-admin .settings-index-title,.dott-admin .settings-index-note{display:none}.dott-admin .settings-index-link{flex:1 1 160px;padding:9px 8px}.dott-admin .settings-main{gap:18px}.dott-admin .settings-section{scroll-margin-top:20px}}
+@media(max-width:600px){.dott-admin .settings-section-head{padding:19px 17px;align-items:flex-start}.dott-admin .settings-section-head h2{font-size:17px}.dott-admin .settings-section-mark{display:none}.dott-admin .settings-section-body,.dott-admin .settings-password-form{padding:18px}.dott-admin .settings-backup-body{grid-template-columns:1fr}.dott-admin .settings-password-grid{grid-template-columns:1fr}.dott-admin .settings-action-row{flex-wrap:wrap}.dott-admin .settings-action-row .btn{margin-left:auto}.dott-admin .settings-index-link{flex:1 1 135px}.dott-admin .settings-index-icon{display:none}}
+@media print{.dott-admin .settings-index,.dott-admin .settings-preview-col{display:none}}
+
+
+/* =============================================================
+   DOTT ADMIN v3 — 일정 관리 / 출석 관리 완전 톤 통일
+   기존 styles.css의 베이지/오렌지 개별 클래스 및 모바일 !important
+   우선순위를 관리자 사이트 전용 스타일로 보정합니다.
+   출석 경과/유예/유지, 일정 취소, 장소/보유 상태 구분색은 보존합니다.
+   ============================================================= */
+
+/* 일정 관리: 영역 · 필터 · 월 선택 · 일괄 작업 */
+.dott-admin .schedule-control-panel{
+  background:#fff;border:1px solid #dce4ef;
+  box-shadow:0 3px 16px rgba(33,53,85,.025);
+}
+.dott-admin .schedule-view-tabs{
+  background:#f1f5fa;border:1px solid #dbe4ef;
+}
+.dott-admin .schedule-view-btn{
+  color:#536b88;background:transparent;box-shadow:none;
+}
+.dott-admin .schedule-view-btn:hover:not(.active){
+  background:#e5eef9;color:#315b91;
+}
+.dott-admin .schedule-view-btn.active{
+  background:#4168b1;color:#fff;box-shadow:0 2px 7px rgba(49,87,148,.15);
+}
+.dott-admin .schedule-add-btn{
+  background:#4168b1;border-color:#4168b1;color:#fff;
+  box-shadow:0 2px 8px rgba(45,78,135,.12);
+}
+.dott-admin .schedule-add-btn:hover:not(:disabled){
+  background:#345995;color:#fff;border-color:#345995;
+}
+.dott-admin .schedule-monthbar{
+  background:#fff;border-top:1px solid #e1e8f2;border-bottom:1px solid #e1e8f2;
+}
+.dott-admin .schedule-month-nav{
+  background:#fff;border-color:#dce4ef;
+}
+.dott-admin .schedule-month-nav strong{color:#263d5c}
+.dott-admin .schedule-month-arrow{
+  background:#fff!important;color:#456489!important;
+  border-color:#dce4ef!important;
+}
+.dott-admin .schedule-month-arrow:hover{
+  background:#edf3fc!important;color:#284e80!important;
+}
+.dott-admin .schedule-month-today{
+  background:#f7f9fd;color:#48617f;border-color:#d4deec;
+}
+.dott-admin .schedule-month-today:hover{background:#eaf1fb;color:#315b91}
+.dott-admin .schedule-count{
+  background:#eaf1fc;color:#416590;border:1px solid #d7e4f4;
+}
+.dott-admin .schedule-bulkbar{color:#6b7f98}
+.dott-admin .schedule-select-all{color:#58708b}
+.dott-admin .schedule-select-all input,
+.dott-admin .schedule-check,
+.dott-admin .venue-flex-check input{accent-color:#4168b1}
+.dott-admin .schedule-bulk-actions{color:#7b8b9f}
+.dott-admin .schedule-table-wrap{border-color:#dce4ef;background:#fff}
+.dott-admin .schedule-table th{
+  background:#eff4fa;color:#526a88;border-color:#dce4ef;
+}
+.dott-admin .schedule-table td{border-color:#e7edf4;color:#354b67}
+.dott-admin .schedule-table tbody tr:hover:not(.cancelled-row){background:#f7faff}
+.dott-admin .schedule-table .icon-btn{border-color:#d7e1ef;color:#4c688d;background:#fff}
+.dott-admin .schedule-table .icon-btn:hover{background:#eaf1fc;color:#315b91}
+.dott-admin .schedule-status:not(.cancelled){background:#e8f2f9;color:#32628e}
+/* 취소는 업무상 경고 상태이므로 빨강 계열 유지 */
+.dott-admin .schedule-status.cancelled{background:#faeaea;color:#ae4b53}
+.dott-admin .cancelled-row td:not(:last-child){color:#8290a4}
+.dott-admin .venue-flex-check{color:#667e97}
+.dott-admin .venue-flex-mark{color:#4b6fb0}
+/* 기존 분류별 색상(.cat-tag 인라인 style)은 의도적으로 그대로 둡니다. */
+
+/* 출석 관리: 요약 · 검색 · 필터 · 표 · 운영진 강조 */
+.dott-admin .attendance-summary span{
+  background:#f7f9fd;color:#4f6683;border:1px solid #dce5f0;
+}
+/* 출석 상태는 업무상 의미가 있는 기존 색(유지/경과/유예)을 유지합니다. */
+.dott-admin .attendance-summary span.keep{background:#eaf5f1;color:#34715b;border-color:#cce7dd}
+.dott-admin .attendance-summary span.overdue{background:#fceeee;color:#b14d55;border-color:#efd0d4}
+.dott-admin .attendance-summary span.grace{background:#fff6e5;color:#946d2e;border-color:#f0dfbe}
+.dott-admin .attendance-help{color:#74869d}
+.dott-admin .attendance-filters{gap:7px}
+.dott-admin .attendance-filter{
+  color:#526b89;border-color:#d7e2ee;background:#fff;
+  transition:background .15s ease,color .15s ease,border-color .15s ease;
+}
+.dott-admin .attendance-filter:hover:not(.active){background:#f0f5fc;border-color:#adc1db;color:#345c8f}
+.dott-admin .attendance-filter.active{background:#4168b1;border-color:#4168b1;color:#fff}
+.dott-admin .attendance-table-wrap{border-color:#dce4ef;background:#fff}
+.dott-admin .attendance-table th{
+  background:#eff4fa;color:#526a88;border-color:#dce4ef;
+}
+.dott-admin .attendance-table td{border-color:#e7edf4;color:#334a66}
+.dott-admin .attendance-table tbody tr:hover:not(.overdue):not(.due-soon):not(.left){background:#f8fafd}
+.dott-admin .attendance-row.staff:not(.overdue):not(.due-soon){background:#f7faff}
+.dott-admin .attendance-row.staff td:first-child{box-shadow:inset 3px 0 0 #6688bd}
+.dott-admin .attendance-staff-badge{
+  background:#e8f0fc;border-color:#c4d6f0;color:#3f6498;
+}
+.dott-admin .attendance-table .icon-btn{background:#fff;border-color:#d7e1ef;color:#496789}
+.dott-admin .attendance-table .icon-btn:hover{background:#eaf1fc;color:#315b91}
+.dott-admin .attendance-today{
+  background:#eaf1fb;border-color:#c6d8ed;color:#386195;
+}
+.dott-admin .attendance-today:hover{background:#dfeaf8;color:#2f5685}
+.dott-admin .attendance-table td:first-child{color:#263d58}
+.dott-admin .attendance-row.left{background:#f3f5f8}
+.dott-admin .attendance-setup code{border-color:#d6e3f2;background:#fff;color:#38577b}
+.dott-admin .attendance-form .attendance-check{color:#506982}
+.dott-admin .attendance-form input[type="checkbox"]{accent-color:#4168b1}
+.dott-admin .schedule-form input[type="checkbox"]{accent-color:#4168b1}
+
+/* 모바일 출석 표 기존 CSS가 background / color !important 로 고정되어 있던 부분 */
+@media(max-width:700px){
+  .dott-admin .attendance-table th{
+    background:#eff4fa!important;color:#526a88!important;
+    border-bottom-color:#dce4ef!important;
+  }
+  .dott-admin .attendance-table td{
+    border-bottom-color:#e7edf4!important;color:#334a66;
+  }
+  .dott-admin .attendance-table td:first-child{
+    background:#f3f7fc;color:#263d58;
+  }
+  .dott-admin .attendance-table td::before{color:#7087a1}
+  .dott-admin .attendance-row.staff td:first-child{box-shadow:inset 2px 0 0 #6688bd}
+  .dott-admin .schedule-table th{background:#eff4fa!important;color:#526a88!important}
+  .dott-admin .schedule-month-arrow:hover{background:#edf3fc!important}
+}
