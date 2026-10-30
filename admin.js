@@ -15,6 +15,7 @@ let adminLoadWarnings=[];
 let startupCycle=0;
 let startupDataPending=false;
 let startupPendingKeys=new Set();
+let startupWaitingTab=null;
 let dottAdminRole=null;
 let dottAdminEmail='';
 
@@ -123,7 +124,7 @@ async function loadStartupDashboard(){
   startupDataPending=false;
   syncStartupWarnings();
   // 사용자가 이미 편집 중이라면 팝업을 건드리지 않고 새로고침 버튼만 활성화합니다.
-  if(document.getElementById('modal')?.classList.contains('open')){
+  if(document.getElementById('modal')?.classList.contains('open')||(tab!=='dashboard'&&startupWaitingTab!==tab)){
     const refresh=document.getElementById('refreshData');
     if(refresh){refresh.disabled=false;refresh.textContent='↻ 새로고침';}
     return;
@@ -149,9 +150,11 @@ function renderPanel(){
   const p=document.getElementById('panel');
   const dependencies={"dashboard":["schedules","attendance","boardgame","murder","deduction","fees"],"stats":["schedules","attendance","fees"],"schedules":["schedules"],"attendance":["attendance"],"notices":["notices"],"boardgame":["boardgame"],"murder":["murder"],"deduction":["deduction"],"rentals":["rentals"],"accounting":["fees","attendance","ledger","receipts","closures"],"settings":["settings"]};
   if(startupDataPending&&(dependencies[tab]||[]).some(key=>startupPendingKeys.has(key))){
+    startupWaitingTab=tab;
     p.innerHTML='<div class="info-box" role="status">필요한 데이터를 불러오는 중입니다. 준비되면 자동으로 표시됩니다.</div>';
     return;
   }
+  startupWaitingTab=null;
   if(tab==='dashboard')return dashboardPanel(p);
   if(tab==='stats')return statsPanel(p);
   if(tab==='settings')return settingsPanel(p);
