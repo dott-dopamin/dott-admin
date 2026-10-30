@@ -122,6 +122,12 @@ async function loadStartupDashboard(){
   if(cycle!==startupCycle)return;
   startupDataPending=false;
   syncStartupWarnings();
+  // 사용자가 이미 편집 중이라면 팝업을 건드리지 않고 새로고침 버튼만 활성화합니다.
+  if(document.getElementById('modal')?.classList.contains('open')){
+    const refresh=document.getElementById('refreshData');
+    if(refresh){refresh.disabled=false;refresh.textContent='↻ 새로고침';}
+    return;
+  }
   renderAdmin();
 }
 
