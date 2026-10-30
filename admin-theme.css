@@ -399,3 +399,36 @@ html:has(body.dott-admin){background:#f2f5fa}
   .dott-admin .settings-team-person-detail{min-width:125px}
   .dott-admin .settings-team-person .settings-role-badge{font-size:9px}
 }
+
+/* DOTT ADMIN v6 | 출석 경과 알림 */
+.dott-admin .dash-attention{margin:0 0 17px}
+.dott-admin .dash-attention-heading{display:flex;align-items:end;justify-content:space-between;gap:15px;padding:0 2px;margin:0 0 12px}
+.dott-admin .dash-attention-heading>div>span{font-size:10px;letter-spacing:1.2px;color:#7189ad;font-weight:800}
+.dott-admin .dash-attention-heading h3{margin:5px 0 4px;color:#203957;font-size:18px;line-height:1.3}
+.dott-admin .dash-attention-heading p{margin:0;color:#8799b0;font-size:11px;line-height:1.55}
+.dott-admin .dash-attention-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.dott-admin .dash-attention-card{background:#fff;border:1px solid #e2e8f1;border-radius:16px;padding:19px 20px 15px;min-width:0;border-top:3px solid #d1ddec;display:flex;flex-direction:column}
+.dott-admin .dash-attention-card.soon{border-top-color:#dfa62a}
+.dott-admin .dash-attention-card.overdue{border-top-color:#d96b72}
+.dott-admin .dash-attention-card-heading{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.dott-admin .dash-attention-card-heading h4{margin:0;display:flex;align-items:center;gap:9px;color:#283e59;font-weight:850;font-size:14px}
+.dott-admin .dash-attention-dot{width:9px;height:9px;border-radius:50%;display:inline-block;flex:0 0 9px}
+.dott-admin .dash-attention-dot.soon{background:#e0ad3d}
+.dott-admin .dash-attention-dot.overdue{background:#dd707a}
+.dott-admin .dash-attention-card-heading>strong{font-size:22px;color:#284060;font-weight:900}
+.dott-admin .dash-attention-card-heading>strong small{font-size:11px;color:#8b9eb4;margin-left:3px}
+.dott-admin .dash-attention-card>p{font-size:10px;color:#8d9db2;margin:3px 0 15px}
+.dott-admin .dash-attention-list{max-height:285px;min-height:58px;overflow-y:auto;overscroll-behavior:contain;border-top:1px solid #eff2f6;scrollbar-width:thin}
+.dott-admin .dash-attention-person{display:flex;align-items:center;justify-content:space-between;gap:10px;min-width:0;padding:12px 2px;border-bottom:1px solid #eff2f6}
+.dott-admin .dash-attention-person-main{display:flex;flex-direction:column;gap:5px;min-width:0}
+.dott-admin .dash-attention-person-main strong{color:#344a68;font-size:12px;overflow-wrap:anywhere}
+.dott-admin .dash-attention-person-main small{color:#93a2b6;font-size:10px}
+.dott-admin .dash-attention-day{padding:6px 9px;white-space:nowrap;border-radius:8px;font-size:11px;font-weight:850}
+.dott-admin .dash-attention-day.soon{color:#91611b;background:#fff4d7}
+.dott-admin .dash-attention-day.overdue{color:#a24750;background:#fff0f0}
+.dott-admin .dash-attention-empty{text-align:center;color:#9aa7b8;padding:24px 6px;font-size:11px}
+.dott-admin .dash-attention-view{align-self:flex-end;background:transparent;border:0;color:#4d6f9d;font-weight:800;padding:13px 0 0;cursor:pointer;font-size:11px}
+.dott-admin .dash-attention-view:hover{text-decoration:underline}
+.dott-admin .dash-attention-view:focus-visible{outline:3px solid #9db7df;outline-offset:3px}
+@media(max-width:980px){.dott-admin .dash-attention-grid{grid-template-columns:1fr}}
+@media(max-width:490px){.dott-admin .dash-attention-heading{align-items:flex-start}.dott-admin .dash-attention-heading .dash-link{font-size:10px}.dott-admin .dash-attention-card{padding:16px 14px 12px}.dott-admin .dash-attention-person{padding:11px 2px}}
