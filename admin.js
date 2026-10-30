@@ -1,5 +1,6 @@
 const app=document.getElementById('app');
 let tab='dashboard';
+let statsMonth=todayYmd().slice(0,7);
 let attendanceFilter='all';
 let attendanceSearch='';
 let scheduleView='month';
@@ -80,13 +81,14 @@ async function loadAll(){
     else{adminLoadWarnings.push(label);console.warn(`${label} 불러오기 실패`,r.reason)}
   });
   if(window.DOTT_ATTENDANCE_ERROR&&!adminLoadWarnings.includes('출석'))adminLoadWarnings.push('출석');
+  if(window.DOTT_FEES_ERROR&&!adminLoadWarnings.includes('회비'))adminLoadWarnings.push('회비');
 }
 
 function renderAdmin(){
-  const tabs=[['dashboard','대시보드'],['schedules','일정 관리'],['attendance','출석 관리'],['notices','공지 관리'],['boardgame','보드게임'],['murder','머더미스터리'],['deduction','추리게임'],['rentals','대여 관리'],['accounting','회비 · 회계'],['settings','관리자 설정']];
+  const tabs=[['dashboard','대시보드'],['stats','운영 통계'],['schedules','일정 관리'],['attendance','출석 관리'],['notices','공지 관리'],['boardgame','보드게임'],['murder','머더미스터리'],['deduction','추리게임'],['rentals','대여 관리'],['accounting','회비 · 회계'],['settings','관리자 설정']];
   const loadWarning=adminLoadWarnings.length?`<div class="info-box admin-load-warning">⚠ ${adminLoadWarnings.join(' · ')} 데이터를 최신 상태로 불러오지 못했습니다. 네트워크가 안정되면 새로고침해 주세요.</div>`:'';
-  const navGroups=[['운영 관리',['dashboard','schedules','attendance']],['콘텐츠 관리',['notices','boardgame','murder','deduction','rentals']],['재무 · 설정',['accounting','settings']]];
-  const titles={dashboard:['통합 대시보드','도트의 운영 현황을 한눈에 확인하세요.'],schedules:['일정 관리','예약 일정과 이용 현황을 관리합니다.'],attendance:['출석 관리','회원 활동 내역을 관리합니다.'],notices:['공지 관리','회원에게 표시할 공지사항을 관리합니다.'],boardgame:['보드게임','보유 게임과 소유주를 관리합니다.'],murder:['머더미스터리','시나리오 목록을 관리합니다.'],deduction:['추리게임','추리게임 목록을 관리합니다.'],rentals:['대여 관리','대여 현황과 반납을 관리합니다.'],accounting:['회비 · 회계','납부·지출·월 마감 내역을 관리합니다.'],settings:['관리자 설정','내 계정 · 홈페이지 문구 · 백업 · 운영진 권한을 관리합니다.']};
+  const navGroups=[['운영 관리',['dashboard','stats','schedules','attendance']],['콘텐츠 관리',['notices','boardgame','murder','deduction','rentals']],['재무 · 설정',['accounting','settings']]];
+  const titles={dashboard:['통합 대시보드','도트의 운영 현황을 한눈에 확인하세요.'],stats:['운영 통계','월별 벙 현황 · 회비 납부 · 최근 출석을 확인합니다.'],schedules:['일정 관리','예약 일정과 이용 현황을 관리합니다.'],attendance:['출석 관리','회원 활동 내역을 관리합니다.'],notices:['공지 관리','회원에게 표시할 공지사항을 관리합니다.'],boardgame:['보드게임','보유 게임과 소유주를 관리합니다.'],murder:['머더미스터리','시나리오 목록을 관리합니다.'],deduction:['추리게임','추리게임 목록을 관리합니다.'],rentals:['대여 관리','대여 현황과 반납을 관리합니다.'],accounting:['회비 · 회계','납부·지출·월 마감 내역을 관리합니다.'],settings:['관리자 설정','내 계정 · 홈페이지 문구 · 백업 · 운영진 권한을 관리합니다.']};
   const [pageTitle,pageDesc]=titles[tab]||titles.dashboard;
   app.innerHTML=`${nav('admin')}<div class="admin-layout"><aside class="admin-sidebar"><div class="sidebar-label">DOTT WORKSPACE</div><div class="sidebar-nav">${navGroups.map(([group,ids])=>`<div class="nav-group"><div class="nav-group-title">${group}</div>${ids.map(id=>{const item=tabs.find(x=>x[0]===id);return `<button class="tab ${tab===id?'active':''}" data-tab="${id}">${item?.[1]||id}</button>`}).join('')}</div>`).join('')}</div><div class="sidebar-bottom"><span class="status-dot"></span> 공통 Supabase 연결</div></aside><main class="admin-wrap"><section class="admin-hero"><div><span class="eyebrow">DOTT / OPERATIONS</span><h1>${pageTitle}</h1><p>${pageDesc}</p></div><div class="toolbar"><a class="btn" href="${esc(CFG.publicSiteUrl)}" target="_blank" rel="noopener noreferrer">↗ 회원 사이트</a><button class="btn" id="refreshData" type="button">↻ 새로고침</button><button class="btn" id="logout" type="button">로그아웃</button></div></section>${loadWarning}<div id="panel"></div></main></div>${footer()}`;
   document.getElementById('refreshData').onclick=async()=>{const btn=document.getElementById('refreshData');btn.disabled=true;btn.textContent='불러오는 중…';try{await loadAll();renderAdmin();toast('최신 데이터로 새로고침했습니다.')}catch(e){alert(e.message||e);btn.disabled=false}};
@@ -98,6 +100,7 @@ function renderAdmin(){
 function renderPanel(){
   const p=document.getElementById('panel');
   if(tab==='dashboard')return dashboardPanel(p);
+  if(tab==='stats')return statsPanel(p);
   if(tab==='settings')return settingsPanel(p);
   if(tab==='accounting')return accountingPanel(p);
   if(tab==='rentals')return rentalPanel(p);
@@ -107,6 +110,18 @@ function renderPanel(){
   return catalogPanel(p,tab);
 }
 
+
+function statsPanel(panel){
+  if(!window.DOTT_STATS){
+    panel.innerHTML='<div class="info-box">운영 통계 파일을 불러오지 못했습니다. 페이지를 새로고침해 주세요.</div>';
+    return;
+  }
+  window.DOTT_STATS.render(panel,{
+    data, month:statsMonth, today:todayYmd(), warnings:adminLoadWarnings,
+    changeMonth:next=>{statsMonth=next;statsPanel(document.getElementById('panel'));},
+    navigate:next=>{tab=next;renderAdmin();}
+  });
+}
 
 function dashboardPanel(p){
   const today=todayYmd();
@@ -124,7 +139,7 @@ function dashboardPanel(p){
   p.innerHTML=`<section class="dash-welcome"><div><span class="dash-overline">OVERVIEW</span><h2>오늘의 운영 현황</h2><p>${esc(fmtDate(today))} 기준 · 기존 DOTT 데이터와 연결</p></div><span class="dash-live"><i></i> LIVE DATA</span></section>
     <div class="dash-stats">${stat('활동 회원',num('출석',members.length),'탈퇴 회원 제외')}${stat('예정된 예약',num('일정',upcoming.length),'오늘 이후 · 취소 제외')}${stat('게임 보유목록',adminLoadWarnings.some(x=>['보드게임','머더미스터리','추리게임'].includes(x))?'확인 필요':games.toLocaleString('ko-KR'),'보드게임 · 머미 · 추리')}${stat('이번 달 회비 미납',adminLoadWarnings.some(x=>['출석','회비'].includes(x))?'확인 필요':pending.toLocaleString('ko-KR'),'회비 기록 기준 · 확인용 추정')}</div>
     <div class="dash-cols"><section class="dash-card"><div class="dash-card-head"><div><h3>예정된 일정</h3><p>가까운 일정 6건</p></div><button class="dash-link" data-open-tab="schedules">전체 보기 →</button></div>${adminLoadWarnings.includes('일정')?'<div class="dash-empty">일정 데이터를 불러오지 못했습니다. 새로고침해 주세요.</div>':upcomingHtml}</section>
-    <section class="dash-card"><div class="dash-card-head"><div><h3>빠른 관리</h3><p>자주 사용하는 운영 메뉴</p></div></div><div class="dash-shortcuts">${go('schedules','예약 관리','일정 등록 · 수정')}${go('attendance','회원 · 출석','활동 현황 확인')}${go('accounting','회비 · 회계','월별 납부 · 장부')}${go('boardgame','게임 관리','목록 · 소유주')}</div></section></div>
+    <section class="dash-card"><div class="dash-card-head"><div><h3>빠른 관리</h3><p>자주 사용하는 운영 메뉴</p></div></div><div class="dash-shortcuts">${go('schedules','예약 관리','일정 등록 · 수정')}${go('attendance','회원 · 출석','활동 현황 확인')}${go('accounting','회비 · 회계','월별 납부 · 장부')}${go('stats','운영 통계','월별 벙 · 회비 통계')}${go('boardgame','게임 관리','목록 · 소유주')}</div></section></div>
     <div class="dash-footnote">※ 회비 미납 수는 현재 활동 회원과 해당 월 납부·면제 기록을 기준으로 계산한 참고값입니다. 실시간 변경사항은 새로고침 후 반영됩니다.</div>`;
   p.querySelectorAll('[data-open-tab]').forEach(b=>b.onclick=()=>{tab=b.dataset.openTab;renderAdmin()});
 }
