@@ -201,7 +201,7 @@ window.DOTT_DB={
 
 // DOTT 회비 · 회계
 Object.assign(window.DOTT_DB,{
-  async feeRecords(){try{return await restSelect('fee_records','select=*&order=fee_month.desc,paid_at.asc','회비',true)}catch(e){console.warn('fee_records',e);return []}},
+  async feeRecords(){try{const rows=await restSelect('fee_records','select=*&order=fee_month.desc,paid_at.asc','회비',true);window.DOTT_FEES_ERROR=null;return rows}catch(e){window.DOTT_FEES_ERROR=e;console.warn('fee_records',e);return []}},
   async accountingEntries(){try{return await restSelect('accounting_entries','select=*&order=entry_date.asc,created_at.asc','회계장부',true)}catch(e){console.warn('accounting_entries',e);return []}},
   async accountingReceipts(){try{return await restSelect('accounting_receipts','select=*&order=entry_id.asc,sort_order.asc,created_at.asc','회계 영수증',true)}catch(e){console.warn('accounting_receipts',e);return []}},
   async accountingClosures(){try{return await restSelect('accounting_month_closures','select=*&order=month.desc','월 마감',true)}catch(e){console.warn('accounting_month_closures',e);return []}},
