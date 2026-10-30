@@ -123,6 +123,41 @@ function statsPanel(panel){
   });
 }
 
+function dashboardAttendanceAlerts(){
+  if(adminLoadWarnings.includes('출석')){
+    return `<section class="dash-attention"><div class="dash-attention-heading"><div><span>ATTENDANCE ALERTS</span><h3>출석 경과 알림</h3><p>출석 정보를 불러오지 못했습니다. 새로고침해 주세요.</p></div><button type="button" class="dash-link" data-open-tab="attendance">출석 관리 →</button></div></section>`;
+  }
+  const at=todayYmd();
+  const toUtc=value=>{const [y,m,d]=String(value).split('-').map(Number);return Date.UTC(y,m-1,d);};
+  const list=(data.attendance||[]).map(member=>{
+    const state=attendanceState(member);
+    const due=attendanceDueDate(member);
+    const dueSoon=attendanceDueSoon(due);
+    return {member,state,due,dueSoon,overDays:due?Math.max(0,Math.round((toUtc(at)-toUtc(due))/86400000)):0};
+  });
+  const soon=list.filter(x=>x.state.key==='keep'&&x.dueSoon.active)
+    .sort((a,b)=>a.due.localeCompare(b.due)||String(a.member.name||'').localeCompare(String(b.member.name||''),'ko'));
+  const overdue=list.filter(x=>x.state.key==='overdue'&&x.due)
+    .sort((a,b)=>a.due.localeCompare(b.due)||String(a.member.name||'').localeCompare(String(b.member.name||''),'ko'));
+  const person=(x,kind)=>`<div class="dash-attention-person">
+    <div class="dash-attention-person-main"><strong>${esc(x.member.name||'이름 없음')}</strong><small>${kind==='soon'?'경과 예정':'경과 기준일'} ${esc(shortDate(x.due))}</small></div>
+    <span class="dash-attention-day ${kind}">${kind==='soon'?`D-${x.dueSoon.days}`:(x.overDays===0?'경과 당일':`D+${x.overDays}`)}</span>
+  </div>`;
+  const section=(kind,title,subtitle,people)=>`<section class="dash-attention-card ${kind}">
+    <div class="dash-attention-card-heading"><h4><span class="dash-attention-dot ${kind}"></span>${title}</h4><strong>${people.length}<small>명</small></strong></div>
+    <p>${subtitle}</p>
+    <div class="dash-attention-list">${people.length?people.map(x=>person(x,kind)).join(''):'<div class="dash-attention-empty">해당 회원이 없습니다.</div>'}</div>
+    <button type="button" class="dash-attention-view" data-attention-filter="${kind==='soon'?'dueSoon':'overdue'}">출석관리에서 확인하기 →</button>
+  </section>`;
+  return `<section class="dash-attention">
+    <div class="dash-attention-heading"><div><span>ATTENDANCE ALERTS</span><h3>출석 경과 알림</h3><p>유예·탈퇴 회원 제외 · 최근 참석일이 없으면 가입일을 기준으로 계산</p></div><button type="button" class="dash-link" data-open-tab="attendance">전체 출석관리 →</button></div>
+    <div class="dash-attention-grid">
+      ${section('soon','경과 임박','2개월 경과일 14일 전부터 D-1까지',soon)}
+      ${section('overdue','2개월 경과','2개월 경과일 당일 및 이후',overdue)}
+    </div>
+  </section>`;
+}
+
 function dashboardPanel(p){
   const today=todayYmd();
   const upcoming=[...(data.schedules||[])].filter(x=>String(x.event_date||'')>=today&&!isCancelledStatus(x.status)).sort((a,b)=>String(a.event_date||'').localeCompare(String(b.event_date||''))||String(a.event_time||'').localeCompare(String(b.event_time||'')));
@@ -138,10 +173,12 @@ function dashboardPanel(p){
   const upcomingHtml=upcoming.slice(0,6).map(x=>`<div class="dash-schedule"><div class="dash-date">${esc(String(x.event_date||'').slice(5).replace('-',' / '))}</div><div class="dash-event"><b>${esc(x.title||x.name||x.event_name||x.event_title||x.bung_name||x.group_name||'예약 일정')}</b><small>${esc(String(x.event_time||'').slice(0,5))}${x.organizer?' · '+esc(x.organizer):''}</small></div><span class="dash-dot"></span></div>`).join('')||'<div class="dash-empty">예정된 예약 일정이 없습니다.</div>';
   p.innerHTML=`<section class="dash-welcome"><div><span class="dash-overline">OVERVIEW</span><h2>오늘의 운영 현황</h2><p>${esc(fmtDate(today))} 기준 · 기존 DOTT 데이터와 연결</p></div><span class="dash-live"><i></i> LIVE DATA</span></section>
     <div class="dash-stats">${stat('활동 회원',num('출석',members.length),'탈퇴 회원 제외')}${stat('예정된 예약',num('일정',upcoming.length),'오늘 이후 · 취소 제외')}${stat('게임 보유목록',adminLoadWarnings.some(x=>['보드게임','머더미스터리','추리게임'].includes(x))?'확인 필요':games.toLocaleString('ko-KR'),'보드게임 · 머미 · 추리')}${stat('이번 달 회비 미납',adminLoadWarnings.some(x=>['출석','회비'].includes(x))?'확인 필요':pending.toLocaleString('ko-KR'),'회비 기록 기준 · 확인용 추정')}</div>
+    ${dashboardAttendanceAlerts()}
     <div class="dash-cols"><section class="dash-card"><div class="dash-card-head"><div><h3>예정된 일정</h3><p>가까운 일정 6건</p></div><button class="dash-link" data-open-tab="schedules">전체 보기 →</button></div>${adminLoadWarnings.includes('일정')?'<div class="dash-empty">일정 데이터를 불러오지 못했습니다. 새로고침해 주세요.</div>':upcomingHtml}</section>
     <section class="dash-card"><div class="dash-card-head"><div><h3>빠른 관리</h3><p>자주 사용하는 운영 메뉴</p></div></div><div class="dash-shortcuts">${go('schedules','예약 관리','일정 등록 · 수정')}${go('attendance','회원 · 출석','활동 현황 확인')}${go('accounting','회비 · 회계','월별 납부 · 장부')}${go('stats','운영 통계','월별 벙 · 회비 통계')}${go('boardgame','게임 관리','목록 · 소유주')}</div></section></div>
     <div class="dash-footnote">※ 회비 미납 수는 현재 활동 회원과 해당 월 납부·면제 기록을 기준으로 계산한 참고값입니다. 실시간 변경사항은 새로고침 후 반영됩니다.</div>`;
   p.querySelectorAll('[data-open-tab]').forEach(b=>b.onclick=()=>{tab=b.dataset.openTab;renderAdmin()});
+  p.querySelectorAll('[data-attention-filter]').forEach(b=>b.onclick=()=>{attendanceFilter=b.dataset.attentionFilter;tab='attendance';renderAdmin()});
 }
 
 function scheduleMonthLabel(){return `${scheduleCursor.getFullYear()}년 ${scheduleCursor.getMonth()+1}월`}
@@ -328,13 +365,14 @@ function attendancePanel(p){
   const states=data.attendance.map(x=>{const due=attendanceDueDate(x);return {member:x,state:attendanceState(x),due,dueSoon:attendanceDueSoon(due)}});
   const counts={all:states.length,keep:0,overdue:0,grace:0,left:0};
   states.forEach(x=>counts[x.state.key]=(counts[x.state.key]||0)+1);
-  let rows=states.filter(({member,state})=>{
+  let rows=states.filter(({member,state,dueSoon})=>{
+    if(attendanceFilter==='dueSoon')return state.key==='keep'&&dueSoon.active;
     if(attendanceFilter!=='all'&&state.key!==attendanceFilter)return false;
     return true;
   });
   // 운영진은 항상 최상단에 고정하고, 운영진/일반회원 각각 이름 가나다순으로 정렬합니다.
   rows.sort((a,b)=>Number(Boolean(b.member.is_staff))-Number(Boolean(a.member.is_staff))||String(a.member.name||'').localeCompare(String(b.member.name||''),'ko'));
-  const filters=[['all','전체'],['keep','유지'],['overdue','경과'],['grace','유예'],['left','탈퇴']];
+  const filters=[['all','전체'],['keep','유지'],['dueSoon','경과 임박'],['overdue','경과'],['grace','유예'],['left','탈퇴']];
   p.innerHTML=`
     <div class="attendance-head">
       <div>
