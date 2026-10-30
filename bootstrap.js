@@ -3,7 +3,7 @@
   const entry=bootScript?.dataset?.entry||'';
   const app=document.getElementById('app');
   const sleep=ms=>new Promise(r=>setTimeout(r,ms));
-  const BUILD='dott-20261026-owner-search';
+  const BUILD='dott-admin-v4-20261030';
 
   function loadScript(src,{timeout=9000,retries=2}={}){
     return (async()=>{
@@ -34,7 +34,7 @@
     if(!app)return;
     const msg=String(error?.message||error||'연결 오류');
     const safe=msg.replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-    app.innerHTML=`<main style="max-width:720px;margin:72px auto;padding:24px;font-family:Arial,'Noto Sans KR',sans-serif;color:#222"><div style="border:1px solid #eadfd4;border-radius:18px;padding:24px;background:#fffaf5;text-align:center"><div style="font-size:34px;margin-bottom:10px">↻</div><h2 style="margin:0 0 10px;font-size:20px">페이지 연결이 잠시 불안정해요</h2><p style="margin:0 0 18px;line-height:1.6;color:#666">사이트 파일은 열렸지만 필요한 기능 파일을 불러오지 못했습니다.<br>잠시 후 다시 시도해 주세요.</p><button id="bootRetry" style="border:0;border-radius:12px;background:#e95d20;color:white;padding:11px 18px;font-weight:700">다시 시도</button><details style="margin-top:16px;color:#999;font-size:12px"><summary>오류 내용</summary><div style="margin-top:8px;word-break:break-all">${safe}</div></details></div></main>`;
+    app.innerHTML=`<main style="max-width:720px;margin:72px auto;padding:24px;font-family:Arial,'Noto Sans KR',sans-serif;color:#222"><div style="border:1px solid #dce4ef;border-radius:18px;padding:24px;background:#f7f9fc;text-align:center"><div style="font-size:34px;margin-bottom:10px">↻</div><h2 style="margin:0 0 10px;font-size:20px">페이지 연결이 잠시 불안정해요</h2><p style="margin:0 0 18px;line-height:1.6;color:#666">사이트 파일은 열렸지만 필요한 기능 파일을 불러오지 못했습니다.<br>잠시 후 다시 시도해 주세요.</p><button id="bootRetry" style="border:0;border-radius:12px;background:#4168b1;color:white;padding:11px 18px;font-weight:700">다시 시도</button><details style="margin-top:16px;color:#999;font-size:12px"><summary>오류 내용</summary><div style="margin-top:8px;word-break:break-all">${safe}</div></details></div></main>`;
     document.getElementById('bootRetry')?.addEventListener('click',()=>location.reload());
   }
 

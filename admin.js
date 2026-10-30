@@ -11,18 +11,36 @@ let accountingFilter='all';
 let accountingSearch='';
 let data={schedules:[],notices:[],attendance:[],boardgame:[],murder:[],deduction:[],settings:null,fees:[],ledger:[],receipts:[],closures:[],rentals:[]};
 let adminLoadWarnings=[];
+let dottAdminRole=null;
+let dottAdminEmail='';
 
 (async()=>{
   try{
     const s=await DOTT_DB.session();
     if(!s)return renderLogin();
+    await ensureAdminRole();
     await loadAll();
     renderAdmin();
   }catch(e){
-    console.warn('관리자 세션 확인 실패',e);
-    renderLogin();
+    console.warn('관리자 접근 권한 확인 실패',e);
+    renderAccessError(e);
   }
 })();
+
+async function ensureAdminRole(){
+  const role=await DOTT_DB.myRole();
+  if(role!=='owner'&&role!=='admin')throw new Error('승인된 운영진 계정이 아닙니다. 최고관리자에게 문의해 주세요.');
+  dottAdminRole=role;
+  const session=await DOTT_DB.session();
+  dottAdminEmail=String(session?.user?.email||'');
+  return role;
+}
+function renderAccessError(e){
+  const message=esc(e?.message||String(e)||'권한 확인 실패');
+  app.innerHTML=`${nav('admin')}<div class="login-box"><span class="eyebrow">접근 권한 확인</span><h1>관리실에 연결하지 못했어요</h1><p class="settings-access-error">${message}</p><p class="settings-access-help">운영진 역할을 확인할 수 없으면 데이터는 불러오지 않습니다. Supabase에 <code>dott_my_role()</code> 함수가 있는지 확인해 주세요.</p><button class="btn primary" id="retryAdmin">다시 확인</button> <button class="btn" id="backLogin">로그인 화면</button></div>${footer()}`;
+  document.getElementById('retryAdmin').onclick=()=>location.reload();
+  document.getElementById('backLogin').onclick=async()=>{await DOTT_DB.signOut();dottAdminRole=null;renderLogin()};
+}
 
 function renderLogin(){
   app.innerHTML=`${nav('admin')}<div class="login-box"><span class="eyebrow">🔒 관리자</span><h1>관리자 로그인</h1><p style="color:var(--muted);font-size:13px;line-height:1.6">실제 운영용 관리자 로그인입니다. Supabase Authentication에 만든 관리자 이메일/비밀번호를 사용하세요.</p><label class="label">이메일</label><input id="email" class="field" type="email" placeholder="admin@example.com"><label class="label" style="margin-top:12px">비밀번호</label><input id="password" class="field" type="password" placeholder="비밀번호"><button id="login" class="btn primary" style="width:100%;margin-top:14px">로그인</button><div class="error" id="err"></div></div>${footer()}`;
@@ -31,9 +49,10 @@ function renderLogin(){
     btn.disabled=true;
     try{
       await DOTT_DB.signIn(document.getElementById('email').value,document.getElementById('password').value);
+      await ensureAdminRole();
       await loadAll();
       renderAdmin();
-    }catch(e){document.getElementById('err').textContent=e.message}
+    }catch(e){document.getElementById('err').textContent=e.message||String(e)}
     finally{btn.disabled=false}
   };
 }
@@ -67,11 +86,11 @@ function renderAdmin(){
   const tabs=[['dashboard','대시보드'],['schedules','일정 관리'],['attendance','출석 관리'],['notices','공지 관리'],['boardgame','보드게임'],['murder','머더미스터리'],['deduction','추리게임'],['rentals','대여 관리'],['accounting','회비 · 회계'],['settings','관리자 설정']];
   const loadWarning=adminLoadWarnings.length?`<div class="info-box admin-load-warning">⚠ ${adminLoadWarnings.join(' · ')} 데이터를 최신 상태로 불러오지 못했습니다. 네트워크가 안정되면 새로고침해 주세요.</div>`:'';
   const navGroups=[['운영 관리',['dashboard','schedules','attendance']],['콘텐츠 관리',['notices','boardgame','murder','deduction','rentals']],['재무 · 설정',['accounting','settings']]];
-  const titles={dashboard:['통합 대시보드','도트의 운영 현황을 한눈에 확인하세요.'],schedules:['일정 관리','예약 일정과 이용 현황을 관리합니다.'],attendance:['출석 관리','회원 활동 내역을 관리합니다.'],notices:['공지 관리','회원에게 표시할 공지사항을 관리합니다.'],boardgame:['보드게임','보유 게임과 소유주를 관리합니다.'],murder:['머더미스터리','시나리오 목록을 관리합니다.'],deduction:['추리게임','추리게임 목록을 관리합니다.'],rentals:['대여 관리','대여 현황과 반납을 관리합니다.'],accounting:['회비 · 회계','납부·지출·월 마감 내역을 관리합니다.'],settings:['관리자 설정','홈페이지 문구 · 데이터 백업 · 계정 보안을 관리합니다.']};
+  const titles={dashboard:['통합 대시보드','도트의 운영 현황을 한눈에 확인하세요.'],schedules:['일정 관리','예약 일정과 이용 현황을 관리합니다.'],attendance:['출석 관리','회원 활동 내역을 관리합니다.'],notices:['공지 관리','회원에게 표시할 공지사항을 관리합니다.'],boardgame:['보드게임','보유 게임과 소유주를 관리합니다.'],murder:['머더미스터리','시나리오 목록을 관리합니다.'],deduction:['추리게임','추리게임 목록을 관리합니다.'],rentals:['대여 관리','대여 현황과 반납을 관리합니다.'],accounting:['회비 · 회계','납부·지출·월 마감 내역을 관리합니다.'],settings:['관리자 설정','내 계정 · 홈페이지 문구 · 백업 · 운영진 권한을 관리합니다.']};
   const [pageTitle,pageDesc]=titles[tab]||titles.dashboard;
   app.innerHTML=`${nav('admin')}<div class="admin-layout"><aside class="admin-sidebar"><div class="sidebar-label">DOTT WORKSPACE</div><div class="sidebar-nav">${navGroups.map(([group,ids])=>`<div class="nav-group"><div class="nav-group-title">${group}</div>${ids.map(id=>{const item=tabs.find(x=>x[0]===id);return `<button class="tab ${tab===id?'active':''}" data-tab="${id}">${item?.[1]||id}</button>`}).join('')}</div>`).join('')}</div><div class="sidebar-bottom"><span class="status-dot"></span> 공통 Supabase 연결</div></aside><main class="admin-wrap"><section class="admin-hero"><div><span class="eyebrow">DOTT / OPERATIONS</span><h1>${pageTitle}</h1><p>${pageDesc}</p></div><div class="toolbar"><a class="btn" href="${esc(CFG.publicSiteUrl)}" target="_blank" rel="noopener noreferrer">↗ 회원 사이트</a><button class="btn" id="refreshData" type="button">↻ 새로고침</button><button class="btn" id="logout" type="button">로그아웃</button></div></section>${loadWarning}<div id="panel"></div></main></div>${footer()}`;
   document.getElementById('refreshData').onclick=async()=>{const btn=document.getElementById('refreshData');btn.disabled=true;btn.textContent='불러오는 중…';try{await loadAll();renderAdmin();toast('최신 데이터로 새로고침했습니다.')}catch(e){alert(e.message||e);btn.disabled=false}};
-  document.getElementById('logout').onclick=async()=>{await DOTT_DB.signOut();renderLogin()};
+  document.getElementById('logout').onclick=async()=>{await DOTT_DB.signOut();dottAdminRole=null;dottAdminEmail='';renderLogin()};
   document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{tab=b.dataset.tab;renderAdmin()});
   renderPanel();
 }
@@ -688,6 +707,8 @@ function wireRows(table,editFn,kind){
 }
 
 function settingsPanel(p){
+  const isOwner=dottAdminRole==='owner';
+  const roleLabel=isOwner?'최고관리자 · OWNER':'일반 운영진 · ADMIN';
   const s={
     hero_badge:'◎ 전체 공개 일정',
     hero_title:'우리의 모든 일정을\n한눈에 확인하세요',
@@ -698,41 +719,59 @@ function settingsPanel(p){
     deduction_description:'추리·사건 해결형 게임 보유 목록을 확인하세요.',
     ...(data.settings||{})
   };
+  const ownerNav=isOwner?'<a href="#setting-team" class="settings-index-link"><span class="settings-index-icon">04</span><span><b>운영진 권한</b><small>최고관리자 전용</small></span></a>':'';
+  const ownerSection=isOwner?`<section id="setting-team" class="settings-section">
+    <div class="settings-section-head"><div><span class="settings-kicker">04 / STAFF ACCESS</span><h2>운영진 권한 관리</h2><p>최고관리자만 승인된 운영진 명단을 확인하고 권한을 부여·해제할 수 있습니다.</p></div><span class="settings-section-mark">OWNER ONLY</span></div>
+    <div class="settings-team-body">
+      <div class="settings-team-intro"><span class="settings-team-lock">🔒</span><span>현재 최고관리자는 1명으로 고정됩니다. 운영진 추가는 이미 Supabase Auth에 만들어진 계정에만 가능합니다.</span></div>
+      <div id="teamList" aria-live="polite"><p class="settings-help">운영진 명단을 불러오는 중입니다…</p></div>
+      <form id="teamAddForm" class="settings-team-add" autocomplete="off">
+        <div class="settings-field"><label class="label" for="teamAddEmail">일반 운영진 등록</label><input id="teamAddEmail" class="field" type="email" autocomplete="off" placeholder="등록된 운영진 이메일 입력" required></div>
+        <button class="btn primary" type="submit" id="teamAddButton">운영진 권한 부여</button>
+      </form>
+      <p class="settings-help">계정을 새로 만드는 기능은 아닙니다. Supabase Authentication에 기존 계정이 있어야 하며, Owner 역할은 이 화면에서 변경하지 않습니다.</p>
+      <div class="error" id="teamErr" role="alert"></div>
+    </div>
+  </section>`:'';
   p.innerHTML=`<div class="settings-layout">
     <aside class="settings-index" aria-label="설정 항목">
-      <div class="settings-index-title">SETTINGS <span>01 — 03</span></div>
-      <a href="#setting-content" class="settings-index-link"><span class="settings-index-icon">01</span><span><b>홈페이지 문구</b><small>회원 사이트 첫 화면</small></span></a>
-      <a href="#setting-backup" class="settings-index-link"><span class="settings-index-icon">02</span><span><b>데이터 백업·복원</b><small>전체 데이터 보호</small></span></a>
-      <a href="#setting-security" class="settings-index-link"><span class="settings-index-icon">03</span><span><b>계정 보안</b><small>내 로그인 비밀번호</small></span></a>
-      <div class="settings-index-note"><strong>설정 안내</strong><br>저장 버튼을 누른 항목만 반영됩니다. 이 페이지는 기존 사이트 설정과 연결되어 있습니다.</div>
+      <div class="settings-index-title">SETTINGS <span>01 — ${isOwner?'04':'03'}</span></div>
+      <div class="settings-index-profile"><span class="settings-user-avatar">${isOwner?'O':'A'}</span><div><b>${esc(roleLabel)}</b><small title="${esc(dottAdminEmail)}">${esc(dottAdminEmail||'운영진 로그인')}</small></div></div>
+      <a href="#setting-account" class="settings-index-link"><span class="settings-index-icon">01</span><span><b>내 계정</b><small>계정 · 비밀번호</small></span></a>
+      <a href="#setting-content" class="settings-index-link"><span class="settings-index-icon">02</span><span><b>홈페이지 문구</b><small>운영진 모두 수정 가능</small></span></a>
+      <a href="#setting-backup" class="settings-index-link"><span class="settings-index-icon">03</span><span><b>데이터 백업·복원</b><small>백업 다운로드 · 복원 안내</small></span></a>
+      ${ownerNav}
+      <div class="settings-index-note"><strong>설정 안내</strong><br>문구 변경은 회원용 도트 홈페이지에 반영됩니다. 권한 변경은 별도의 서버 검사로 보호됩니다.</div>
     </aside>
     <div class="settings-main">
+      <section id="setting-account" class="settings-section">
+        <div class="settings-section-head"><div><span class="settings-kicker">01 / MY ACCOUNT</span><h2>내 계정 관리</h2><p>로그인한 내 계정의 역할을 확인하고 비밀번호를 변경합니다.</p></div><span class="settings-section-mark">${isOwner?'OWNER':'ADMIN'}</span></div>
+        <div class="settings-account-overview"><div class="settings-account-avatar">${isOwner?'O':'A'}</div><div class="settings-account-details"><small>현재 로그인 계정</small><strong>${esc(dottAdminEmail||'이메일 정보 없음')}</strong><span class="settings-role-badge">${esc(roleLabel)}</span></div></div>
+        <div class="settings-password-form"><div class="settings-security-note"><b>내 비밀번호 변경</b><span>다른 운영진 계정의 비밀번호는 변경되지 않습니다. 안전한 새 비밀번호를 설정해 주세요.</span></div>
+          <div class="settings-password-grid"><div class="settings-field"><label class="label" for="pw1">새 비밀번호</label><input id="pw1" class="field" type="password" autocomplete="new-password" placeholder="8자 이상"></div><div class="settings-field"><label class="label" for="pw2">새 비밀번호 확인</label><input id="pw2" class="field" type="password" autocomplete="new-password" placeholder="새 비밀번호 다시 입력"></div></div>
+          <div class="settings-action-row"><span class="settings-save-hint">현재 계정에만 적용됩니다.</span><button class="btn primary" id="changePw" type="button">비밀번호 변경</button></div><div class="error" id="pwErr" role="alert"></div>
+        </div>
+      </section>
       <section id="setting-content" class="settings-section">
-        <div class="settings-section-head"><div><span class="settings-kicker">01 / SITE CONTENT</span><h2>홈페이지 문구</h2><p>회원용 도트 홈페이지의 예약 캘린더 상단에 표시되는 문구를 편집합니다.</p></div><span class="settings-section-mark">화면 표시</span></div>
+        <div class="settings-section-head"><div><span class="settings-kicker">02 / SITE CONTENT</span><h2>홈페이지 문구</h2><p>회원용 도트 홈페이지의 예약 캘린더 상단에 표시되는 문구를 편집합니다.</p></div><span class="settings-section-mark">운영진 공통</span></div>
         <div class="settings-section-body"><div class="settings-fields">
           <div class="settings-field"><label class="label" for="heroBadge">작은 안내 문구</label><input id="heroBadge" class="field" value="${esc(s.hero_badge)}" placeholder="예: 전체 공개 일정"></div>
           <div class="settings-field"><label class="label" for="heroTitle">메인 제목</label><textarea id="heroTitle" class="field" rows="3" placeholder="예약 페이지의 큰 제목">${esc(s.hero_title)}</textarea><small class="settings-help">줄을 바꾸고 싶은 위치에서 Enter를 누르면 됩니다.</small></div>
           <div class="settings-field"><label class="label" for="heroDescription">소개 문구</label><textarea id="heroDescription" class="field" rows="3" placeholder="회원에게 보여줄 안내 문구">${esc(s.hero_description)}</textarea></div>
-          <div class="settings-action-row"><span class="settings-save-hint">저장 후 회원 사이트에 반영됩니다.</span><button class="btn primary" id="saveHero" type="button">문구 저장하기</button></div>
+          <div class="settings-action-row"><span class="settings-save-hint">Owner와 Admin 모두 수정할 수 있습니다.</span><button class="btn primary" id="saveHero" type="button">문구 저장하기</button></div>
           <div class="error" id="settingsErr" role="alert"></div>
-        </div><div class="settings-preview-col"><div class="settings-preview-head">미리보기 <span>회원 사이트 · 상단 문구</span></div><div class="settings-preview"><span class="settings-preview-badge" id="heroPreviewBadge"></span><h3 id="heroPreviewTitle"></h3><p id="heroPreviewDescription"></p></div><p class="settings-help">미리보기는 편집 중인 문구를 표시하며, 실제 회원 사이트 디자인과는 다를 수 있습니다.</p></div></div>
+        </div><div class="settings-preview-col"><div class="settings-preview-head">실시간 미리보기 <span>회원 사이트 · 상단 문구</span></div><div class="settings-preview"><span class="settings-preview-badge" id="heroPreviewBadge"></span><h3 id="heroPreviewTitle"></h3><p id="heroPreviewDescription"></p></div><p class="settings-help">미리보기는 입력 중인 문구를 보여줍니다. 실제 디자인과 차이가 있을 수 있습니다.</p></div></div>
       </section>
       <section id="setting-backup" class="settings-section">
-        <div class="settings-section-head"><div><span class="settings-kicker">02 / DATA MANAGEMENT</span><h2>데이터 백업 · 복원</h2><p>예약·출석·회계 등 주요 기록을 JSON 파일로 보관하거나 복원합니다.</p></div><span class="settings-section-mark">데이터 관리</span></div>
+        <div class="settings-section-head"><div><span class="settings-kicker">03 / DATA MANAGEMENT</span><h2>데이터 백업 · 복원</h2><p>운영 데이터는 정기적으로 보관하되, 위험한 일괄 복원은 별도 절차로 관리합니다.</p></div><span class="settings-section-mark">안전 관리</span></div>
         <div class="settings-section-body settings-backup-body">
-          <div class="settings-backup-option"><span class="settings-option-symbol">↓</span><div><h3>전체 데이터 다운로드</h3><p>일정 · 공지 · 출석 · 게임 목록 · 사이트 설정 · 회비 · 회계 정보를 JSON 형식으로 저장합니다.</p><button class="btn primary" id="downloadBackup" type="button">전체 데이터 백업</button></div></div>
-          <div class="settings-backup-option settings-restore-option"><span class="settings-option-symbol">↻</span><div><h3>백업 파일에서 복원</h3><p>선택한 백업 내용으로 현재 데이터가 교체됩니다. 기존 데이터가 변경될 수 있으니 먼저 최신 백업을 저장하세요.</p><button class="btn" id="chooseRestore" type="button">백업 파일 선택 · 복원</button><input id="restoreFile" type="file" accept=".json,application/json" hidden></div></div>
-          <div class="settings-backup-footnote">유의사항 · 게임 이미지와 회계 영수증 원본 등 Supabase Storage의 파일은 JSON에 포함되지 않습니다. 복원 전 확인창이 두 번 표시됩니다.</div>
+          <div class="settings-backup-option"><span class="settings-option-symbol">↓</span><div><h3>전체 데이터 JSON 백업</h3><p>예약 · 출석 · 게임 · 회비 · 회계 · 공지 데이터를 다운로드합니다. 운영진 모두 사용 가능합니다.</p><button class="btn primary" id="downloadBackup" type="button">JSON 백업 다운로드</button></div></div>
+          <div class="settings-backup-option settings-restore-option"><span class="settings-option-symbol">🔒</span><div><h3>전체 데이터 복원 <small>OWNER 전용</small></h3><p>${isOwner?'현재 복원은 안전한 서버 측 전용 절차를 준비하기 전까지 비활성화되어 있습니다. 기존 자동 복원은 데이터 손상 위험이 있어 제거했습니다.':'전체 복원은 최고관리자 전용 작업입니다. 일반 운영진에게 복원 기능은 제공되지 않습니다.'}</p><span class="settings-restore-disabled">${isOwner?'복원 기능 비활성화 · 안전한 복원 방식 준비 필요':'Owner만 복원 요청 가능'}</span></div></div>
+          <div class="settings-backup-footnote">JSON 백업에는 Supabase Auth 계정, RLS 정책, 함수 정의, 게임 이미지와 영수증 원본 파일이 포함되지 않습니다. 저장한 JSON은 공개 GitHub에 올리지 마세요.</div>
           <div class="error" id="backupErr" role="alert"></div>
         </div>
       </section>
-      <section id="setting-security" class="settings-section">
-        <div class="settings-section-head"><div><span class="settings-kicker">03 / ACCOUNT SECURITY</span><h2>계정 보안</h2><p>현재 로그인한 관리자의 Supabase 계정 비밀번호를 변경합니다.</p></div><span class="settings-section-mark">개인 계정</span></div>
-        <div class="settings-password-form"><div class="settings-security-note"><b>내 계정 비밀번호 변경</b><span>다른 운영진의 비밀번호는 변경되지 않습니다. 변경 직후 새 비밀번호를 사용하세요.</span></div>
-          <div class="settings-password-grid"><div class="settings-field"><label class="label" for="pw1">새 비밀번호</label><input id="pw1" class="field" type="password" autocomplete="new-password" placeholder="8자 이상 권장"></div><div class="settings-field"><label class="label" for="pw2">새 비밀번호 확인</label><input id="pw2" class="field" type="password" autocomplete="new-password" placeholder="비밀번호 다시 입력"></div></div>
-          <div class="settings-action-row"><span class="settings-save-hint">로그인 계정의 비밀번호만 변경됩니다.</span><button class="btn primary" id="changePw" type="button">비밀번호 변경</button></div><div class="error" id="pwErr" role="alert"></div>
-        </div>
-      </section>
+      ${ownerSection}
     </div>
   </div>`;
   const updateSettingsPreview=()=>{
@@ -748,52 +787,66 @@ function settingsPanel(p){
       const row={hero_badge:document.getElementById('heroBadge').value.trim(),hero_title:document.getElementById('heroTitle').value.trim(),hero_description:document.getElementById('heroDescription').value.trim()};
       if(!row.hero_title)throw new Error('큰 제목을 입력해 주세요.');
       data.settings=await DOTT_DB.saveSettings(row);toast('메인 화면 문구를 저장했습니다.');
-    }catch(e){err.textContent=(e.message||e)+' — add-site-settings.sql을 아직 실행하지 않았다면 먼저 실행해 주세요.'}
+    }catch(e){err.textContent=e.message||String(e)}
     finally{btn.disabled=false}
   };
-
   document.getElementById('downloadBackup').onclick=async()=>{
-    const btn=document.getElementById('downloadBackup'),err=document.getElementById('backupErr');
-    btn.disabled=true;err.textContent='';
+    const btn=document.getElementById('downloadBackup'),err=document.getElementById('backupErr');btn.disabled=true;err.textContent='';
     try{
       const backup=await DOTT_DB.createFullBackup();
       const blob=new Blob([JSON.stringify(backup,null,2)],{type:'application/json;charset=utf-8'});
       const url=URL.createObjectURL(blob),link=document.createElement('a');
       const stamp=new Date().toLocaleDateString('sv-SE');
       link.href=url;link.download=`DOTT_backup_${stamp}.json`;document.body.appendChild(link);link.click();link.remove();
-      setTimeout(()=>URL.revokeObjectURL(url),1000);toast('전체 데이터 백업 파일을 저장했습니다.');
+      setTimeout(()=>URL.revokeObjectURL(url),1000);toast('JSON 백업 파일을 저장했습니다.');
     }catch(e){err.textContent=e.message||String(e)}
     finally{btn.disabled=false}
   };
-  document.getElementById('chooseRestore').onclick=()=>document.getElementById('restoreFile').click();
-  document.getElementById('restoreFile').onchange=async e=>{
-    const input=e.currentTarget,file=input.files?.[0],err=document.getElementById('backupErr');
-    if(!file)return;err.textContent='';
-    try{
-      const backup=JSON.parse(await file.text());
-      if(backup?.format!=='DOTT_FULL_BACKUP'||backup?.version!==1)throw new Error('DOTT 백업 파일이 아닙니다.');
-      const counts=Object.values(backup.tables||{}).reduce((n,v)=>n+(Array.isArray(v)?v.length:0),0);
-      const created=backup.created_at?new Date(backup.created_at).toLocaleString('ko-KR'):'날짜 정보 없음';
-      if(!confirm(`백업 파일을 복원할까요?\n\n백업 생성: ${created}\n총 데이터: ${counts}건\n\n현재 Supabase 데이터가 이 백업 내용으로 교체됩니다.`))return;
-      if(!confirm('정말 복원하시겠습니까?\n이 작업은 현재 데이터를 변경합니다.'))return;
-      document.getElementById('chooseRestore').disabled=true;
-      await DOTT_DB.restoreFullBackup(backup);
-      await loadAll();renderAdmin();toast('백업 데이터를 복원했습니다.');
-    }catch(ex){err.textContent=ex.message||String(ex)}
-    finally{input.value='';const b=document.getElementById('chooseRestore');if(b)b.disabled=false}
-  };
-
   document.getElementById('changePw').onclick=async()=>{
     const btn=document.getElementById('changePw'),err=document.getElementById('pwErr');
     const a=document.getElementById('pw1').value,b=document.getElementById('pw2').value;
     err.textContent='';
-    if(a.length<6){err.textContent='비밀번호는 6자 이상 입력해 주세요. (8자 이상 권장)';return;}
-    if(a!==b){err.textContent='입력한 비밀번호가 서로 다릅니다.';return;}
+    if(a.length<8){err.textContent='비밀번호는 8자 이상으로 입력해 주세요.';return}
+    if(a!==b){err.textContent='입력한 비밀번호가 서로 다릅니다.';return}
     btn.disabled=true;
     try{await DOTT_DB.changePassword(a);document.getElementById('pw1').value='';document.getElementById('pw2').value='';toast('비밀번호를 변경했습니다.');}
     catch(ex){err.textContent=ex.message||String(ex)}
     finally{btn.disabled=false}
   };
+  if(isOwner)initTeamManagement();
+}
+
+async function initTeamManagement(){
+  const el=document.getElementById('teamList'),err=document.getElementById('teamErr');
+  if(!el||dottAdminRole!=='owner')return;
+  const refresh=async()=>{
+    el.innerHTML='<p class="settings-help">운영진 명단을 불러오는 중입니다…</p>';
+    try{
+      const rows=await DOTT_DB.listAdminMembers();
+      if(!document.getElementById('teamList'))return;
+      el.innerHTML=`<div class="settings-team-list-head"><strong>현재 운영진</strong><span>${rows.length}명</span></div><div class="settings-team-list">${rows.map(x=>`<div class="settings-team-person"><span class="settings-team-person-avatar ${x.role==='owner'?'is-owner':''}">${x.role==='owner'?'O':'A'}</span><div class="settings-team-person-detail"><b>${esc(x.email)}</b><small>${x.role==='owner'?'최고관리자 · OWNER':'일반 운영진 · ADMIN'}</small></div><span class="settings-role-badge">${x.role==='owner'?'OWNER':'ADMIN'}</span>${x.role==='admin'?`<button class="btn settings-revoke" type="button" data-revoke-email="${esc(x.email)}">권한 해제</button>`:'<span class="settings-owner-lock">보호됨</span>'}</div>`).join('')}</div>`;
+      el.querySelectorAll('[data-revoke-email]').forEach(btn=>btn.onclick=async()=>{
+        const email=btn.dataset.revokeEmail;
+        if(!confirm(`${email} 계정의 DOTT ADMIN 접근 권한을 해제할까요?\nSupabase 계정 자체는 삭제하지 않습니다.`))return;
+        btn.disabled=true;err.textContent='';
+        try{await DOTT_DB.setAdminMember(email,'remove');toast('운영진 권한을 해제했습니다.');await refresh()}
+        catch(e){err.textContent=e.message||String(e);btn.disabled=false}
+      });
+    }catch(e){
+      const needsSetup=e?.status===404||/Could not find the function|schema cache|PGRST202|PGRST205/i.test(String(e?.message||''));
+      el.innerHTML=`<div class="settings-team-notice"><b>${needsSetup?'운영진 권한 관리 SQL 설치가 필요합니다.':'운영진 명단을 불러오지 못했습니다.'}</b><p>${needsSetup?'별도로 제공한 DOTT_ADMIN_v4_운영진권한_SQL.sql 파일을 Supabase SQL Editor에서 실행하면 명단과 추가·해제 기능이 활성화됩니다.':esc(e?.message||'다시 시도해 주세요.')}</p><button type="button" class="btn" id="retryTeam">다시 불러오기</button></div>`;
+      document.getElementById('retryTeam')?.addEventListener('click',refresh);
+    }
+  };
+  document.getElementById('teamAddForm').onsubmit=async e=>{
+    e.preventDefault();const input=document.getElementById('teamAddEmail'),btn=document.getElementById('teamAddButton');
+    const email=input.value.trim();if(!email)return;
+    err.textContent='';btn.disabled=true;
+    try{await DOTT_DB.setAdminMember(email,'add');input.value='';toast('운영진 권한을 부여했습니다.');await refresh()}
+    catch(ex){err.textContent=ex.message||String(ex)}
+    finally{btn.disabled=false}
+  };
+  await refresh();
 }
 
 // ===== 회비 · 회계 =====

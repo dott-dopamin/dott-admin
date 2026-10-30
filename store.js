@@ -145,6 +145,25 @@ window.DOTT_DB={
   async update(table,id,row){const body=await restWrite('PATCH',table,{id,row});return Array.isArray(body)?body[0]:body},
   async remove(table,id){await restWrite('DELETE',table,{id,prefer:'return=minimal'})},
   async removeMany(table,ids){if(ids?.length)await restWrite('DELETE',table,{ids,prefer:'return=minimal'})},
+  async myRole(){
+    const res=await fetchWithTimeout(`${API_BASE}/rest/v1/rpc/dott_my_role`,{
+      method:'POST',headers:await headersFor({auth:true,json:true}),body:'{}'
+    },10000);
+    return parseResponse(res);
+  },
+  async listAdminMembers(){
+    const res=await fetchWithTimeout(`${API_BASE}/rest/v1/rpc/dott_list_admins`,{
+      method:'POST',headers:await headersFor({auth:true,json:true}),body:'{}'
+    },12000);
+    return (await parseResponse(res))||[];
+  },
+  async setAdminMember(email,action){
+    const res=await fetchWithTimeout(`${API_BASE}/rest/v1/rpc/dott_set_admin_member`,{
+      method:'POST',headers:await headersFor({auth:true,json:true}),
+      body:JSON.stringify({p_email:email,p_action:action})
+    },12000);
+    return parseResponse(res);
+  },
   async session(){return currentSession()},
   async signIn(email,password){
     const res=await fetchWithTimeout(`${API_BASE}/auth/v1/token?grant_type=password`,{
@@ -233,22 +252,14 @@ Object.assign(window.DOTT_DB,{
 
 // DOTT 전체 데이터 백업 · 복원
 async function backupTable(table,label){
-  return restSelect(table,'select=*',label,true);
-}
-async function backupBulkInsert(table,rows){
-  if(!Array.isArray(rows)||!rows.length)return;
-  const res=await fetchWithTimeout(`${API_BASE}/rest/v1/${table}`,{
-    method:'POST',
-    headers:await headersFor({auth:true,json:true,prefer:'return=minimal'}),
-    body:JSON.stringify(rows)
-  },30000);
-  await parseResponse(res);
-}
-async function backupDeleteIds(table,rows){
-  const ids=(rows||[]).map(x=>x?.id).filter(v=>v!==undefined&&v!==null);
-  for(let i=0;i<ids.length;i+=100){
-    await restWrite('DELETE',table,{ids:ids.slice(i,i+100),prefer:'return=minimal'});
+  // Page through results so a growing game collection is not silently cut at 1000 rows.
+  const pageSize=500, rows=[];
+  for(let page=0;page<200;page++){
+    const batch=await restSelect(table,`select=*&order=id.asc&limit=${pageSize}&offset=${page*pageSize}`,label,true);
+    rows.push(...batch);
+    if(batch.length<pageSize)return rows;
   }
+  throw new Error(`${label} 데이터가 너무 많아 안전하게 백업하지 못했습니다.`);
 }
 Object.assign(window.DOTT_DB,{
   async createFullBackup(){
@@ -270,28 +281,5 @@ Object.assign(window.DOTT_DB,{
       created_at:new Date().toISOString(),
       tables:{schedules,notices,attendance_members:attendance,catalog_items,site_settings,fee_records,accounting_entries,accounting_receipts,accounting_month_closures,rental_loans}
     };
-  },
-  async restoreFullBackup(backup){
-    if(!backup||backup.format!=='DOTT_FULL_BACKUP'||![1,2].includes(backup.version)||!backup.tables)throw new Error('DOTT 백업 파일 형식이 아닙니다.');
-    const required=['schedules','notices','attendance_members','catalog_items','site_settings','fee_records','accounting_entries','accounting_month_closures'];
-    for(const t of required)if(!Array.isArray(backup.tables[t]))throw new Error(`백업 파일에 ${t} 데이터가 없습니다.`);
-    if(!Array.isArray(backup.tables.rental_loans))backup.tables.rental_loans=[];
-    if(!Array.isArray(backup.tables.accounting_receipts))backup.tables.accounting_receipts=[];
-    const allTables=[...required,'accounting_receipts','rental_loans'];
-
-    // 현재 행을 먼저 읽어 실제 존재하는 ID만 삭제합니다. 전체 테이블 무조건 삭제 쿼리는 사용하지 않습니다.
-    const current={};
-    for(const t of allTables)current[t]=await backupTable(t,`${t} 현재 데이터 확인`);
-
-    // 참조 가능성이 있는 회계 데이터를 먼저 지운 뒤 회원/기본 데이터를 지웁니다.
-    for(const t of ['accounting_receipts','fee_records','accounting_entries','accounting_month_closures','rental_loans','schedules','notices','catalog_items','site_settings','attendance_members']){
-      await backupDeleteIds(t,current[t]);
-    }
-    // 회원을 먼저 복원하고, 회계 내역 다음에 영수증 메타데이터를 복원합니다.
-    for(const t of ['attendance_members','site_settings','schedules','notices','catalog_items','rental_loans','accounting_month_closures','accounting_entries','accounting_receipts','fee_records']){
-      await backupBulkInsert(t,backup.tables[t]);
-    }
-    return true;
   }
 });
-
