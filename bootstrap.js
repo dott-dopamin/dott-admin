@@ -3,7 +3,7 @@
   const entry=bootScript?.dataset?.entry||'';
   const app=document.getElementById('app');
   const sleep=ms=>new Promise(r=>setTimeout(r,ms));
-  const BUILD='dott-admin-v4-20261030';
+  const BUILD='dott-admin-v5-20261030';
 
   function loadScript(src,{timeout=9000,retries=2}={}){
     return (async()=>{
@@ -43,6 +43,7 @@
       await loadScript('config.js',{timeout:6000,retries:2});
       await loadScript('store.js',{timeout:6000,retries:2});
       await loadScript('common.js',{timeout:6000,retries:2});
+      await loadScript('stats.js',{timeout:6000,retries:2});
       if(!entry)throw new Error('실행 파일이 지정되지 않았습니다.');
       await loadScript(entry,{timeout:8000,retries:2});
     }catch(e){
