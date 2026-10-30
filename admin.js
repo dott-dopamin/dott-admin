@@ -12,6 +12,9 @@ let accountingFilter='all';
 let accountingSearch='';
 let data={schedules:[],notices:[],attendance:[],boardgame:[],murder:[],deduction:[],settings:null,fees:[],ledger:[],receipts:[],closures:[],rentals:[]};
 let adminLoadWarnings=[];
+let startupCycle=0;
+let startupDataPending=false;
+let startupPendingKeys=new Set();
 let dottAdminRole=null;
 let dottAdminEmail='';
 
@@ -20,8 +23,7 @@ let dottAdminEmail='';
     const s=await DOTT_DB.session();
     if(!s)return renderLogin();
     await ensureAdminRole();
-    await loadAll();
-    renderAdmin();
+    await loadStartupDashboard();
   }catch(e){
     console.warn('관리자 접근 권한 확인 실패',e);
     renderAccessError(e);
@@ -51,15 +53,28 @@ function renderLogin(){
     try{
       await DOTT_DB.signIn(document.getElementById('email').value,document.getElementById('password').value);
       await ensureAdminRole();
-      await loadAll();
-      renderAdmin();
-    }catch(e){document.getElementById('err').textContent=e.message||String(e)}
+      await loadStartupDashboard();
+    }catch(e){const label=document.getElementById('err');if(label)label.textContent=e.message||String(e);else renderAccessError(e)}
     finally{btn.disabled=false}
   };
 }
 
 async function loadAll(){
-  const jobs=[
+  const jobs=getAdminLoadJobs();
+  const results=await Promise.allSettled(jobs.map(x=>x[2]));
+  adminLoadWarnings=[];
+  results.forEach((r,i)=>{
+    const [key,label]=jobs[i];
+    if(r.status==='fulfilled')data[key]=r.value;
+    else{adminLoadWarnings.push(label);console.warn(`${label} 불러오기 실패`,r.reason)}
+  });
+  if(window.DOTT_ATTENDANCE_ERROR&&!adminLoadWarnings.includes('출석'))adminLoadWarnings.push('출석');
+  if(window.DOTT_FEES_ERROR&&!adminLoadWarnings.includes('회비'))adminLoadWarnings.push('회비');
+}
+
+
+function getAdminLoadJobs(){
+  return [
     ['schedules','일정',DOTT_DB.schedules()],
     ['notices','공지',DOTT_DB.notices()],
     ['attendance','출석',DOTT_DB.attendance()],
@@ -73,15 +88,41 @@ async function loadAll(){
     ['closures','월 마감',DOTT_DB.accountingClosures()],
     ['rentals','대여 관리대장',DOTT_DB.rentalLoans()]
   ];
-  const results=await Promise.allSettled(jobs.map(x=>x[2]));
-  adminLoadWarnings=[];
-  results.forEach((r,i)=>{
-    const [key,label]=jobs[i];
-    if(r.status==='fulfilled')data[key]=r.value;
-    else{adminLoadWarnings.push(label);console.warn(`${label} 불러오기 실패`,r.reason)}
-  });
+}
+function syncStartupWarnings(){
   if(window.DOTT_ATTENDANCE_ERROR&&!adminLoadWarnings.includes('출석'))adminLoadWarnings.push('출석');
   if(window.DOTT_FEES_ERROR&&!adminLoadWarnings.includes('회비'))adminLoadWarnings.push('회비');
+}
+async function loadStartupDashboard(){
+  const cycle=++startupCycle;
+  startupDataPending=true;
+  adminLoadWarnings=[];
+  const jobs=getAdminLoadJobs();
+  startupPendingKeys=new Set(jobs.map(x=>x[0]));
+  app.innerHTML=nav('admin')+'<main class="loading">운영진 인증 완료 · 대시보드 데이터를 불러오는 중…</main>';
+  const tasks=jobs.map(async ([key,label,promise])=>{
+    try{
+      const value=await promise;
+      if(cycle===startupCycle)data[key]=value;
+    }catch(error){
+      if(cycle===startupCycle){
+        adminLoadWarnings.push(label);
+        console.warn(label+' 불러오기 실패',error);
+      }
+    }finally{
+      if(cycle===startupCycle)startupPendingKeys.delete(key);
+    }
+  });
+  const dashboardKeys=new Set(['schedules','attendance','boardgame','murder','deduction','fees']);
+  await Promise.all(tasks.filter((_,index)=>dashboardKeys.has(jobs[index][0])));
+  if(cycle!==startupCycle)return;
+  syncStartupWarnings();
+  renderAdmin();
+  await Promise.all(tasks);
+  if(cycle!==startupCycle)return;
+  startupDataPending=false;
+  syncStartupWarnings();
+  renderAdmin();
 }
 
 function renderAdmin(){
@@ -91,14 +132,20 @@ function renderAdmin(){
   const titles={dashboard:['통합 대시보드','도트의 운영 현황을 한눈에 확인하세요.'],stats:['운영 통계','월별 벙 현황 · 회비 납부 · 최근 출석을 확인합니다.'],schedules:['일정 관리','예약 일정과 이용 현황을 관리합니다.'],attendance:['출석 관리','회원 활동 내역을 관리합니다.'],notices:['공지 관리','회원에게 표시할 공지사항을 관리합니다.'],boardgame:['보드게임','보유 게임과 소유주를 관리합니다.'],murder:['머더미스터리','시나리오 목록을 관리합니다.'],deduction:['추리게임','추리게임 목록을 관리합니다.'],rentals:['대여 관리','대여 현황과 반납을 관리합니다.'],accounting:['회비 · 회계','납부·지출·월 마감 내역을 관리합니다.'],settings:['관리자 설정','내 계정 · 홈페이지 문구 · 백업 · 운영진 권한을 관리합니다.']};
   const [pageTitle,pageDesc]=titles[tab]||titles.dashboard;
   app.innerHTML=`${nav('admin')}<div class="admin-layout"><aside class="admin-sidebar"><div class="sidebar-label">DOTT WORKSPACE</div><div class="sidebar-nav">${navGroups.map(([group,ids])=>`<div class="nav-group"><div class="nav-group-title">${group}</div>${ids.map(id=>{const item=tabs.find(x=>x[0]===id);return `<button class="tab ${tab===id?'active':''}" data-tab="${id}">${item?.[1]||id}</button>`}).join('')}</div>`).join('')}</div><div class="sidebar-bottom"><span class="status-dot"></span> 공통 Supabase 연결</div></aside><main class="admin-wrap"><section class="admin-hero"><div><span class="eyebrow">DOTT / OPERATIONS</span><h1>${pageTitle}</h1><p>${pageDesc}</p></div><div class="toolbar"><a class="btn" href="${esc(CFG.publicSiteUrl)}" target="_blank" rel="noopener noreferrer">↗ 회원 사이트</a><button class="btn" id="refreshData" type="button">↻ 새로고침</button><button class="btn" id="logout" type="button">로그아웃</button></div></section>${loadWarning}<div id="panel"></div></main></div>${footer()}`;
-  document.getElementById('refreshData').onclick=async()=>{const btn=document.getElementById('refreshData');btn.disabled=true;btn.textContent='불러오는 중…';try{await loadAll();renderAdmin();toast('최신 데이터로 새로고침했습니다.')}catch(e){alert(e.message||e);btn.disabled=false}};
-  document.getElementById('logout').onclick=async()=>{await DOTT_DB.signOut();dottAdminRole=null;dottAdminEmail='';renderLogin()};
+  if(startupDataPending){const ref=document.getElementById('refreshData');ref.disabled=true;ref.textContent='동기화 중…';}
+  document.getElementById('refreshData').onclick=async()=>{if(startupDataPending)return;const btn=document.getElementById('refreshData');btn.disabled=true;btn.textContent='불러오는 중…';try{await loadAll();renderAdmin();toast('최신 데이터로 새로고침했습니다.')}catch(e){alert(e.message||e);btn.disabled=false}};
+  document.getElementById('logout').onclick=async()=>{startupCycle++;startupDataPending=false;startupPendingKeys.clear();await DOTT_DB.signOut();dottAdminRole=null;dottAdminEmail='';renderLogin()};
   document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{tab=b.dataset.tab;renderAdmin()});
   renderPanel();
 }
 
 function renderPanel(){
   const p=document.getElementById('panel');
+  const dependencies={"dashboard":["schedules","attendance","boardgame","murder","deduction","fees"],"stats":["schedules","attendance","fees"],"schedules":["schedules"],"attendance":["attendance"],"notices":["notices"],"boardgame":["boardgame"],"murder":["murder"],"deduction":["deduction"],"rentals":["rentals"],"accounting":["fees","attendance","ledger","receipts","closures"],"settings":["settings"]};
+  if(startupDataPending&&(dependencies[tab]||[]).some(key=>startupPendingKeys.has(key))){
+    p.innerHTML='<div class="info-box" role="status">필요한 데이터를 불러오는 중입니다. 준비되면 자동으로 표시됩니다.</div>';
+    return;
+  }
   if(tab==='dashboard')return dashboardPanel(p);
   if(tab==='stats')return statsPanel(p);
   if(tab==='settings')return settingsPanel(p);
