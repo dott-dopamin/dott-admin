@@ -541,3 +541,31 @@ html:has(body.dott-admin){background:#f2f5fa}
     border-radius:5px;font-size:8px;line-height:1;
   }
 }
+
+/* DOTT ADMIN v9: attendance overview numbers are direct, keyboard-accessible filters. */
+.dott-admin .attendance-summary .attendance-summary-chip{
+  appearance:none;display:inline-flex;align-items:center;justify-content:center;gap:4px;
+  border:1px solid #dce5f0;border-radius:999px;background:#f7f9fd;color:#4f6683;
+  padding:7px 10px;font:inherit;font-size:11px;font-weight:500;line-height:1.2;
+  cursor:pointer;white-space:nowrap;transition:background .15s,border-color .15s,box-shadow .15s;
+}
+.dott-admin .attendance-summary .attendance-summary-chip b{font-weight:800}
+.dott-admin .attendance-summary .attendance-summary-chip.keep{
+  background:#eaf5f1;color:#34715b;border-color:#cce7dd;
+}
+.dott-admin .attendance-summary .attendance-summary-chip.overdue{
+  background:#fceeee;color:#b14d55;border-color:#efd0d4;
+}
+.dott-admin .attendance-summary .attendance-summary-chip.grace{
+  background:#fff6e5;color:#946d2e;border-color:#f0dfbe;
+}
+.dott-admin .attendance-summary .attendance-summary-chip:hover{
+  filter:brightness(.97);border-color:#9eb6d1;box-shadow:0 2px 7px rgba(49,84,130,.09);
+}
+.dott-admin .attendance-summary .attendance-summary-chip:focus-visible{
+  outline:2px solid #4168b1;outline-offset:3px;
+}
+.dott-admin .attendance-summary .attendance-summary-chip.active{
+  box-shadow:0 0 0 2px rgba(65,104,177,.22);border-color:#7898c6;
+  font-weight:750;
+}
