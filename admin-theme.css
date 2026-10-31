@@ -553,6 +553,9 @@ html:has(body.dott-admin){background:#f2f5fa}
 .dott-admin .attendance-summary .attendance-summary-chip.keep{
   background:#eaf5f1;color:#34715b;border-color:#cce7dd;
 }
+.dott-admin .attendance-summary .attendance-summary-chip.dueSoon{
+  background:#fff7df;color:#946f27;border-color:#f0dfa8;
+}
 .dott-admin .attendance-summary .attendance-summary-chip.overdue{
   background:#fceeee;color:#b14d55;border-color:#efd0d4;
 }
