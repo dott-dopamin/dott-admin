@@ -140,12 +140,17 @@ async function loadStartupDashboard(){
 }
 
 function renderAdmin(){
+  // 모바일 가로 메뉴는 화면을 다시 렌더링해도 사용자가 넘긴 위치를 유지합니다.
+  const sidebarNavScrollLeft=document.querySelector('.dott-admin .admin-sidebar .sidebar-nav')?.scrollLeft ?? 0;
   const tabs=[['dashboard','대시보드'],['stats','운영 통계'],['schedules','일정 관리'],['attendance','출석 관리'],['notices','공지 관리'],['boardgame','보드게임'],['murder','머더미스터리'],['deduction','추리게임'],['rentals','대여 관리'],['accounting','회비 · 회계'],['settings','관리자 설정']];
   const loadWarning=adminLoadWarnings.length?`<div class="info-box admin-load-warning">⚠ ${adminLoadWarnings.join(' · ')} 데이터를 최신 상태로 불러오지 못했습니다. 네트워크가 안정되면 새로고침해 주세요.</div>`:'';
   const navGroups=[['운영 관리',['dashboard','stats','schedules','attendance']],['콘텐츠 관리',['notices','boardgame','murder','deduction','rentals']],['재무 · 설정',['accounting','settings']]];
   const titles={dashboard:['통합 대시보드','도트의 운영 현황을 한눈에 확인하세요.'],stats:['운영 통계','월별 벙 현황 · 회비 납부 · 최근 출석을 확인합니다.'],schedules:['일정 관리','예약 일정과 이용 현황을 관리합니다.'],attendance:['출석 관리','회원 활동 내역을 관리합니다.'],notices:['공지 관리','회원에게 표시할 공지사항을 관리합니다.'],boardgame:['보드게임','보유 게임과 소유주를 관리합니다.'],murder:['머더미스터리','시나리오 목록을 관리합니다.'],deduction:['추리게임','추리게임 목록을 관리합니다.'],rentals:['대여 관리','대여 현황과 반납을 관리합니다.'],accounting:['회비 · 회계','납부·지출·월 마감 내역을 관리합니다.'],settings:['관리자 설정','내 계정 · 홈페이지 문구 · 백업 · 운영진 권한을 관리합니다.']};
   const [pageTitle,pageDesc]=titles[tab]||titles.dashboard;
   app.innerHTML=`${nav('admin')}<div class="admin-layout"><aside class="admin-sidebar"><div class="sidebar-label">DOTT WORKSPACE</div><div class="sidebar-nav">${navGroups.map(([group,ids])=>`<div class="nav-group"><div class="nav-group-title">${group}</div>${ids.map(id=>{const item=tabs.find(x=>x[0]===id);return `<button class="tab ${tab===id?'active':''}" data-tab="${id}">${item?.[1]||id}</button>`}).join('')}</div>`).join('')}</div><div class="sidebar-bottom"><span class="status-dot"></span> 공통 Supabase 연결</div></aside><main class="admin-wrap"><section class="admin-hero"><div><span class="eyebrow">DOTT / OPERATIONS</span><h1>${pageTitle}</h1><p>${pageDesc}</p></div><div class="toolbar"><a class="btn" href="${esc(CFG.publicSiteUrl)}" target="_blank" rel="noopener noreferrer">↗ 회원 사이트</a><button class="btn" id="refreshData" type="button">↻ 새로고침</button><button class="btn" id="logout" type="button">로그아웃</button></div></section>${loadWarning}<div id="panel"></div></main></div>${footer()}`;
+  // app.innerHTML로 메뉴 DOM이 교체되므로 새 메뉴에 기존 가로 위치를 복원합니다.
+  const sidebarNav=document.querySelector('.dott-admin .admin-sidebar .sidebar-nav');
+  if(sidebarNav)sidebarNav.scrollLeft=sidebarNavScrollLeft;
   if(startupDataPending){const ref=document.getElementById('refreshData');ref.disabled=true;ref.textContent='동기화 중…';}
   document.getElementById('refreshData').onclick=async()=>{if(startupDataPending)return;const btn=document.getElementById('refreshData');btn.disabled=true;btn.textContent='불러오는 중…';try{await loadAll();renderAdmin();toast('최신 데이터로 새로고침했습니다.')}catch(e){alert(e.message||e);btn.disabled=false}};
   document.getElementById('logout').onclick=async()=>{startupCycle++;startupDataPending=false;startupPendingKeys.clear();await DOTT_DB.signOut();dottAdminRole=null;dottAdminEmail='';renderLogin()};
