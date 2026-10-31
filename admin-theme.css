@@ -572,3 +572,34 @@ html:has(body.dott-admin){background:#f2f5fa}
   box-shadow:0 0 0 2px rgba(65,104,177,.22);border-color:#7898c6;
   font-weight:750;
 }
+
+/* DOTT ADMIN v12: mobile-only compact crown icon for staff */
+@media (max-width:700px){
+  .dott-admin .attendance-table .attendance-name-wrap{
+    gap:3px;
+  }
+  .dott-admin .attendance-table .attendance-staff-badge{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:14px;
+    min-width:14px;
+    height:14px;
+    flex:0 0 14px;
+    padding:0;
+    margin:0;
+    border:0;
+    border-radius:0;
+    background:transparent;
+    font-size:0;
+    line-height:1;
+    overflow:visible;
+    vertical-align:middle;
+  }
+  .dott-admin .attendance-table .attendance-staff-badge::before{
+    content:"👑";
+    font-size:11px;
+    line-height:1;
+    display:block;
+  }
+}
