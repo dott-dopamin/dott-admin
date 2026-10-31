@@ -519,7 +519,7 @@ function attendancePanel(p){
     <div class="attendance-head">
       <div>
         <div class="attendance-summary">
-          <span>전체 <b>${counts.all}</b></span><span class="keep">유지 <b>${counts.keep}</b></span><span class="overdue">경과 <b>${counts.overdue}</b></span><span class="grace">유예 <b>${counts.grace}</b></span><span>탈퇴 <b>${counts.left}</b></span>
+          ${[['all','전체',counts.all],['keep','유지',counts.keep],['overdue','경과',counts.overdue],['grace','유예',counts.grace],['left','탈퇴',counts.left]].map(([key,label,count])=>`<button type="button" class="attendance-summary-chip ${key} ${attendanceMode==='manage'&&attendanceFilter===key?'active':''}" data-att-summary="${key}" aria-pressed="${attendanceMode==='manage'&&attendanceFilter===key}" title="${label} 회원 목록 보기">${label} <b>${count}</b></button>`).join('')}
         </div>
         <p class="attendance-help">최근 참석일이 없으면 가입일 기준으로 계산하고, 최근 참석일 + 2개월이 되면 자동으로 ‘경과’ 표시됩니다. <b class="attendance-warning-guide">경과일 14일 전부터 노란색으로 표시됩니다.</b></p>
       </div>
@@ -545,6 +545,12 @@ function attendancePanel(p){
       </table>
     </div>`;
   document.getElementById('addMember').onclick=()=>attendanceModal();
+  document.querySelectorAll('[data-att-summary]').forEach(btn=>btn.onclick=()=>{
+    attendanceMode='manage';
+    attendanceFilter=btn.dataset.attSummary;
+    attendanceSearch='';
+    attendancePanel(p);
+  });
   document.getElementById('attendanceManage')?.addEventListener('click',()=>{attendanceMode='manage';attendancePanel(p)});
   document.getElementById('attendanceBackToCheck')?.addEventListener('click',()=>{attendanceMode='check';attendanceCheckFilter='pending';attendancePanel(p)});
   document.querySelectorAll('[data-check-filter]').forEach(btn=>btn.onclick=()=>{attendanceCheckFilter=btn.dataset.checkFilter;attendancePanel(p)});
