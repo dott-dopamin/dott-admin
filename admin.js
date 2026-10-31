@@ -482,8 +482,11 @@ function attendancePanel(p){
     return;
   }
   const states=data.attendance.map(x=>{const due=attendanceDueDate(x);return {member:x,state:attendanceState(x),due,dueSoon:attendanceDueSoon(due)}});
-  const counts={all:states.length,keep:0,overdue:0,grace:0,left:0};
-  states.forEach(x=>counts[x.state.key]=(counts[x.state.key]||0)+1);
+  const counts={all:states.length,keep:0,dueSoon:0,overdue:0,grace:0,left:0};
+  states.forEach(x=>{
+    counts[x.state.key]=(counts[x.state.key]||0)+1;
+    if(x.state.key==='keep'&&x.dueSoon.active)counts.dueSoon++;
+  });
   const checkMode=attendanceMode==='check';
   const checkable=states.filter(({member})=>member.member_status!=='left');
   const completeCount=checkable.filter(({member})=>member.last_attended_at===attendanceWorkDate).length;
@@ -497,7 +500,6 @@ function attendancePanel(p){
     });
   // 운영진은 항상 최상단에 고정하고, 운영진/일반회원 각각 이름 가나다순으로 정렬합니다.
   rows.sort((a,b)=>Number(Boolean(b.member.is_staff))-Number(Boolean(a.member.is_staff))||String(a.member.name||'').localeCompare(String(b.member.name||''),'ko'));
-  const filters=[['all','전체'],['keep','유지'],['dueSoon','경과 임박'],['overdue','경과'],['grace','유예'],['left','탈퇴']];
   const checkToolbar=checkMode?`
     <section class="attendance-checkdesk" aria-label="출석 체크 모드">
       <div class="attendance-checkdesk-top">
@@ -519,15 +521,14 @@ function attendancePanel(p){
     <div class="attendance-head">
       <div>
         <div class="attendance-summary">
-          ${[['all','전체',counts.all],['keep','유지',counts.keep],['overdue','경과',counts.overdue],['grace','유예',counts.grace],['left','탈퇴',counts.left]].map(([key,label,count])=>`<button type="button" class="attendance-summary-chip ${key} ${attendanceMode==='manage'&&attendanceFilter===key?'active':''}" data-att-summary="${key}" aria-pressed="${attendanceMode==='manage'&&attendanceFilter===key}" title="${label} 회원 목록 보기">${label} <b>${count}</b></button>`).join('')}
+          ${[['all','전체',counts.all],['keep','유지',counts.keep],['dueSoon','경과 임박',counts.dueSoon],['overdue','경과',counts.overdue],['grace','유예',counts.grace],['left','탈퇴',counts.left]].map(([key,label,count])=>`<button type="button" class="attendance-summary-chip ${key} ${attendanceMode==='manage'&&attendanceFilter===key?'active':''}" data-att-summary="${key}" aria-pressed="${attendanceMode==='manage'&&attendanceFilter===key}" title="${label} 회원 목록 보기">${label} <b>${count}</b></button>`).join('')}
         </div>
         <p class="attendance-help">최근 참석일이 없으면 가입일 기준으로 계산하고, 최근 참석일 + 2개월이 되면 자동으로 ‘경과’ 표시됩니다. <b class="attendance-warning-guide">경과일 14일 전부터 노란색으로 표시됩니다.</b></p>
       </div>
       <button class="btn primary" id="addMember">+ 회원 추가</button>
     </div>
     ${checkToolbar}
-    <div class="attendance-controls ${checkMode?'attendance-check-controls':''}">
-      ${checkMode?'':`<div class="attendance-filters">${filters.map(([v,l])=>`<button class="attendance-filter ${attendanceFilter===v?'active':''}" data-att-filter="${v}">${l}</button>`).join('')}</div>`}
+    <div class="attendance-controls attendance-check-controls">
       <input id="attendanceSearch" class="field attendance-search" placeholder="이름 검색" aria-label="회원 이름 검색" value="${esc(attendanceSearch)}">
     </div>
     <div class="attendance-table-wrap">
@@ -563,7 +564,6 @@ function attendancePanel(p){
   };
   document.getElementById('attendanceResetDate')?.addEventListener('click',()=>{attendanceWorkDate=todayYmd();attendanceAutoDate=attendanceWorkDate;attendanceDateManual=false;attendanceCheckFilter='pending';attendancePanel(p)});
   document.getElementById('attendanceSync')?.addEventListener('click',()=>refreshAttendanceMembers());
-  document.querySelectorAll('[data-att-filter]').forEach(btn=>btn.onclick=()=>{attendanceFilter=btn.dataset.attFilter;attendancePanel(p)});
   const search=document.getElementById('attendanceSearch');
   // 검색 중에는 input DOM을 절대 다시 만들지 않습니다.
   // 한글 IME의 compositionend 직후 input 자체를 교체하면 마지막 음절이 사라질 수 있습니다.
