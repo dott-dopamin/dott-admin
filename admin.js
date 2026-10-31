@@ -533,7 +533,7 @@ function attendancePanel(p){
     <div class="attendance-table-wrap">
       <table class="attendance-table">
         <thead><tr><th>이름</th><th>가입일</th><th><span class="att-head-desktop">최근 참석일</span><span class="att-head-mobile">최근</span></th><th><span class="att-head-desktop">2개월 경과일</span><span class="att-head-mobile">경과일</span></th><th>상태</th><th><span class="att-head-desktop">메모</span><span class="att-head-mobile">메모</span></th><th>관리</th></tr></thead>
-        <tbody>${rows.map(({member:x,state,due,dueSoon})=>`<tr class="attendance-row ${state.key} ${dueSoon.active&&state.key==='keep'?'due-soon':''} ${x.is_staff?'staff':''} ${checkMode&&x.last_attended_at===attendanceWorkDate?'attendance-checked-row':''}>
+        <tbody>${rows.map(({member:x,state,due,dueSoon})=>`<tr class="attendance-row ${state.key} ${dueSoon.active&&state.key==='keep'?'due-soon':''} ${x.is_staff?'staff':''} ${checkMode&&x.last_attended_at===attendanceWorkDate?'attendance-checked-row':''}">
           <td data-label="이름"><span class="attendance-name-wrap"><b>${esc(x.name)}</b>${x.is_staff?'<span class="attendance-staff-badge">운영진</span>':''}</span></td>
           <td data-label="가입일"><span class="att-date-desktop">${shortDate(x.joined_at)}</span><span class="att-date-mobile">${compactAttendanceDate(x.joined_at)}</span></td>
           <td data-label="최근 참석일"><span class="att-date-desktop">${shortDate(x.last_attended_at)}</span><span class="att-date-mobile">${compactAttendanceDate(x.last_attended_at)}</span></td>
