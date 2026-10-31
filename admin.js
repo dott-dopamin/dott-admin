@@ -445,15 +445,16 @@ async function refreshAttendanceMembers({silent=false}={}){
     const latest=await DOTT_DB.attendance();
     if(window.DOTT_ATTENDANCE_ERROR)throw window.DOTT_ATTENDANCE_ERROR;
     if(attendanceWriting)return;
+    const changed=JSON.stringify(latest)!==JSON.stringify(data.attendance);
     data.attendance=latest;
     if(tab==='attendance'&&!document.getElementById('modal')?.classList.contains('open')){
       const panel=document.getElementById('panel');
-      if(panel)attendancePanel(panel);
+      if(panel&&(changed||(!attendanceDateManual&&attendanceAutoDate!==todayYmd())))attendancePanel(panel);
     }
     if(!silent)toast('출석 명단을 최신 상태로 동기화했습니다.');
   }catch(error){
     console.warn('출석 명단 동기화 실패',error);
-    if(!silent)alert('출석 명단을 갱신하지 못했습니다.\\n'+(error.message||error));
+    if(!silent)alert('출석 명단을 갱신하지 못했습니다.\n'+(error.message||error));
   }finally{
     attendanceSyncing=false;
     if(button?.isConnected){button.disabled=false;button.textContent='↻ 명단 동기화';}
@@ -511,7 +512,7 @@ function attendancePanel(p){
         <button type="button" class="attendance-checkdesk-tab ${attendanceCheckFilter==='pending'?'active':''}" data-check-filter="pending" aria-pressed="${attendanceCheckFilter==='pending'}">미체크 <b>${pendingCount}</b><small>명</small></button>
         <button type="button" class="attendance-checkdesk-tab ${attendanceCheckFilter==='done'?'active':''}" data-check-filter="done" aria-pressed="${attendanceCheckFilter==='done'}">출석 완료 <b>${completeCount}</b><small>명</small></button>
       </div>
-      <p class="attendance-checkdesk-note">활동 회원 ${checkable.length}명 기준 · 출석 완료는 <b>최근 참석일이 선택 날짜와 일치</b>하는 경우예요. 출석 기록은 날짜별로 따로 저장하지 않아요. <span class="attendance-safety-text">더 최근 참석일이 있는 회원은 과거 날짜로 덮어쓰지 않아요.</span></p>
+      <p class="attendance-checkdesk-note">활동 회원 ${checkable.length}명 기준 · 출석 완료는 <b>최근 참석일이 선택 날짜와 일치</b>하는 경우예요. 출석 기록은 날짜별로 따로 저장하지 않아요. 다른 운영진의 체크 내역은 약 30초마다 반영돼요. <span class="attendance-safety-text">더 최근 참석일이 있는 회원은 과거 날짜로 덮어쓰지 않아요.</span></p>
     </section>`:`
     <section class="attendance-manage-bar"><div><strong>회원 상태별 관리</strong><p>기존 유지 · 경과 임박 · 경과 · 유예 · 탈퇴 필터를 그대로 사용할 수 있어요.</p></div><button class="btn" type="button" id="attendanceBackToCheck">← 출석 체크로</button></section>`;
   p.innerHTML=`
