@@ -3,6 +3,11 @@ let tab='dashboard';
 let statsMonth=todayYmd().slice(0,7);
 let attendanceFilter='all';
 let attendanceSearch='';
+let attendanceMode='check'; // check | manage
+let attendanceCheckFilter='pending'; // pending | done
+let attendanceWorkDate=todayYmd();
+let attendanceWriting=false;
+let attendanceSyncing=false;
 let scheduleView='month';
 let scheduleCursor=new Date(); scheduleCursor.setDate(1);
 let selectedScheduleIds=new Set();
@@ -234,7 +239,7 @@ function dashboardPanel(p){
     <section class="dash-card"><div class="dash-card-head"><div><h3>빠른 관리</h3><p>자주 사용하는 운영 메뉴</p></div></div><div class="dash-shortcuts">${go('schedules','예약 관리','일정 등록 · 수정')}${go('attendance','회원 · 출석','활동 현황 확인')}${go('accounting','회비 · 회계','월별 납부 · 장부')}${go('stats','운영 통계','월별 벙 · 회비 통계')}${go('boardgame','게임 관리','목록 · 소유주')}</div></section></div>
     <div class="dash-footnote">※ 회비 미납 수는 현재 활동 회원과 해당 월 납부·면제 기록을 기준으로 계산한 참고값입니다. 실시간 변경사항은 새로고침 후 반영됩니다.</div>`;
   p.querySelectorAll('[data-open-tab]').forEach(b=>b.onclick=()=>{tab=b.dataset.openTab;renderAdmin()});
-  p.querySelectorAll('[data-attention-filter]').forEach(b=>b.onclick=()=>{attendanceFilter=b.dataset.attentionFilter;tab='attendance';renderAdmin()});
+  p.querySelectorAll('[data-attention-filter]').forEach(b=>b.onclick=()=>{attendanceFilter=b.dataset.attentionFilter;attendanceMode='manage';tab='attendance';renderAdmin()});
 }
 
 function scheduleMonthLabel(){return `${scheduleCursor.getFullYear()}년 ${scheduleCursor.getMonth()+1}월`}
@@ -413,6 +418,54 @@ function attendanceDueSoon(due){
   return {active:days>=1&&days<=14,days};
 }
 
+
+function attendanceActionHtml(member){
+  if(member.member_status==='left')return '';
+  const date=attendanceMode==='check'?attendanceWorkDate:todayYmd();
+  if(attendanceMode==='check'&&member.last_attended_at===date){
+    return '<span class="attendance-checked-label" title="선택 날짜 출석 완료"><span class="att-action-desktop">✓ 완료</span><span class="att-action-mobile">✓</span></span>';
+  }
+  if(member.last_attended_at&&member.last_attended_at>date){
+    return '<span class="attendance-date-protected" title="선택한 날짜보다 최근 참석일이 더 최신입니다. 수정이 필요하면 연필 버튼을 이용하세요."><span class="att-action-desktop">최신일 유지</span><span class="att-action-mobile">↗</span></span>';
+  }
+  if(date>todayYmd()){
+    return '<span class="attendance-date-protected" title="미래 날짜는 출석 처리할 수 없습니다."><span class="att-action-desktop">미래 날짜</span><span class="att-action-mobile">—</span></span>';
+  }
+  const label=attendanceMode==='check'?'참석 처리':'오늘 참석';
+  return `<button class="btn attendance-today" type="button" data-attend="${esc(member.id)}" title="${esc(shortDate(date))} 참석 처리"><span class="att-action-desktop">${label}</span><span class="att-action-mobile">✓</span></button>`;
+}
+async function refreshAttendanceMembers({silent=false}={}){
+  if(attendanceSyncing||attendanceWriting)return;
+  attendanceSyncing=true;
+  const button=document.getElementById('attendanceSync');
+  if(button){button.disabled=true;button.textContent='동기화 중…';}
+  try{
+    const latest=await DOTT_DB.attendance();
+    if(window.DOTT_ATTENDANCE_ERROR)throw window.DOTT_ATTENDANCE_ERROR;
+    if(attendanceWriting)return;
+    data.attendance=latest;
+    if(tab==='attendance'&&!document.getElementById('modal')?.classList.contains('open')){
+      const panel=document.getElementById('panel');
+      if(panel)attendancePanel(panel);
+    }
+    if(!silent)toast('출석 명단을 최신 상태로 동기화했습니다.');
+  }catch(error){
+    console.warn('출석 명단 동기화 실패',error);
+    if(!silent)alert('출석 명단을 갱신하지 못했습니다.\\n'+(error.message||error));
+  }finally{
+    attendanceSyncing=false;
+    if(button?.isConnected){button.disabled=false;button.textContent='↻ 명단 동기화';}
+  }
+}
+// 여러 운영진이 따로 체크한 내역도 안전하게 반영합니다.
+// 검색 입력/회원 수정 중에는 새로 그리지 않아 입력이 사라지지 않도록 합니다.
+setInterval(()=>{
+  if(tab!=='attendance'||attendanceMode!=='check'||startupDataPending||attendanceWriting||attendanceSyncing||document.visibilityState==='hidden')return;
+  if(document.getElementById('modal')?.classList.contains('open'))return;
+  if(['attendanceSearch','attendanceWorkDate'].includes(document.activeElement?.id))return;
+  refreshAttendanceMembers({silent:true});
+},30000);
+
 function attendancePanel(p){
   if(window.DOTT_ATTENDANCE_ERROR){
     p.innerHTML=`<div class="info-box attendance-setup"><b>출석관리 DB를 아직 만들지 않았습니다.</b><br>Supabase SQL Editor에서 <code>add-attendance.sql</code>을 한 번 실행하면 이 메뉴가 활성화됩니다.</div>`;
@@ -421,14 +474,37 @@ function attendancePanel(p){
   const states=data.attendance.map(x=>{const due=attendanceDueDate(x);return {member:x,state:attendanceState(x),due,dueSoon:attendanceDueSoon(due)}});
   const counts={all:states.length,keep:0,overdue:0,grace:0,left:0};
   states.forEach(x=>counts[x.state.key]=(counts[x.state.key]||0)+1);
-  let rows=states.filter(({member,state,dueSoon})=>{
-    if(attendanceFilter==='dueSoon')return state.key==='keep'&&dueSoon.active;
-    if(attendanceFilter!=='all'&&state.key!==attendanceFilter)return false;
-    return true;
-  });
+  const checkMode=attendanceMode==='check';
+  const checkable=states.filter(({member})=>member.member_status!=='left');
+  const completeCount=checkable.filter(({member})=>member.last_attended_at===attendanceWorkDate).length;
+  const pendingCount=checkable.length-completeCount;
+  let rows=checkMode
+    ?checkable.filter(({member})=>(member.last_attended_at===attendanceWorkDate)===(attendanceCheckFilter==='done'))
+    :states.filter(({state,dueSoon})=>{
+      if(attendanceFilter==='dueSoon')return state.key==='keep'&&dueSoon.active;
+      if(attendanceFilter!=='all'&&state.key!==attendanceFilter)return false;
+      return true;
+    });
   // 운영진은 항상 최상단에 고정하고, 운영진/일반회원 각각 이름 가나다순으로 정렬합니다.
   rows.sort((a,b)=>Number(Boolean(b.member.is_staff))-Number(Boolean(a.member.is_staff))||String(a.member.name||'').localeCompare(String(b.member.name||''),'ko'));
   const filters=[['all','전체'],['keep','유지'],['dueSoon','경과 임박'],['overdue','경과'],['grace','유예'],['left','탈퇴']];
+  const checkToolbar=checkMode?`
+    <section class="attendance-checkdesk" aria-label="출석 체크 모드">
+      <div class="attendance-checkdesk-top">
+        <div class="attendance-work-date">
+          <label class="label" for="attendanceWorkDate">출석 기준 날짜</label>
+          <div class="attendance-work-date-inputs"><input class="field" type="date" id="attendanceWorkDate" value="${esc(attendanceWorkDate)}"><button type="button" class="btn attendance-date-reset" id="attendanceResetDate">오늘로</button></div>
+        </div>
+        <div class="attendance-checkdesk-description"><strong>${esc(shortDate(attendanceWorkDate))} 출석 체크</strong><small>선택한 날짜를 최근 참석일로 기록해요. 전날 벙도 날짜만 바꿔서 처리하면 돼요.</small></div>
+        <div class="attendance-checkdesk-tools"><button type="button" class="btn attendance-sync" id="attendanceSync">↻ 명단 동기화</button><button type="button" class="btn attendance-manage-toggle" id="attendanceManage">⚙ 상태별 관리</button></div>
+      </div>
+      <div class="attendance-checkdesk-tabs" role="group" aria-label="선택 날짜 출석 상태">
+        <button type="button" class="attendance-checkdesk-tab ${attendanceCheckFilter==='pending'?'active':''}" data-check-filter="pending" aria-pressed="${attendanceCheckFilter==='pending'}">미체크 <b>${pendingCount}</b><small>명</small></button>
+        <button type="button" class="attendance-checkdesk-tab ${attendanceCheckFilter==='done'?'active':''}" data-check-filter="done" aria-pressed="${attendanceCheckFilter==='done'}">출석 완료 <b>${completeCount}</b><small>명</small></button>
+      </div>
+      <p class="attendance-checkdesk-note">활동 회원 ${checkable.length}명 기준 · 출석 완료는 <b>최근 참석일이 선택 날짜와 일치</b>하는 경우예요. 출석 기록은 날짜별로 따로 저장하지 않아요.</p>
+    </section>`:`
+    <section class="attendance-manage-bar"><div><strong>회원 상태별 관리</strong><p>기존 유지 · 경과 임박 · 경과 · 유예 · 탈퇴 필터를 그대로 사용할 수 있어요.</p></div><button class="btn" type="button" id="attendanceBackToCheck">← 출석 체크로</button></section>`;
   p.innerHTML=`
     <div class="attendance-head">
       <div>
@@ -439,25 +515,38 @@ function attendancePanel(p){
       </div>
       <button class="btn primary" id="addMember">+ 회원 추가</button>
     </div>
-    <div class="attendance-controls">
-      <div class="attendance-filters">${filters.map(([v,l])=>`<button class="attendance-filter ${attendanceFilter===v?'active':''}" data-att-filter="${v}">${l}</button>`).join('')}</div>
-      <input id="attendanceSearch" class="field attendance-search" placeholder="이름 검색" value="${esc(attendanceSearch)}">
+    ${checkToolbar}
+    <div class="attendance-controls ${checkMode?'attendance-check-controls':''}">
+      ${checkMode?'':`<div class="attendance-filters">${filters.map(([v,l])=>`<button class="attendance-filter ${attendanceFilter===v?'active':''}" data-att-filter="${v}">${l}</button>`).join('')}</div>`}
+      <input id="attendanceSearch" class="field attendance-search" placeholder="이름 검색" aria-label="회원 이름 검색" value="${esc(attendanceSearch)}">
     </div>
     <div class="attendance-table-wrap">
       <table class="attendance-table">
         <thead><tr><th>이름</th><th>가입일</th><th><span class="att-head-desktop">최근 참석일</span><span class="att-head-mobile">최근</span></th><th><span class="att-head-desktop">2개월 경과일</span><span class="att-head-mobile">경과일</span></th><th>상태</th><th><span class="att-head-desktop">메모</span><span class="att-head-mobile">메모</span></th><th>관리</th></tr></thead>
-        <tbody>${rows.map(({member:x,state,due,dueSoon})=>`<tr class="attendance-row ${state.key} ${dueSoon.active&&state.key==='keep'?'due-soon':''} ${x.is_staff?'staff':''}">
+        <tbody>${rows.map(({member:x,state,due,dueSoon})=>`<tr class="attendance-row ${state.key} ${dueSoon.active&&state.key==='keep'?'due-soon':''} ${x.is_staff?'staff':''} ${checkMode&&x.last_attended_at===attendanceWorkDate?'attendance-checked-row':''}>
           <td data-label="이름"><span class="attendance-name-wrap"><b>${esc(x.name)}</b>${x.is_staff?'<span class="attendance-staff-badge">운영진</span>':''}</span></td>
           <td data-label="가입일"><span class="att-date-desktop">${shortDate(x.joined_at)}</span><span class="att-date-mobile">${compactAttendanceDate(x.joined_at)}</span></td>
           <td data-label="최근 참석일"><span class="att-date-desktop">${shortDate(x.last_attended_at)}</span><span class="att-date-mobile">${compactAttendanceDate(x.last_attended_at)}</span></td>
           <td data-label="2개월 경과일" class="${dueSoon.active&&state.key==='keep'?'attendance-due-cell due-soon':''}"><span class="att-date-desktop">${shortDate(due)}${dueSoon.active&&state.key==='keep'?` <span class="attendance-due-badge">D-${dueSoon.days}</span>`:''}</span><span class="att-date-mobile">${compactAttendanceDate(due)}${dueSoon.active&&state.key==='keep'?` <span class="attendance-due-badge">D-${dueSoon.days}</span>`:''}</span></td>
           <td data-label="상태"><span class="attendance-status ${state.key}">${state.label}</span></td>
           <td data-label="메모" class="attendance-reason" title="${esc(x.grace_reason||'-')}">${esc(x.grace_reason||'-')}</td>
-          <td data-label="관리"><div class="attendance-actions">${x.member_status!=='left'?`<button class="btn attendance-today" data-attend="${x.id}" title="오늘 참석"><span class="att-action-desktop">오늘 참석</span><span class="att-action-mobile">✓</span></button>`:''}<button class="icon-btn" data-att-edit="${x.id}" title="수정">✎</button><button class="icon-btn" data-att-del="${x.id}" title="완전 삭제">♲</button></div></td>
+          <td data-label="관리"><div class="attendance-actions">${attendanceActionHtml(x)}<button class="icon-btn" data-att-edit="${esc(x.id)}" title="수정">✎</button><button class="icon-btn" data-att-del="${esc(x.id)}" title="완전 삭제">♲</button></div></td>
         </tr>`).join('')||`<tr><td colspan="7" class="attendance-empty">해당하는 회원이 없습니다.</td></tr>`}</tbody>
       </table>
     </div>`;
   document.getElementById('addMember').onclick=()=>attendanceModal();
+  document.getElementById('attendanceManage')?.addEventListener('click',()=>{attendanceMode='manage';attendancePanel(p)});
+  document.getElementById('attendanceBackToCheck')?.addEventListener('click',()=>{attendanceMode='check';attendanceCheckFilter='pending';attendancePanel(p)});
+  document.querySelectorAll('[data-check-filter]').forEach(btn=>btn.onclick=()=>{attendanceCheckFilter=btn.dataset.checkFilter;attendancePanel(p)});
+  const dateInput=document.getElementById('attendanceWorkDate');
+  if(dateInput)dateInput.onchange=()=>{
+    if(!/^\\d{4}-\\d{2}-\\d{2}$/.test(dateInput.value)){dateInput.value=attendanceWorkDate;return;}
+    attendanceWorkDate=dateInput.value;
+    attendanceCheckFilter='pending';
+    attendancePanel(p);
+  };
+  document.getElementById('attendanceResetDate')?.addEventListener('click',()=>{attendanceWorkDate=todayYmd();attendanceCheckFilter='pending';attendancePanel(p)});
+  document.getElementById('attendanceSync')?.addEventListener('click',()=>refreshAttendanceMembers());
   document.querySelectorAll('[data-att-filter]').forEach(btn=>btn.onclick=()=>{attendanceFilter=btn.dataset.attFilter;attendancePanel(p)});
   const search=document.getElementById('attendanceSearch');
   // 검색 중에는 input DOM을 절대 다시 만들지 않습니다.
@@ -486,11 +575,26 @@ function attendancePanel(p){
   search.addEventListener('input',applyAttendanceSearch);
   applyAttendanceSearch();
   document.querySelectorAll('[data-attend]').forEach(btn=>btn.onclick=async()=>{
+    if(attendanceWriting)return;
+    const date=attendanceMode==='check'?attendanceWorkDate:todayYmd();
+    const member=data.attendance.find(x=>String(x.id)===btn.dataset.attend);
+    if(!member||member.member_status==='left')return alert('활동 회원을 찾지 못했습니다. 명단을 갱신해 주세요.');
+    if(date>todayYmd())return alert('미래 날짜로는 출석을 기록할 수 없어요.');
+    if(member.last_attended_at&&member.last_attended_at>date)return alert('이미 더 최근 날짜로 기록된 회원입니다. 기존 날짜를 유지할게요.');
+    attendanceWriting=true;
     btn.disabled=true;
     try{
-      await DOTT_DB.update('attendance_members',btn.dataset.attend,{last_attended_at:todayYmd(),grace:false,member_status:'active',left_at:null,updated_at:new Date().toISOString()});
-      await loadAll();attendancePanel(p);toast('오늘 참석으로 처리했습니다.');
-    }catch(e){alert(e.message||e)}finally{btn.disabled=false}
+      const saved=await DOTT_DB.markAttendance(btn.dataset.attend,date);
+      data.attendance=data.attendance.map(x=>String(x.id)===btn.dataset.attend?{...x,...saved}:x);
+      attendancePanel(p);
+      toast(shortDate(date)+' 참석으로 처리했습니다.');
+    }catch(e){
+      if(e.status===409){
+        const latest=await DOTT_DB.attendance();
+        if(!window.DOTT_ATTENDANCE_ERROR){data.attendance=latest;attendancePanel(p);}
+      }
+      alert(e.message||e);
+    }finally{attendanceWriting=false;btn.disabled=false}
   });
   document.querySelectorAll('[data-att-edit]').forEach(btn=>btn.onclick=()=>attendanceModal(data.attendance.find(x=>x.id===btn.dataset.attEdit)));
   document.querySelectorAll('[data-att-del]').forEach(btn=>btn.onclick=async()=>{
