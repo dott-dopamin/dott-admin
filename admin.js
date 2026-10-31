@@ -6,6 +6,8 @@ let attendanceSearch='';
 let attendanceMode='check'; // check | manage
 let attendanceCheckFilter='pending'; // pending | done
 let attendanceWorkDate=todayYmd();
+let attendanceAutoDate=attendanceWorkDate;
+let attendanceDateManual=false;
 let attendanceWriting=false;
 let attendanceSyncing=false;
 let scheduleView='month';
@@ -467,6 +469,13 @@ setInterval(()=>{
 },30000);
 
 function attendancePanel(p){
+  const currentDate=todayYmd();
+  // 날짜를 직접 선택하지 않은 경우에는 자정이 지나도 자동으로 새로운 오늘을 사용합니다.
+  if(!attendanceDateManual&&attendanceAutoDate!==currentDate){
+    attendanceWorkDate=currentDate;
+    attendanceAutoDate=currentDate;
+    attendanceCheckFilter='pending';
+  }
   if(window.DOTT_ATTENDANCE_ERROR){
     p.innerHTML=`<div class="info-box attendance-setup"><b>출석관리 DB를 아직 만들지 않았습니다.</b><br>Supabase SQL Editor에서 <code>add-attendance.sql</code>을 한 번 실행하면 이 메뉴가 활성화됩니다.</div>`;
     return;
@@ -502,7 +511,7 @@ function attendancePanel(p){
         <button type="button" class="attendance-checkdesk-tab ${attendanceCheckFilter==='pending'?'active':''}" data-check-filter="pending" aria-pressed="${attendanceCheckFilter==='pending'}">미체크 <b>${pendingCount}</b><small>명</small></button>
         <button type="button" class="attendance-checkdesk-tab ${attendanceCheckFilter==='done'?'active':''}" data-check-filter="done" aria-pressed="${attendanceCheckFilter==='done'}">출석 완료 <b>${completeCount}</b><small>명</small></button>
       </div>
-      <p class="attendance-checkdesk-note">활동 회원 ${checkable.length}명 기준 · 출석 완료는 <b>최근 참석일이 선택 날짜와 일치</b>하는 경우예요. 출석 기록은 날짜별로 따로 저장하지 않아요.</p>
+      <p class="attendance-checkdesk-note">활동 회원 ${checkable.length}명 기준 · 출석 완료는 <b>최근 참석일이 선택 날짜와 일치</b>하는 경우예요. 출석 기록은 날짜별로 따로 저장하지 않아요. <span class="attendance-safety-text">더 최근 참석일이 있는 회원은 과거 날짜로 덮어쓰지 않아요.</span></p>
     </section>`:`
     <section class="attendance-manage-bar"><div><strong>회원 상태별 관리</strong><p>기존 유지 · 경과 임박 · 경과 · 유예 · 탈퇴 필터를 그대로 사용할 수 있어요.</p></div><button class="btn" type="button" id="attendanceBackToCheck">← 출석 체크로</button></section>`;
   p.innerHTML=`
@@ -540,12 +549,13 @@ function attendancePanel(p){
   document.querySelectorAll('[data-check-filter]').forEach(btn=>btn.onclick=()=>{attendanceCheckFilter=btn.dataset.checkFilter;attendancePanel(p)});
   const dateInput=document.getElementById('attendanceWorkDate');
   if(dateInput)dateInput.onchange=()=>{
-    if(!/^\\d{4}-\\d{2}-\\d{2}$/.test(dateInput.value)){dateInput.value=attendanceWorkDate;return;}
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(dateInput.value)){dateInput.value=attendanceWorkDate;return;}
     attendanceWorkDate=dateInput.value;
+    attendanceDateManual=true;
     attendanceCheckFilter='pending';
     attendancePanel(p);
   };
-  document.getElementById('attendanceResetDate')?.addEventListener('click',()=>{attendanceWorkDate=todayYmd();attendanceCheckFilter='pending';attendancePanel(p)});
+  document.getElementById('attendanceResetDate')?.addEventListener('click',()=>{attendanceWorkDate=todayYmd();attendanceAutoDate=attendanceWorkDate;attendanceDateManual=false;attendanceCheckFilter='pending';attendancePanel(p)});
   document.getElementById('attendanceSync')?.addEventListener('click',()=>refreshAttendanceMembers());
   document.querySelectorAll('[data-att-filter]').forEach(btn=>btn.onclick=()=>{attendanceFilter=btn.dataset.attFilter;attendancePanel(p)});
   const search=document.getElementById('attendanceSearch');
