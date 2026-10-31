@@ -506,7 +506,7 @@ function attendancePanel(p){
           <div class="attendance-work-date-inputs"><input class="field" type="date" id="attendanceWorkDate" value="${esc(attendanceWorkDate)}"><button type="button" class="btn attendance-date-reset" id="attendanceResetDate">오늘로</button></div>
         </div>
         <div class="attendance-checkdesk-description"><strong>${esc(shortDate(attendanceWorkDate))} 출석 체크</strong><small>선택한 날짜를 최근 참석일로 기록해요. 전날 벙도 날짜만 바꿔서 처리하면 돼요.</small></div>
-        <div class="attendance-checkdesk-tools"><button type="button" class="btn attendance-sync" id="attendanceSync">↻ 명단 동기화</button><button type="button" class="btn attendance-manage-toggle" id="attendanceManage">⚙ 상태별 관리</button></div>
+        <div class="attendance-checkdesk-tools"><button type="button" class="btn attendance-sync" id="attendanceSync">↻ 명단 동기화</button></div>
       </div>
       <div class="attendance-checkdesk-tabs" role="group" aria-label="선택 날짜 출석 상태">
         <button type="button" class="attendance-checkdesk-tab ${attendanceCheckFilter==='pending'?'active':''}" data-check-filter="pending" aria-pressed="${attendanceCheckFilter==='pending'}">미체크 <b>${pendingCount}</b><small>명</small></button>
@@ -551,7 +551,6 @@ function attendancePanel(p){
     attendanceSearch='';
     attendancePanel(p);
   });
-  document.getElementById('attendanceManage')?.addEventListener('click',()=>{attendanceMode='manage';attendancePanel(p)});
   document.getElementById('attendanceBackToCheck')?.addEventListener('click',()=>{attendanceMode='check';attendanceCheckFilter='pending';attendancePanel(p)});
   document.querySelectorAll('[data-check-filter]').forEach(btn=>btn.onclick=()=>{attendanceCheckFilter=btn.dataset.checkFilter;attendancePanel(p)});
   const dateInput=document.getElementById('attendanceWorkDate');
