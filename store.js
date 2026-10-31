@@ -127,6 +127,16 @@ window.DOTT_DB={
     try{const rows=await restSelect('attendance_members','select=*&order=name.asc','출석',true);window.DOTT_ATTENDANCE_ERROR=null;return rows}
     catch(error){window.DOTT_ATTENDANCE_ERROR=error;console.warn('attendance_members를 불러오지 못했습니다.',error);return []}
   },
+  async markAttendance(id,date){
+    // 최신 참석일보다 과거로 되돌리지 않는 원자적 업데이트 (다른 운영진과 동시 사용해도 보호).
+    const row={last_attended_at:date,grace:false,member_status:'active',left_at:null,updated_at:new Date().toISOString()};
+    const query='member_status=neq.left&or=(last_attended_at.is.null,last_attended_at.lte.'+enc(date)+')';
+    const body=await restWrite('PATCH','attendance_members',{id,row,query});
+    if(!Array.isArray(body)||body.length!==1){
+      throw apiError('이미 더 최근 날짜로 처리되었거나 회원 상태가 변경되었습니다. 명단을 동기화한 뒤 확인해 주세요.',409);
+    }
+    return body[0];
+  },
   async catalog(kind){
     const filter=kind?`&kind=eq.${enc(kind)}`:'';
     return restSelect('catalog_items',`select=*${filter}&order=name.asc`,'게임 목록');
