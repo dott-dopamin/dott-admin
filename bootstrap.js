@@ -3,7 +3,7 @@
   const entry=bootScript?.dataset?.entry||'';
   const app=document.getElementById('app');
   const sleep=ms=>new Promise(r=>setTimeout(r,ms));
-  const BUILD='dott-admin-20261104-strategy-category';
+  const BUILD='dott-admin-20261104-other-purple';
 
   function loadScript(src,{timeout=9000,retries=2}={}){
     return (async()=>{
