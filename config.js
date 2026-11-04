@@ -10,6 +10,6 @@ window.DOTT_CONFIG = {
     { value: 'murder', label: '머미', color: '#e95d20' },
     { value: 'deduction', label: '추리', color: '#4e9f67' },
     { value: 'strategy', label: '전략', color: '#4f7cff' },
-    { value: 'other', label: '기타', color: '#cdc1ef' }
+    { value: 'other', label: '기타', color: '#9B6AD6' }
   ]
 };
