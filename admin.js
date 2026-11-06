@@ -1227,6 +1227,109 @@ async function receiptModal(x){
   await showReceipt(0);
 }
 
+async function ensureReceiptPdfJs(){
+  if(window.pdfjsLib)return window.pdfjsLib;
+  await new Promise((resolve,reject)=>{
+    const existing=document.querySelector('script[data-dott-pdfjs]');
+    if(existing){
+      existing.addEventListener('load',resolve,{once:true});
+      existing.addEventListener('error',()=>reject(new Error('PDF 영수증 변환 모듈을 불러오지 못했습니다.')),{once:true});
+      return;
+    }
+    const s=document.createElement('script');
+    s.dataset.dottPdfjs='1';
+    s.src='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+    s.onload=resolve;
+    s.onerror=()=>reject(new Error('PDF 영수증 변환 모듈을 불러오지 못했습니다.'));
+    document.head.appendChild(s);
+  });
+  if(!window.pdfjsLib)throw new Error('PDF 영수증 변환 모듈 초기화에 실패했습니다.');
+  window.pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  return window.pdfjsLib;
+}
+function receiptBlobToDataUrl(blob){
+  return new Promise((resolve,reject)=>{
+    const reader=new FileReader();
+    reader.onload=()=>resolve(String(reader.result||''));
+    reader.onerror=()=>reject(new Error('영수증 이미지를 읽지 못했습니다.'));
+    reader.readAsDataURL(blob);
+  });
+}
+async function receiptPdfToImages(blob){
+  const pdfjs=await ensureReceiptPdfJs();
+  const pdf=await pdfjs.getDocument({data:await blob.arrayBuffer()}).promise;
+  const pages=[];
+  for(let pageNo=1;pageNo<=pdf.numPages;pageNo++){
+    const page=await pdf.getPage(pageNo);
+    const viewport=page.getViewport({scale:1.65});
+    const canvas=document.createElement('canvas');
+    canvas.width=Math.ceil(viewport.width);
+    canvas.height=Math.ceil(viewport.height);
+    const ctx=canvas.getContext('2d',{alpha:false});
+    ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);
+    await page.render({canvasContext:ctx,viewport}).promise;
+    pages.push(canvas.toDataURL('image/jpeg',.9));
+  }
+  return pages;
+}
+function waitReceiptImages(root){
+  return Promise.all([...root.querySelectorAll('img')].map(img=>img.complete?Promise.resolve():new Promise((resolve,reject)=>{
+    img.addEventListener('load',resolve,{once:true});
+    img.addEventListener('error',()=>reject(new Error('영수증 이미지를 출력용으로 준비하지 못했습니다.')),{once:true});
+  })));
+}
+async function prepareReceiptAppendix(rows){
+  document.getElementById('printReceiptAppendix')?.remove();
+  const jobs=[];
+  for(const entry of rows){
+    const receipts=ledgerReceipts(entry);
+    for(let i=0;i<receipts.length;i++){
+      const receipt=receipts[i];
+      const blob=await DOTT_DB.receiptBlob(receipt.receipt_path);
+      const isPdf=(receipt.receipt_type||blob.type||'').toLowerCase().includes('pdf')||/\.pdf$/i.test(receipt.receipt_name||'');
+      const images=isPdf?await receiptPdfToImages(blob):[await receiptBlobToDataUrl(blob)];
+      images.forEach((src,pageIndex)=>jobs.push({entry,receipt,receiptIndex:i,receiptCount:receipts.length,src,pageIndex,pageCount:images.length}));
+    }
+  }
+  if(!jobs.length)return null;
+  const appendix=document.createElement('section');
+  appendix.id='printReceiptAppendix';
+  appendix.className='receipt-appendix';
+  appendix.innerHTML=jobs.map((job,index)=>{
+    const x=job.entry,receiptLabel=job.receiptCount>1?`영수증 ${job.receiptIndex+1}/${job.receiptCount}`:'영수증';
+    const pdfPage=job.pageCount>1?` · PDF ${job.pageIndex+1}/${job.pageCount}`:'';
+    return `<section class="receipt-sheet">
+      <div class="receipt-appendix-head"><div><span>별첨</span><h3>영수증 증빙자료</h3></div><b>${index+1} / ${jobs.length}</b></div>
+      <div class="receipt-meta">
+        <div><small>일자</small><strong>${acctYmd(x.entry_date)}</strong></div>
+        <div><small>구분</small><strong>${esc(x.category||'-')}</strong></div>
+        <div class="wide"><small>내용</small><strong>${esc(x.description||'-')}</strong></div>
+        <div><small>관련 회원/거래처</small><strong>${esc(x.party_name||'-')}</strong></div>
+        <div><small>금액</small><strong>${acctMoney(x.amount)}</strong></div>
+      </div>
+      <div class="receipt-sheet-label">${receiptLabel}${pdfPage} · ${esc(job.receipt.receipt_name||'증빙자료')}</div>
+      <div class="receipt-sheet-image"><img src="${job.src}" alt="영수증 증빙자료"></div>
+    </section>`;
+  }).join('');
+  document.querySelector('.accounting-report.final-report')?.appendChild(appendix);
+  await waitReceiptImages(appendix);
+  return appendix;
+}
+async function printAccountingReportWithReceipts(button){
+  const oldText=button?.textContent;
+  if(button){button.disabled=true;button.textContent='영수증 준비 중...'}
+  try{
+    const rows=acctRows();
+    await prepareReceiptAppendix(rows);
+    await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
+    window.print();
+  }catch(e){
+    document.getElementById('printReceiptAppendix')?.remove();
+    alert((e.message||e)+'\n\n영수증 별첨을 준비하지 못해 PDF 생성을 중단했습니다.');
+  }finally{
+    if(button){button.disabled=false;button.textContent=oldText||'PDF 생성'}
+  }
+}
 function reportPanel(p){
   const rows=acctRows(),closed=acctClosed(),carry=acctBalanceBefore();
   const income=rows.filter(x=>x.entry_type==='수입').reduce((a,x)=>a+Number(x.amount),0);
@@ -1245,7 +1348,7 @@ function reportPanel(p){
     <section class="fr-sec"><h3>3. 전체 거래 내역</h3><table><thead><tr><th>날짜</th><th>수입/지출</th><th>구분</th><th>내용</th><th>관련 회원/거래처</th><th>금액</th><th>잔액</th></tr></thead><tbody>${txRows}</tbody></table></section>
     <section class="fr-sec"><h3>4. 미지급금 요약</h3><div class="fr-unpaidbox"><div class="fr-unpaidhead"><span>현재 지급해야 할 금액</span><strong>${acctMoney(payable)}</strong></div>${payableSummaryHtml(rows)}</div><p class="fr-note">※ 미지급금은 회원/운영진이 대신 결제한 금액 중 아직 정산되지 않은 금액을 표시합니다. 일부 지급 시 지급액을 차감하여 남은 미지급금을 자동 계산합니다.</p></section>
   </article>`;
-  wireAcctMonth(p);p.querySelector('#closeMonth')?.addEventListener('click',()=>confirmCloseMonth());p.querySelector('#reopenMonth')?.addEventListener('click',()=>reopenMonth());p.querySelector('#printReport')?.addEventListener('click',()=>window.print());
+  wireAcctMonth(p);p.querySelector('#closeMonth')?.addEventListener('click',()=>confirmCloseMonth());p.querySelector('#reopenMonth')?.addEventListener('click',()=>reopenMonth());p.querySelector('#printReport')?.addEventListener('click',e=>printAccountingReportWithReceipts(e.currentTarget));
 }
 function payableSummaryHtml(rows){const map={};rows.filter(x=>x.category==='미지급금').forEach(x=>{const k=x.party_name||'미지정';map[k]??={name:k,first:x.entry_date,desc:x.description||'-',occur:0,paid:0};if(x.entry_type==='발생'){map[k].occur+=Number(x.amount);if(String(x.entry_date)<String(map[k].first))map[k].first=x.entry_date;if(map[k].desc==='-'&&x.description)map[k].desc=x.description}else map[k].paid+=Number(x.amount)});const vals=Object.values(map),occur=vals.reduce((a,v)=>a+v.occur,0),paid=vals.reduce((a,v)=>a+v.paid,0);return `<table class="payable-table"><colgroup><col style="width:14%"><col style="width:12%"><col style="width:25%"><col style="width:16%"><col style="width:16%"><col style="width:17%"></colgroup><thead><tr><th>이름</th><th>발생일</th><th>내용</th><th>발생 금액</th><th>지급 금액</th><th>남은 미지급금</th></tr></thead><tbody>${vals.map(v=>`<tr><td><b>${esc(v.name)}</b></td><td>${acctYmd(v.first).slice(5)}</td><td>${esc(v.desc)}</td><td>${acctMoney(v.occur)}</td><td>${v.paid?acctMoney(v.paid):'-'}</td><td>${acctMoney(v.occur-v.paid)}</td></tr>`).join('')||'<tr><td colspan="6">미지급금 내역이 없습니다.</td></tr>'}${vals.length?`<tr class="fr-sumrow"><td colspan="3">합계</td><td>${acctMoney(occur)}</td><td>${acctMoney(paid)}</td><td>${acctMoney(occur-paid)}</td></tr>`:''}</tbody></table>`}
 function confirmCloseMonth(){showModal(`${acctMonthLabel()} 장부를 마감하시겠습니까?`,`<div class="info-box" style="border-color:#efc79d;background:#fff5e9;color:#76522f">마감 후에는 해당 월의 <b>회비 및 회계내역을 수정할 수 없습니다.</b><br>PDF도 마감된 데이터를 기준으로 생성됩니다.</div>`,async()=>{await DOTT_DB.closeAccountingMonth(acctMonthKey());await loadAll();accountingPanel(document.getElementById('panel'));toast(`${acctMonthLabel()} 장부를 마감했습니다.`)});const save=document.getElementById('modalSave');if(save)save.textContent=`${accountingMonth.getMonth()+1}월 마감`}
