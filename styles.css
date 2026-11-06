@@ -1832,3 +1832,84 @@ body.recommend-open{overflow:hidden}
     grid-column:1/-1!important;
   }
 }
+
+/* 회계 보고서 영수증 별첨 */
+.receipt-appendix{display:none}
+@media print{
+  .receipt-appendix{display:block!important}
+  .receipt-sheet{
+    display:flex!important;
+    flex-direction:column;
+    box-sizing:border-box;
+    min-height:265mm;
+    page-break-before:always;
+    break-before:page;
+    padding:3mm 0 0;
+    color:#262321;
+    background:#fff;
+  }
+  .receipt-appendix-head{
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:12px;
+    padding-bottom:4mm;
+    border-bottom:2px solid #2e2a27;
+  }
+  .receipt-appendix-head>div{display:flex;align-items:center;gap:10px}
+  .receipt-appendix-head span{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    padding:4px 8px;
+    border-radius:999px;
+    background:#f45b22;
+    color:#fff;
+    font-size:10px;
+    font-weight:900;
+  }
+  .receipt-appendix-head h3{margin:0;font-size:20px}
+  .receipt-appendix-head>b{font-size:11px;color:#81776f}
+  .receipt-meta{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:0;
+    margin:4mm 0 3mm;
+    border:1px solid #e3d9cd;
+    border-radius:8px;
+    overflow:hidden;
+  }
+  .receipt-meta>div{
+    display:flex;
+    justify-content:space-between;
+    gap:10px;
+    padding:2.5mm 3mm;
+    border-bottom:1px solid #eee5dc;
+  }
+  .receipt-meta>div:nth-last-child(-n+2){border-bottom:0}
+  .receipt-meta .wide{grid-column:1/-1;border-bottom:1px solid #eee5dc}
+  .receipt-meta small{color:#81776f;font-size:9px}
+  .receipt-meta strong{font-size:10px;text-align:right}
+  .receipt-sheet-label{
+    margin:0 0 2.5mm;
+    font-size:10px;
+    font-weight:800;
+    color:#5d554f;
+  }
+  .receipt-sheet-image{
+    flex:1;
+    min-height:0;
+    display:flex;
+    align-items:flex-start;
+    justify-content:center;
+    overflow:hidden;
+  }
+  .receipt-sheet-image img{
+    display:block;
+    width:auto;
+    height:auto;
+    max-width:100%;
+    max-height:218mm;
+    object-fit:contain;
+  }
+}
