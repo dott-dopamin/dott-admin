@@ -1278,8 +1278,7 @@ function waitReceiptImages(root){
     img.addEventListener('error',()=>reject(new Error('영수증 이미지를 출력용으로 준비하지 못했습니다.')),{once:true});
   })));
 }
-async function prepareReceiptAppendix(rows){
-  document.getElementById('printReceiptAppendix')?.remove();
+async function buildReceiptAppendixHtml(rows){
   const jobs=[];
   for(const entry of rows){
     const receipts=ledgerReceipts(entry);
@@ -1291,12 +1290,10 @@ async function prepareReceiptAppendix(rows){
       images.forEach((src,pageIndex)=>jobs.push({entry,receipt,receiptIndex:i,receiptCount:receipts.length,src,pageIndex,pageCount:images.length}));
     }
   }
-  if(!jobs.length)return null;
-  const appendix=document.createElement('section');
-  appendix.id='printReceiptAppendix';
-  appendix.className='receipt-appendix';
-  appendix.innerHTML=jobs.map((job,index)=>{
-    const x=job.entry,receiptLabel=job.receiptCount>1?`영수증 ${job.receiptIndex+1}/${job.receiptCount}`:'영수증';
+  if(!jobs.length)return {html:'',count:0};
+  const html=`<section class="receipt-appendix print-receipt-appendix">${jobs.map((job,index)=>{
+    const x=job.entry;
+    const receiptLabel=job.receiptCount>1?`영수증 ${job.receiptIndex+1}/${job.receiptCount}`:'영수증';
     const pdfPage=job.pageCount>1?` · PDF ${job.pageIndex+1}/${job.pageCount}`:'';
     return `<section class="receipt-sheet">
       <div class="receipt-appendix-head"><div><span>별첨</span><h3>영수증 증빙자료</h3></div><b>${index+1} / ${jobs.length}</b></div>
@@ -1310,26 +1307,96 @@ async function prepareReceiptAppendix(rows){
       <div class="receipt-sheet-label">${receiptLabel}${pdfPage} · ${esc(job.receipt.receipt_name||'증빙자료')}</div>
       <div class="receipt-sheet-image"><img src="${job.src}" alt="영수증 증빙자료"></div>
     </section>`;
-  }).join('');
-  document.querySelector('.accounting-report.final-report')?.appendChild(appendix);
-  await waitReceiptImages(appendix);
-  return appendix;
+  }).join('')}</section>`;
+  return {html,count:jobs.length};
+}
+function printWindowBaseCss(){
+  return `
+  @page{size:A4;margin:12mm}
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:#fff;color:#262321;font-family:Arial,"Noto Sans KR",sans-serif}
+  body{font-size:12px}
+  .accounting-report.final-report{width:100%;max-width:none;margin:0;padding:0;border:0;box-shadow:none;background:#fff}
+  .final-report .fr-header{text-align:center;border-bottom:2px solid #2e2a27;padding-bottom:20px}
+  .final-report .fr-header h2{font-size:30px;margin:0 0 8px}
+  .final-report .fr-header p{margin:3px;color:#786f67;font-size:13px}
+  .final-report .fr-sec{margin-top:27px}
+  .final-report .fr-sec>h3{font-size:18px;border-left:4px solid #f45b22;padding-left:10px;margin:0 0 12px}
+  .final-report .fr-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
+  .final-report .fr-card{border:1px solid #e5dbcf;border-radius:10px;padding:14px;background:#fcfaf7}
+  .final-report .fr-card small{display:block;color:#7c736b;margin-bottom:6px}
+  .final-report .fr-card b{font-size:19px}
+  .final-report .fr-card.green{background:#eff9f1}
+  .final-report .fr-card.red{background:#fff1ef}
+  .final-report .fr-card.orange{background:#fff4e9}
+  .final-report .fr-total{border:2px solid #f45b22;border-radius:12px;padding:0 18px;margin-top:12px;display:flex;justify-content:space-between;align-items:center;min-height:78px}
+  .final-report .fr-total strong{font-size:24px}
+  .final-report .fr-cats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+  .final-report .fr-cat{border:1px solid #e5dbcf;border-radius:9px;padding:11px;text-align:center}
+  .final-report .fr-cat b{display:block;margin-top:5px}
+  .final-report table{width:100%;border-collapse:collapse;font-size:12px}
+  .final-report th{background:#f8f4ee}
+  .final-report th,.final-report td{border:1px solid #e3d9cd;padding:8px 7px;text-align:left;vertical-align:middle}
+  .final-report td.num{text-align:right}
+  .final-report .fr-unpaidbox{border:1px solid #edc7a9;border-radius:12px;overflow:hidden}
+  .final-report .fr-unpaidhead{display:flex;justify-content:space-between;align-items:center;background:#fff5eb;padding:13px 15px}
+  .final-report .fr-unpaidhead strong{font-size:18px;color:#c5521e}
+  .final-report .fr-unpaidbox th,.final-report .fr-unpaidbox td{border-left:0;border-right:0}
+  .final-report .fr-sumrow td{font-weight:800;background:#fff9f3}
+  .final-report .fr-note{font-size:11px;color:#81776f;line-height:1.5;margin-top:9px}
+  .final-report .payable-table th,.final-report .payable-table td{text-align:center!important}
+  .money-in{color:#28764a;font-weight:800}.money-out{color:#d94841;font-weight:800}.money-payable{color:#7c3aed;font-weight:800}
+  .print-receipt-appendix{display:block!important}
+  .receipt-sheet{display:flex;flex-direction:column;min-height:270mm;page-break-before:always;break-before:page;padding-top:2mm;background:#fff}
+  .receipt-appendix-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;padding-bottom:4mm;border-bottom:2px solid #2e2a27}
+  .receipt-appendix-head>div{display:flex;align-items:center;gap:10px}
+  .receipt-appendix-head span{display:inline-flex;align-items:center;justify-content:center;padding:4px 8px;border-radius:999px;background:#f45b22;color:#fff;font-size:10px;font-weight:900}
+  .receipt-appendix-head h3{margin:0;font-size:20px}.receipt-appendix-head>b{font-size:11px;color:#81776f}
+  .receipt-meta{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));margin:4mm 0 3mm;border:1px solid #e3d9cd;border-radius:8px;overflow:hidden}
+  .receipt-meta>div{display:flex;justify-content:space-between;gap:10px;padding:2.5mm 3mm;border-bottom:1px solid #eee5dc}
+  .receipt-meta>div:nth-last-child(-n+2){border-bottom:0}.receipt-meta .wide{grid-column:1/-1;border-bottom:1px solid #eee5dc}
+  .receipt-meta small{color:#81776f;font-size:9px}.receipt-meta strong{font-size:10px;text-align:right}
+  .receipt-sheet-label{margin:0 0 2.5mm;font-size:10px;font-weight:800;color:#5d554f}
+  .receipt-sheet-image{flex:1;min-height:0;display:flex;align-items:flex-start;justify-content:center;overflow:hidden}
+  .receipt-sheet-image img{display:block;width:auto;height:auto;max-width:100%;max-height:220mm;object-fit:contain}
+  `;
+}
+async function waitPrintWindowImages(doc){
+  const imgs=[...doc.images];
+  await Promise.all(imgs.map(img=>img.complete?Promise.resolve():new Promise((resolve,reject)=>{
+    img.addEventListener('load',resolve,{once:true});
+    img.addEventListener('error',()=>reject(new Error('영수증 이미지를 인쇄 창에 불러오지 못했습니다.')),{once:true});
+  })));
 }
 async function printAccountingReportWithReceipts(button){
   const oldText=button?.textContent;
+  const printWin=window.open('','_blank');
+  if(!printWin){alert('팝업이 차단되어 PDF 인쇄 창을 열 수 없습니다. 브라우저에서 팝업을 허용해 주세요.');return}
+  printWin.document.open();
+  printWin.document.write('<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>회계 보고서 준비 중</title></head><body style="font-family:Arial,sans-serif;padding:30px">회계 보고서와 영수증을 준비하고 있습니다...</body></html>');
+  printWin.document.close();
   if(button){button.disabled=true;button.textContent='영수증 준비 중...'}
   try{
+    const report=document.querySelector('.accounting-report.final-report');
+    if(!report)throw new Error('회계 보고서 화면을 찾지 못했습니다.');
     const rows=acctRows();
-    await prepareReceiptAppendix(rows);
-    await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
-    window.print();
+    const appendix=await buildReceiptAppendixHtml(rows);
+    const title=`도파민 ${accountingMonth.getFullYear()}년 ${accountingMonth.getMonth()+1}월 회계 보고서`;
+    printWin.document.open();
+    printWin.document.write(`<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${title}</title><style>${printWindowBaseCss()}</style></head><body>${report.outerHTML}${appendix.html}</body></html>`);
+    printWin.document.close();
+    await waitPrintWindowImages(printWin.document);
+    await new Promise(r=>setTimeout(r,250));
+    printWin.focus();
+    printWin.print();
   }catch(e){
-    document.getElementById('printReceiptAppendix')?.remove();
+    try{printWin.close()}catch(_e){}
     alert((e.message||e)+'\n\n영수증 별첨을 준비하지 못해 PDF 생성을 중단했습니다.');
   }finally{
     if(button){button.disabled=false;button.textContent=oldText||'PDF 생성'}
   }
 }
+
 function reportPanel(p){
   const rows=acctRows(),closed=acctClosed(),carry=acctBalanceBefore();
   const income=rows.filter(x=>x.entry_type==='수입').reduce((a,x)=>a+Number(x.amount),0);
