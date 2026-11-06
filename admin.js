@@ -1287,29 +1287,58 @@ async function buildReceiptAppendixHtml(rows){
       const blob=await DOTT_DB.receiptBlob(receipt.receipt_path);
       const isPdf=(receipt.receipt_type||blob.type||'').toLowerCase().includes('pdf')||/\.pdf$/i.test(receipt.receipt_name||'');
       const images=isPdf?await receiptPdfToImages(blob):[await receiptBlobToDataUrl(blob)];
-      images.forEach((src,pageIndex)=>jobs.push({entry,receipt,receiptIndex:i,receiptCount:receipts.length,src,pageIndex,pageCount:images.length}));
+      images.forEach((src,pageIndex)=>jobs.push({
+        entry,receipt,receiptIndex:i,receiptCount:receipts.length,
+        src,pageIndex,pageCount:images.length,date:acctYmd(entry.entry_date)
+      }));
     }
   }
   if(!jobs.length)return {html:'',count:0};
-  const html=`<section class="receipt-appendix print-receipt-appendix">${jobs.map((job,index)=>{
-    const x=job.entry;
-    const receiptLabel=job.receiptCount>1?`영수증 ${job.receiptIndex+1}/${job.receiptCount}`:'영수증';
-    const pdfPage=job.pageCount>1?` · PDF ${job.pageIndex+1}/${job.pageCount}`:'';
-    return `<section class="receipt-sheet">
-      <div class="receipt-appendix-head"><div><span>별첨</span><h3>영수증 증빙자료</h3></div><b>${index+1} / ${jobs.length}</b></div>
-      <div class="receipt-meta">
-        <div><small>일자</small><strong>${acctYmd(x.entry_date)}</strong></div>
-        <div><small>구분</small><strong>${esc(x.category||'-')}</strong></div>
-        <div class="wide"><small>내용</small><strong>${esc(x.description||'-')}</strong></div>
-        <div><small>관련 회원/거래처</small><strong>${esc(x.party_name||'-')}</strong></div>
-        <div><small>금액</small><strong>${acctMoney(x.amount)}</strong></div>
+
+  jobs.sort((a,b)=>String(a.date).localeCompare(String(b.date))||String(a.entry.created_at||'').localeCompare(String(b.entry.created_at||''))||a.receiptIndex-b.receiptIndex||a.pageIndex-b.pageIndex);
+
+  const groups=[];
+  for(const job of jobs){
+    let group=groups[groups.length-1];
+    if(!group||group.date!==job.date){
+      group={date:job.date,jobs:[]};
+      groups.push(group);
+    }
+    group.jobs.push(job);
+  }
+
+  let running=0;
+  const html=`<section class="receipt-appendix print-receipt-appendix">
+    <div class="receipt-appendix-title">
+      <div><span>별첨</span><h2>영수증 증빙자료</h2></div>
+      <p>회계장부 첨부 영수증 · 일자별 정리</p>
+    </div>
+    ${groups.map(group=>`<section class="receipt-date-group">
+      <div class="receipt-date-head"><strong>${group.date}</strong><span>${group.jobs.length}건</span></div>
+      <div class="receipt-grid">
+        ${group.jobs.map(job=>{
+          running+=1;
+          const x=job.entry;
+          const receiptLabel=job.receiptCount>1?`영수증 ${job.receiptIndex+1}/${job.receiptCount}`:'영수증';
+          const pdfPage=job.pageCount>1?` · PDF ${job.pageIndex+1}/${job.pageCount}`:'';
+          return `<article class="receipt-card">
+            <div class="receipt-card-top"><b>${receiptLabel}${pdfPage}</b><span>${running}/${jobs.length}</span></div>
+            <div class="receipt-card-image"><img src="${job.src}" alt="영수증 증빙자료"></div>
+            <div class="receipt-card-info">
+              <div><span>구분</span><b>${esc(x.category||'-')}</b></div>
+              <div><span>금액</span><b>${acctMoney(x.amount)}</b></div>
+              <div class="wide"><span>내용</span><b>${esc(x.description||'-')}</b></div>
+              <div class="wide"><span>거래처</span><b>${esc(x.party_name||'-')}</b></div>
+            </div>
+          </article>`;
+        }).join('')}
       </div>
-      <div class="receipt-sheet-label">${receiptLabel}${pdfPage} · ${esc(job.receipt.receipt_name||'증빙자료')}</div>
-      <div class="receipt-sheet-image"><img src="${job.src}" alt="영수증 증빙자료"></div>
-    </section>`;
-  }).join('')}</section>`;
+    </section>`).join('')}
+  </section>`;
+
   return {html,count:jobs.length};
 }
+
 function printWindowBaseCss(){
   return `
   @page{size:A4;margin:12mm}
@@ -1346,19 +1375,116 @@ function printWindowBaseCss(){
   .final-report .fr-note{font-size:11px;color:#81776f;line-height:1.5;margin-top:9px}
   .final-report .payable-table th,.final-report .payable-table td{text-align:center!important}
   .money-in{color:#28764a;font-weight:800}.money-out{color:#d94841;font-weight:800}.money-payable{color:#7c3aed;font-weight:800}
-  .print-receipt-appendix{display:block!important}
-  .receipt-sheet{display:flex;flex-direction:column;min-height:270mm;page-break-before:always;break-before:page;padding-top:2mm;background:#fff}
-  .receipt-appendix-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;padding-bottom:4mm;border-bottom:2px solid #2e2a27}
-  .receipt-appendix-head>div{display:flex;align-items:center;gap:10px}
-  .receipt-appendix-head span{display:inline-flex;align-items:center;justify-content:center;padding:4px 8px;border-radius:999px;background:#f45b22;color:#fff;font-size:10px;font-weight:900}
-  .receipt-appendix-head h3{margin:0;font-size:20px}.receipt-appendix-head>b{font-size:11px;color:#81776f}
-  .receipt-meta{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));margin:4mm 0 3mm;border:1px solid #e3d9cd;border-radius:8px;overflow:hidden}
-  .receipt-meta>div{display:flex;justify-content:space-between;gap:10px;padding:2.5mm 3mm;border-bottom:1px solid #eee5dc}
-  .receipt-meta>div:nth-last-child(-n+2){border-bottom:0}.receipt-meta .wide{grid-column:1/-1;border-bottom:1px solid #eee5dc}
-  .receipt-meta small{color:#81776f;font-size:9px}.receipt-meta strong{font-size:10px;text-align:right}
-  .receipt-sheet-label{margin:0 0 2.5mm;font-size:10px;font-weight:800;color:#5d554f}
-  .receipt-sheet-image{flex:1;min-height:0;display:flex;align-items:flex-start;justify-content:center;overflow:hidden}
-  .receipt-sheet-image img{display:block;width:auto;height:auto;max-width:100%;max-height:220mm;object-fit:contain}
+  .print-receipt-appendix{
+    display:block!important;
+    page-break-before:always;
+    break-before:page;
+    padding-top:2mm;
+  }
+  .receipt-appendix-title{
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:12px;
+    padding-bottom:4mm;
+    border-bottom:2px solid #2e2a27;
+    margin-bottom:4mm;
+  }
+  .receipt-appendix-title>div{display:flex;align-items:center;gap:10px}
+  .receipt-appendix-title span{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    padding:4px 8px;
+    border-radius:999px;
+    background:#f45b22;
+    color:#fff;
+    font-size:10px;
+    font-weight:900;
+  }
+  .receipt-appendix-title h2{margin:0;font-size:20px}
+  .receipt-appendix-title p{margin:0;color:#81776f;font-size:10px}
+  .receipt-date-group{
+    margin:0 0 5mm;
+    break-inside:auto;
+    page-break-inside:auto;
+  }
+  .receipt-date-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    margin:0 0 2.5mm;
+    padding:2.2mm 3mm;
+    border-radius:7px;
+    background:#f8f4ee;
+    border:1px solid #e3d9cd;
+  }
+  .receipt-date-head strong{font-size:12px}
+  .receipt-date-head span{font-size:9px;color:#81776f}
+  .receipt-grid{
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:3mm;
+    align-items:start;
+  }
+  .receipt-card{
+    break-inside:avoid;
+    page-break-inside:avoid;
+    border:1px solid #ddd2c6;
+    border-radius:8px;
+    padding:2.5mm;
+    background:#fff;
+    min-width:0;
+  }
+  .receipt-card-top{
+    display:flex;
+    justify-content:space-between;
+    gap:6px;
+    align-items:center;
+    margin-bottom:2mm;
+    font-size:8.5px;
+    color:#5d554f;
+  }
+  .receipt-card-top>b{font-size:9px}
+  .receipt-card-image{
+    height:68mm;
+    display:flex;
+    align-items:flex-start;
+    justify-content:center;
+    overflow:hidden;
+    background:#fafafa;
+    border:1px solid #eee6de;
+    border-radius:5px;
+  }
+  .receipt-card-image img{
+    display:block;
+    width:100%;
+    height:100%;
+    object-fit:contain;
+  }
+  .receipt-card-info{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:1.4mm 2mm;
+    margin-top:2mm;
+    font-size:8px;
+  }
+  .receipt-card-info>div{
+    display:flex;
+    justify-content:space-between;
+    gap:4px;
+    min-width:0;
+  }
+  .receipt-card-info .wide{grid-column:1/-1}
+  .receipt-card-info span{color:#81776f;white-space:nowrap}
+  .receipt-card-info b{
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    text-align:right;
+    min-width:0;
+  }
   `;
 }
 async function waitPrintWindowImages(doc){
