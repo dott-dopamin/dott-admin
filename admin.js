@@ -1496,25 +1496,74 @@ async function waitPrintWindowImages(doc){
 }
 async function printAccountingReportWithReceipts(button){
   const oldText=button?.textContent;
+  const isMobilePrint=/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)||window.matchMedia('(max-width: 700px)').matches;
   const printWin=window.open('','_blank');
-  if(!printWin){alert('팝업이 차단되어 PDF 인쇄 창을 열 수 없습니다. 브라우저에서 팝업을 허용해 주세요.');return}
+  if(!printWin){alert('팝업이 차단되어 PDF 인쇄 화면을 열 수 없습니다. 브라우저에서 팝업을 허용해 주세요.');return}
+
   printWin.document.open();
-  printWin.document.write('<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>회계 보고서 준비 중</title></head><body style="font-family:Arial,sans-serif;padding:30px">회계 보고서와 영수증을 준비하고 있습니다...</body></html>');
+  printWin.document.write('<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>회계 보고서 준비 중</title></head><body style="font-family:Arial,sans-serif;padding:30px;color:#333">회계 보고서와 영수증을 준비하고 있습니다...</body></html>');
   printWin.document.close();
+
   if(button){button.disabled=true;button.textContent='영수증 준비 중...'}
+
   try{
     const report=document.querySelector('.accounting-report.final-report');
     if(!report)throw new Error('회계 보고서 화면을 찾지 못했습니다.');
+
     const rows=acctRows();
     const appendix=await buildReceiptAppendixHtml(rows);
     const title=`도파민 ${accountingMonth.getFullYear()}년 ${accountingMonth.getMonth()+1}월 회계 보고서`;
+
+    const mobileToolbar=isMobilePrint?`
+      <div class="mobile-print-toolbar" id="mobilePrintToolbar">
+        <div>
+          <b>회계 보고서 준비 완료</b>
+          <span>아래 버튼을 눌러 PDF 저장 또는 인쇄를 진행해 주세요.</span>
+        </div>
+        <button type="button" id="mobilePrintButton">PDF 저장 / 인쇄</button>
+      </div>`:'';
+
+    const mobileToolbarCss=isMobilePrint?`
+      .mobile-print-toolbar{
+        position:sticky;top:0;z-index:9999;
+        display:flex;align-items:center;justify-content:space-between;gap:10px;
+        padding:12px 14px;margin:0 0 14px;
+        background:#fff8ed;border:1px solid #edc79e;border-radius:10px;
+        box-shadow:0 4px 14px rgba(0,0,0,.08);
+      }
+      .mobile-print-toolbar>div{display:flex;flex-direction:column;gap:2px;min-width:0}
+      .mobile-print-toolbar b{font-size:14px}
+      .mobile-print-toolbar span{font-size:10px;color:#756a60;line-height:1.35}
+      .mobile-print-toolbar button{
+        flex:0 0 auto;border:0;border-radius:9px;padding:11px 13px;
+        background:#f45b22;color:#fff;font-size:13px;font-weight:800;
+      }
+      @media print{.mobile-print-toolbar{display:none!important}}
+    `:'';
+
     printWin.document.open();
-    printWin.document.write(`<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${title}</title><style>${printWindowBaseCss()}</style></head><body>${report.outerHTML}${appendix.html}</body></html>`);
+    printWin.document.write(`<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${title}</title><style>${printWindowBaseCss()}${mobileToolbarCss}</style></head><body>${mobileToolbar}${report.outerHTML}${appendix.html}</body></html>`);
     printWin.document.close();
+
     await waitPrintWindowImages(printWin.document);
-    await new Promise(r=>setTimeout(r,250));
-    printWin.focus();
-    printWin.print();
+
+    if(isMobilePrint){
+      const mobileBtn=printWin.document.getElementById('mobilePrintButton');
+      if(!mobileBtn)throw new Error('모바일 PDF 버튼을 준비하지 못했습니다.');
+      mobileBtn.onclick=()=>{
+        try{
+          printWin.focus();
+          printWin.print();
+        }catch(e){
+          printWin.alert('이 브라우저에서 인쇄창을 열지 못했습니다. Safari에서 다시 시도해 주세요.');
+        }
+      };
+      printWin.focus();
+    }else{
+      await new Promise(r=>setTimeout(r,250));
+      printWin.focus();
+      printWin.print();
+    }
   }catch(e){
     try{printWin.close()}catch(_e){}
     alert((e.message||e)+'\n\n영수증 별첨을 준비하지 못해 PDF 생성을 중단했습니다.');
