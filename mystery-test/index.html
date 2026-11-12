@@ -251,7 +251,7 @@ node.addEventListener('click',evt=>{const btn=evt.target.closest('[data-action]'
  }
  if(action==='show-records'){view='leaderboard';loadLeaderboard();render();return}
  if(action==='intro-back'){view='investigate';render();return}
- if(!state.started&&!state.completed)return;
+ if(!state.started&&!state.completed&&action!=='sort-runs'&&action!=='refresh-runs')return;
  if(action==='tab'){if(state.completed&&id!=='leaderboard'&&id!=='final')return;if(id==='final'&&count(2)<4&&!state.completed){view='final'}else{view=id}selectedPerson=null;activeQuestion='first';if(id==='leaderboard')loadLeaderboard();}
  else if(action==='view'){const c=data.find(x=>x.id===id);if(!c||c.stage!==state.stage)return;if(!state.opened.includes(id)){if(count(c.stage)>=limit(c.stage))return;state.opened.push(id);save()}modal=id;}
  else if(action==='close'){modal=null;}
