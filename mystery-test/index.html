@@ -87,7 +87,7 @@ let state;try{let o=JSON.parse(localStorage.getItem(KEY)||'null');state=o&&Array
 
 if(state.started){if(!Number.isFinite(Number(state.startedAt))||Number(state.startedAt)<1)state.startedAt=Date.now()}else{state.startedAt=null;state.durationSeconds=0;}
 let view='investigate',modal=null,selectedPerson=null;
-let publicRuns=[],leaderboardMessage='조회 버튼을 눌러 기록을 확인하세요.',boardSort='latest',leaderboardLoading=false;
+let publicRuns=[],publicLoaded=false,leaderboardMessage='조회 버튼을 눌러 기록을 확인하세요.',boardSort='latest',leaderboardLoading=false;
 const runSeconds=()=>state.completed?Math.max(0,Number(state.durationSeconds)||0):state.started?Math.max(0,Math.floor((Date.now()-Number(state.startedAt||Date.now()))/1000)):0;
 const timeText=v=>{v=Math.max(0,Math.round(Number(v)||0));return String(Math.floor(v/3600)).padStart(2,'0')+':'+String(Math.floor(v%3600/60)).padStart(2,'0')+':'+String(v%60).padStart(2,'0')};
 const answerScore=a=>Number(a?.suspect==='jihoon')+Number(a?.motive==='late')+Number(a?.weapon==='metal')+Number(a?.frame==='jei')+Number(['exit','chatfull','corridor'].includes(a?.proof));
@@ -105,8 +105,8 @@ async function loadLeaderboard(){
  const res=await fetch(c.supabaseUrl.replace(/\/$/,'')+'/rest/v1/dopamin_mystery_runs?select=id,nickname,duration_seconds,score,success,created_at&order=created_at.desc&limit=100',{headers:apiHeaders(),cache:'no-store'});
  if(!res.ok)throw Error(res.status===404?'공용 기록 테이블 설정 필요':'조회 실패 ('+res.status+')');
  const rows=await res.json();if(!Array.isArray(rows))throw Error('응답 형식 오류');
- publicRuns=rows;leaderboardMessage='공용 기록 · 최근 100건';
- }catch(err){publicRuns=[];leaderboardMessage='공용 DB 미연결 · 이 기기 기록만 표시합니다. '+String(err.message||err)}
+ publicRuns=rows;publicLoaded=true;leaderboardMessage='공용 기록 · 최근 100건';
+ }catch(err){publicRuns=[];publicLoaded=false;leaderboardMessage='공용 DB 연결 실패 · 이 기기 기록만 표시합니다. '+String(err.message||err)}
  finally{leaderboardLoading=false;if(view==='leaderboard')render()}
 }
 async function submitRun(){
@@ -188,10 +188,10 @@ function result(){let a=state.answers||{},s=Number(a.suspect==='jihoon')+Number(
 function modalView(){const c=data.find(x=>x.id===modal);if(!c)return '';return `<div class="overlay" id="veil"><div class="modal" role="dialog" aria-modal="true" aria-label="증거 열람"><div class="modalhead"><h2>🔍 ${e(c.name)}</h2><button type="button" class="close" data-action="close" aria-label="닫기">×</button></div>${`<div class="modalphoto"><img src="${c.img}" alt="${e(c.name)} 증거 이미지"></div><a class="evidence-export" href="${c.img}" download="${e(c.id)}.png">↗ 증거 원본 이미지 저장</a>`}<div class="modaldesc"><b>조사 기록</b><div>${e(c.detail)}</div></div><p class="hint" style="margin:6px 0">※ 증거 사진은 사건 소품의 재현 이미지이며 실제 진술·시각은 조사 기록을 기준으로 합니다.</p><button class="button primary" type="button" data-action="close">수사 수첩에 보관하고 닫기</button></div></div>`}
 
 function leaderboard(){
- let rows=publicRuns.length?publicRuns.map(x=>({...x,local:false})):localRuns().map(x=>({...x,local:true}));
+ let rows=publicLoaded?publicRuns.map(x=>({...x,local:false})):localRuns().map(x=>({...x,local:true}));
  if(boardSort==='fastest')rows=rows.filter(x=>x.success).sort((a,b)=>a.duration_seconds-b.duration_seconds);
  else rows.sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
- const table=rows.length?rows.map((r,i)=>'<tr><td>'+(i+1)+'</td><td>'+e(r.nickname)+'</td><td class="'+(r.success?'win':'lose')+'">'+(r.success?'성공':'실패')+'</td><td>'+e(String(r.score))+'/5</td><td>'+timeText(r.duration_seconds)+'</td><td>'+new Date(r.created_at).toLocaleDateString('ko-KR')+'</td></tr>').join(''):'<tr><td colspan="6" class="empty-record">기록이 아직 없어요.</td></tr>';
+ const table=rows.length?rows.map((r,i)=>'<tr><td>'+(i+1)+'</td><td>'+e(r.nickname)+'</td><td class="'+(r.success?'win':'lose')+'">'+(r.success?'성공':'실패')+'</td><td>'+e(String(r.score))+'/5</td><td>'+timeText(r.duration_seconds)+'</td><td>'+new Date(r.created_at).toLocaleDateString('ko-KR')+'</td></tr>').join(''):'<tr><td colspan="6" class="empty-record">'+(publicLoaded?'아직 공용 기록이 없어요. 첫 수사관이 되어보세요!':'이 기기에 저장된 기록이 없어요.')+'</td></tr>';
  return '<section class="paper"><div class="overview"><h2>🏆 수사 타임 기록</h2><button class="button" data-action="refresh-runs" type="button">↻ 기록 조회</button></div>'+
  '<p class="muted">닉네임 · 성공/실패 · 점수 · 수사 시간. 다른 플레이어에게 정답은 공개되지 않아요.</p>'+
  '<p class="muted">'+e(leaderboardMessage)+'</p>'+
@@ -232,6 +232,7 @@ node.addEventListener('click',evt=>{const btn=evt.target.closest('[data-action]'
 node.addEventListener('submit',evt=>{if(evt.target.id!=='verdict')return;evt.preventDefault();if(count(2)!==4||state.stage!==2)return;const values=new FormData(evt.target);const nick=String(values.get('nickname')||'').trim();if(!nick||nick.length>16){alert('닉네임을 1~16자로 입력해 주세요.');return;}state.nickname=nick;state.answers=Object.fromEntries(values.entries());delete state.answers.nickname;state.durationSeconds=runSeconds();state.completed=true;state.recordId=crypto.randomUUID();state.recordStatus='pending';addLocalRun({id:state.recordId,nickname:nick,duration_seconds:state.durationSeconds,score:answerScore(state.answers),success:answerSuccess(state.answers),created_at:new Date().toISOString()});save();render();submitRun()});
 document.getElementById('reset').addEventListener('click',()=>{if(window.confirm('저장된 수사 기록을 모두 지울까요?')){state=blank();save();view='investigate';modal=null;selectedPerson=null;render()}});
 render();
+if(state.completed&&state.recordId&&state.recordStatus!=='saved')submitRun();
 setInterval(()=>{if(state.started&&!state.completed){const el=document.getElementById('elapsedClock');if(el)el.textContent=timeText(runSeconds())}},1000);
 })();
 </script><!-- v6: evidence 03,12,14,20 revised; using revised v5 evidence 06,07,08,11,16,18,19 -->
