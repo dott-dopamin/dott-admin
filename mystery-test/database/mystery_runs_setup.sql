@@ -4,11 +4,18 @@
 create table if not exists public.dopamin_mystery_runs (
   id uuid primary key,
   nickname text not null check (char_length(nickname) between 1 and 16),
-  duration_seconds integer not null check (duration_seconds between 20 and 86400),
+  duration_seconds integer not null check (duration_seconds between 0 and 86400),
   score smallint not null check (score between 0 and 5),
   success boolean not null,
   created_at timestamptz not null default now()
 );
+-- Accept accurate sub-20-second runs even when this SQL is rerun.
+alter table public.dopamin_mystery_runs
+  drop constraint if exists dopamin_mystery_runs_duration_seconds_check;
+alter table public.dopamin_mystery_runs
+  add constraint dopamin_mystery_runs_duration_seconds_check
+  check (duration_seconds between 0 and 86400);
+
 create index if not exists dopamin_mystery_runs_fastest_idx
   on public.dopamin_mystery_runs (success, duration_seconds, created_at desc);
 create index if not exists dopamin_mystery_runs_latest_idx
@@ -37,7 +44,7 @@ declare
 begin
   if p_id is null or p_answers is null or jsonb_typeof(p_answers) <> 'object'
      or v_nickname is null or char_length(v_nickname) not between 1 and 16
-     or p_duration_seconds not between 20 and 86400 then
+     or p_duration_seconds not between 0 and 86400 then
     raise exception 'invalid submission';
   end if;
   if p_answers->>'suspect' = 'jihoon' then v_score := v_score + 1; end if;
