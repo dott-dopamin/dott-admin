@@ -1003,6 +1003,84 @@ function wireRows(table,editFn,kind){
   });
 }
 
+function heroEditorField(id,label,value,placeholder,help='',singleLine=false){
+  return `<div class="settings-field settings-rich-field">
+    <label class="label" for="${esc(id)}">${esc(label)}</label>
+    <div class="rich-toolbar settings-rich-toolbar">
+      <button class="rich-tool" type="button" data-hero-bold="${esc(id)}"><b>B</b> 굵게</button>
+      <label class="rich-color">글자색 <input type="color" data-hero-color="${esc(id)}" value="#e95420" aria-label="${esc(label)} 글자색"></label>
+      <button class="rich-tool" type="button" data-hero-clear="${esc(id)}">서식 지우기</button>
+      <span class="rich-help">글자를 드래그해서 적용하세요.</span>
+    </div>
+    <div id="${esc(id)}" class="rich-editor settings-rich-editor ${singleLine?'settings-rich-single':''}" contenteditable="true" role="textbox" aria-label="${esc(label)}" aria-multiline="${!singleLine}" data-placeholder="${esc(placeholder)}">${noticeEditorHtml(value)}</div>
+    ${help?`<small class="settings-help">${esc(help)}</small>`:''}
+  </div>`;
+}
+
+function wireHeroRichEditor(id,onInput){
+  const editor=document.getElementById(id);
+  const bold=document.querySelector(`[data-hero-bold="${id}"]`);
+  const color=document.querySelector(`[data-hero-color="${id}"]`);
+  const clear=document.querySelector(`[data-hero-clear="${id}"]`);
+  if(!editor||!bold||!color||!clear)return;
+  let range=null;
+  const remember=()=>{
+    const selection=window.getSelection();
+    if(selection&&selection.rangeCount&&editor.contains(selection.anchorNode)&&editor.contains(selection.focusNode)){
+      range=selection.getRangeAt(0).cloneRange();
+    }
+  };
+  const restore=()=>{
+    if(!range||!editor.contains(range.commonAncestorContainer))return false;
+    const selection=window.getSelection();
+    if(!selection)return false;
+    selection.removeAllRanges();
+    selection.addRange(range.cloneRange());
+    return true;
+  };
+  const applyColor=value=>{
+    if(!range||range.collapsed||!editor.contains(range.commonAncestorContainer))return;
+    const selected=range.cloneRange();
+    const span=document.createElement('span');
+    span.style.color=value;
+    span.appendChild(selected.extractContents());
+    selected.insertNode(span);
+    const after=document.createRange();
+    after.setStartAfter(span);after.collapse(true);
+    const selection=window.getSelection();
+    selection.removeAllRanges();
+    selection.addRange(after);
+    editor.normalize();
+    editor.focus();
+    remember();
+    onInput();
+  };
+  ['keyup','mouseup','touchend'].forEach(type=>editor.addEventListener(type,remember));
+  editor.addEventListener('input',onInput);
+  editor.addEventListener('focusout',remember);
+  if(editor.dataset.singleLine==='true'||editor.classList.contains('settings-rich-single')){
+    editor.addEventListener('keydown',event=>{if(event.key==='Enter')event.preventDefault()});
+  }
+  [bold,clear].forEach(button=>button.addEventListener('mousedown',event=>event.preventDefault()));
+  bold.addEventListener('click',()=>{
+    if(restore())document.execCommand('bold',false,null);
+    editor.focus();remember();onInput();
+  });
+  color.addEventListener('mousedown',remember);
+  color.addEventListener('change',event=>applyColor(event.target.value));
+  clear.addEventListener('click',()=>{
+    if(restore())document.execCommand('removeFormat',false,null);
+    editor.focus();remember();onInput();
+  });
+}
+
+function heroEditorValue(id){
+  const editor=document.getElementById(id);
+  const plain=String(editor?.textContent||'').trim();
+  if(!plain)return '';
+  return NOTICE_RICH_PREFIX+sanitizeNoticeRichHtml(editor.innerHTML).trim();
+}
+
 function settingsPanel(p){
   const isOwner=dottAdminRole==='owner';
   const roleLabel=isOwner?'최고관리자 · OWNER':'일반 운영진 · ADMIN';
@@ -1052,9 +1130,9 @@ function settingsPanel(p){
       <section id="setting-content" class="settings-section">
         <div class="settings-section-head"><div><span class="settings-kicker">02 / SITE CONTENT</span><h2>홈페이지 문구</h2><p>회원용 도트 홈페이지의 예약 캘린더 상단에 표시되는 문구를 편집합니다.</p></div><span class="settings-section-mark">운영진 공통</span></div>
         <div class="settings-section-body"><div class="settings-fields">
-          <div class="settings-field"><label class="label" for="heroBadge">작은 안내 문구</label><input id="heroBadge" class="field" value="${esc(s.hero_badge)}" placeholder="예: 전체 공개 일정"></div>
-          <div class="settings-field"><label class="label" for="heroTitle">메인 제목</label><textarea id="heroTitle" class="field" rows="3" placeholder="예약 페이지의 큰 제목">${esc(s.hero_title)}</textarea><small class="settings-help">줄을 바꾸고 싶은 위치에서 Enter를 누르면 됩니다.</small></div>
-          <div class="settings-field"><label class="label" for="heroDescription">소개 문구</label><textarea id="heroDescription" class="field" rows="3" placeholder="회원에게 보여줄 안내 문구">${esc(s.hero_description)}</textarea></div>
+          ${heroEditorField('heroBadge','작은 안내 문구',s.hero_badge,'예: 전체 공개 일정','',true)}
+          ${heroEditorField('heroTitle','메인 제목',s.hero_title,'예약 페이지의 큰 제목','줄을 바꾸고 싶은 위치에서 Enter를 누르면 됩니다.')}
+          ${heroEditorField('heroDescription','소개 문구',s.hero_description,'회원에게 보여줄 안내 문구')}
           <div class="settings-action-row"><span class="settings-save-hint">Owner와 Admin 모두 수정할 수 있습니다.</span><button class="btn primary" id="saveHero" type="button">문구 저장하기</button></div>
           <div class="error" id="settingsErr" role="alert"></div>
         </div><div class="settings-preview-col"><div class="settings-preview-head">실시간 미리보기 <span>회원 사이트 · 상단 문구</span></div><div class="settings-preview"><span class="settings-preview-badge" id="heroPreviewBadge"></span><h3 id="heroPreviewTitle"></h3><p id="heroPreviewDescription"></p></div><p class="settings-help">미리보기는 입력 중인 문구를 보여줍니다. 실제 디자인과 차이가 있을 수 있습니다.</p></div></div>
@@ -1072,17 +1150,20 @@ function settingsPanel(p){
     </div>
   </div>`;
   const updateSettingsPreview=()=>{
-    document.getElementById('heroPreviewBadge').textContent=document.getElementById('heroBadge').value||'안내 문구';
-    document.getElementById('heroPreviewTitle').textContent=document.getElementById('heroTitle').value||'메인 제목';
-    document.getElementById('heroPreviewDescription').textContent=document.getElementById('heroDescription').value||'소개 문구';
+    const previews=[['heroBadge','heroPreviewBadge','안내 문구'],['heroTitle','heroPreviewTitle','메인 제목'],['heroDescription','heroPreviewDescription','소개 문구']];
+    previews.forEach(([sourceId,targetId,fallback])=>{
+      const editor=document.getElementById(sourceId);
+      const value=heroEditorValue(sourceId);
+      document.getElementById(targetId).innerHTML=value?heroPublicHtml(value):esc(fallback);
+    });
   };
-  ['heroBadge','heroTitle','heroDescription'].forEach(id=>document.getElementById(id).addEventListener('input',updateSettingsPreview));
+  ['heroBadge','heroTitle','heroDescription'].forEach(id=>wireHeroRichEditor(id,updateSettingsPreview));
   updateSettingsPreview();
   document.getElementById('saveHero').onclick=async()=>{
     const btn=document.getElementById('saveHero'),err=document.getElementById('settingsErr');btn.disabled=true;err.textContent='';
     try{
-      const row={hero_badge:document.getElementById('heroBadge').value.trim(),hero_title:document.getElementById('heroTitle').value.trim(),hero_description:document.getElementById('heroDescription').value.trim()};
-      if(!row.hero_title)throw new Error('큰 제목을 입력해 주세요.');
+      const row={hero_badge:heroEditorValue('heroBadge'),hero_title:heroEditorValue('heroTitle'),hero_description:heroEditorValue('heroDescription')};
+      if(!document.getElementById('heroTitle').textContent.trim())throw new Error('큰 제목을 입력해 주세요.');
       data.settings=await DOTT_DB.saveSettings(row);toast('메인 화면 문구를 저장했습니다.');
     }catch(e){err.textContent=e.message||String(e)}
     finally{btn.disabled=false}
