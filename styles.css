@@ -1913,3 +1913,45 @@ body.recommend-open{overflow:hidden}
     object-fit:contain;
   }
 }
+
+
+/* ===== DOTT ADMIN 2026-11-24 일정 대기 관리 ===== */
+.schedule-option-checks{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.wait-allow-check{color:#5f5790}
+.schedule-wait-enabled{
+  display:inline-flex;align-items:center;border:1px solid #d8d0c7;background:#fffaf4;color:#75695e;
+  border-radius:999px;padding:4px 7px;font-size:9px;font-weight:800;white-space:nowrap
+}
+.schedule-wait-manage{
+  border:1px solid #c8bfe9;background:#f7f4ff;color:#6554a1;border-radius:8px;
+  padding:6px 8px;font-size:10px;font-weight:800;white-space:nowrap
+}
+.schedule-wait-manage:hover{background:#f0ebff}
+.schedule-wait-admin-head{
+  display:flex;justify-content:space-between;gap:12px;align-items:center;
+  padding:10px 12px;margin-bottom:10px;border:1px solid var(--line);border-radius:10px;background:#fffaf4
+}
+.schedule-wait-admin-head b{font-size:12px}
+.schedule-wait-admin-head span{font-size:10px;color:var(--muted)}
+.schedule-wait-admin-list{display:flex;flex-direction:column;gap:8px}
+.schedule-wait-admin-row{
+  display:flex;justify-content:space-between;gap:12px;align-items:center;
+  border:1px solid var(--line);border-radius:10px;padding:10px 11px;background:#fff
+}
+.schedule-wait-admin-main{display:flex;align-items:center;gap:7px;min-width:0;font-size:11px}
+.schedule-wait-admin-main strong{font-size:12px}
+.schedule-wait-kind{border-radius:6px;padding:3px 6px;background:#f0ece7;font-size:9px;font-weight:900}
+.schedule-wait-admin-actions{display:flex;gap:5px;flex:0 0 auto}
+.wait-answer,.wait-delete{border:1px solid var(--line);background:#fff;border-radius:8px;padding:7px 8px;font-size:10px;font-weight:800}
+.wait-answer.ok{color:#317845}.wait-answer.no{color:#b1433b}.wait-delete{color:#8a7f75}
+.wait-answer.ok.active{background:#e3f4e7;border-color:#a8d8b2}
+.wait-answer.no.active{background:#f8e5e3;border-color:#e1b0ac}
+.schedule-wait-admin-empty{padding:24px;text-align:center;color:var(--muted);font-size:11px}
+@media(max-width:700px){
+  .schedule-option-checks{gap:6px}
+  .schedule-wait-enabled,.schedule-wait-manage{font-size:7px;padding:3px 4px}
+  .schedule-wait-admin-row{align-items:flex-start;flex-direction:column}
+  .schedule-wait-admin-main{flex-wrap:wrap}
+  .schedule-wait-admin-actions{width:100%}
+  .wait-answer,.wait-delete{flex:1;font-size:11px}
+}
