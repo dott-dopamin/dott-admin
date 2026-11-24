@@ -122,7 +122,7 @@ async function loadStartupDashboard(){
       if(cycle===startupCycle)startupPendingKeys.delete(key);
     }
   });
-  const dashboardKeys=new Set(['schedules','attendance','boardgame','murder','deduction','fees']);
+  const dashboardKeys=new Set(['schedules','waits','attendance','boardgame','murder','deduction','fees']);
   await Promise.all(tasks.filter((_,index)=>dashboardKeys.has(jobs[index][0])));
   if(cycle!==startupCycle)return;
   syncStartupWarnings();
@@ -161,7 +161,7 @@ function renderAdmin(){
 
 function renderPanel(){
   const p=document.getElementById('panel');
-  const dependencies={"dashboard":["schedules","attendance","boardgame","murder","deduction","fees"],"stats":["schedules","attendance","fees"],"schedules":["schedules","waits"],"attendance":["attendance"],"notices":["notices"],"boardgame":["boardgame"],"murder":["murder"],"deduction":["deduction"],"rentals":["rentals"],"accounting":["fees","attendance","ledger","receipts","closures"],"settings":["settings"]};
+  const dependencies={"dashboard":["schedules","waits","attendance","boardgame","murder","deduction","fees"],"stats":["schedules","attendance","fees"],"schedules":["schedules","waits"],"attendance":["attendance"],"notices":["notices"],"boardgame":["boardgame"],"murder":["murder"],"deduction":["deduction"],"rentals":["rentals"],"accounting":["fees","attendance","ledger","receipts","closures"],"settings":["settings"]};
   if(startupDataPending&&(dependencies[tab]||[]).some(key=>startupPendingKeys.has(key))){
     startupWaitingTab=tab;
     p.innerHTML='<div class="info-box" role="status">필요한 데이터를 불러오는 중입니다. 준비되면 자동으로 표시됩니다.</div>';
@@ -227,6 +227,30 @@ function dashboardAttendanceAlerts(){
   </section>`;
 }
 
+function dashboardWaitRequestsHtml(){
+  const today=todayYmd();
+  const scheduleById=new Map((data.schedules||[]).map(x=>[String(x.id),x]));
+  const rows=(data.waits||[])
+    .map(wait=>({wait,schedule:scheduleById.get(String(wait.schedule_id))}))
+    .filter(x=>x.schedule&&String(x.schedule.event_date||'')>=today&&!isCancelledStatus(x.schedule.status))
+    .sort((a,b)=>String(a.schedule.event_date||'').localeCompare(String(b.schedule.event_date||''))||String(a.schedule.event_time||'').localeCompare(String(b.schedule.event_time||''))||String(a.wait.created_at||'').localeCompare(String(b.wait.created_at||'')));
+  const item=({wait,schedule})=>{
+    const category=wait.category==='strategy'?'전략':'보겜';
+    const response=wait.response==='ok'?'<span class="dash-wait-state ok">O 가능</span>':wait.response==='no'?'<span class="dash-wait-state no">X 불가</span>':'';
+    return `<div class="dash-wait-item">
+      <div class="dash-wait-date"><b>${esc(String(schedule.event_date||'').slice(5).replace('-',' / '))}</b><small>${esc(String(schedule.event_time||'').slice(0,5))}</small></div>
+      <div class="dash-wait-event"><strong>${esc(schedule.title||'일정')}</strong><span>벙주 ${esc(schedule.manager||'-')}</span></div>
+      <span class="dash-wait-category ${wait.category==='strategy'?'strategy':'board'}">${category}</span>
+      <div class="dash-wait-request"><b>${esc(wait.requester_name||'-')}</b><span>${esc(String(wait.requested_time||'').slice(0,5)||'-')} · ${wait.people||'-'}명</span></div>
+      ${response}
+    </div>`;
+  };
+  return `<section class="dash-card dash-wait-card">
+    <div class="dash-card-head"><div><h3>일정 대기 현황</h3><p>대기 허용 일정에 등록된 신청 내역</p></div><button class="dash-link" data-open-tab="schedules">일정 관리 →</button></div>
+    <div class="dash-wait-list">${rows.length?rows.map(item).join(''):'<div class="dash-empty">현재 예정 일정에 등록된 대기가 없습니다.</div>'}</div>
+  </section>`;
+}
+
 function dashboardPanel(p){
   const today=todayYmd();
   const upcoming=[...(data.schedules||[])].filter(x=>String(x.event_date||'')>=today&&!isCancelledStatus(x.status)).sort((a,b)=>String(a.event_date||'').localeCompare(String(b.event_date||''))||String(a.event_time||'').localeCompare(String(b.event_time||'')));
@@ -243,6 +267,7 @@ function dashboardPanel(p){
   p.innerHTML=`<section class="dash-welcome"><div><span class="dash-overline">OVERVIEW</span><h2>오늘의 운영 현황</h2><p>${esc(fmtDate(today))} 기준 · 기존 DOTT 데이터와 연결</p></div><span class="dash-live"><i></i> LIVE DATA</span></section>
     <div class="dash-stats">${stat('활동 회원',num('출석',members.length),'탈퇴 회원 제외')}${stat('예정된 예약',num('일정',upcoming.length),'오늘 이후 · 취소 제외')}${stat('게임 보유목록',adminLoadWarnings.some(x=>['보드게임','머더미스터리','추리게임'].includes(x))?'확인 필요':games.toLocaleString('ko-KR'),'보드게임 · 머미 · 추리')}${stat('이번 달 회비 미납',adminLoadWarnings.some(x=>['출석','회비'].includes(x))?'확인 필요':pending.toLocaleString('ko-KR'),'회비 기록 기준 · 확인용 추정')}</div>
     ${dashboardAttendanceAlerts()}
+    ${dashboardWaitRequestsHtml()}
     <div class="dash-cols"><section class="dash-card"><div class="dash-card-head"><div><h3>예정된 일정</h3><p>가까운 일정 6건</p></div><button class="dash-link" data-open-tab="schedules">전체 보기 →</button></div>${adminLoadWarnings.includes('일정')?'<div class="dash-empty">일정 데이터를 불러오지 못했습니다. 새로고침해 주세요.</div>':upcomingHtml}</section>
     <section class="dash-card"><div class="dash-card-head"><div><h3>빠른 관리</h3><p>자주 사용하는 운영 메뉴</p></div></div><div class="dash-shortcuts">${go('schedules','예약 관리','일정 등록 · 수정')}${go('attendance','회원 · 출석','활동 현황 확인')}${go('accounting','회비 · 회계','월별 납부 · 장부')}${go('stats','운영 통계','월별 벙 · 회비 통계')}${go('boardgame','게임 관리','목록 · 소유주')}</div></section></div>
     <div class="dash-footnote">※ 회비 미납 수는 현재 활동 회원과 해당 월 납부·면제 기록을 기준으로 계산한 참고값입니다. 실시간 변경사항은 새로고침 후 반영됩니다.</div>`;
@@ -339,7 +364,7 @@ function schedulePanel(p){
     </div>
     <div class="table-wrap schedule-table-wrap"><table class="table schedule-table"><thead><tr><th class="check-col"></th><th>날짜</th><th>시간</th><th>카테고리</th><th>일정명</th><th>인원</th><th>벙주</th><th>상태</th><th>대기</th><th>관리</th></tr></thead><tbody>${rows.map(x=>{
       const cancelled=isCancelledStatus(x.status);
-      return `<tr class="${cancelled?'cancelled-row':''}"><td class="check-col"><input class="schedule-check" type="checkbox" data-schedule-check="${x.id}" ${selectedScheduleIds.has(x.id)?'checked':''}></td><td><span class="schedule-date-desktop">${fmtDate(x.event_date)}</span><span class="schedule-date-mobile">${compactScheduleDate(x.event_date)}</span></td><td>${(x.event_time||'').slice(0,5)}</td><td>${tag(x.category)}</td><td><b>${esc(x.title)}</b></td><td>${x.people||'-'}명</td><td>${esc(x.manager||'')}${x.venue_flexible?' <span class="venue-flex-mark" title="장소 이동 가능">✓</span>':''}</td><td><span class="schedule-status ${cancelled?'cancelled':''}">${scheduleStatusLabel(x.status)}</span></td><td>${scheduleWaitSummaryHtml(x)}</td><td><div class="actions"><button class="icon-btn" data-edit="${x.id}">✎</button><button class="icon-btn" data-del="${x.id}">♲</button></div></td></tr>`
+      return `<tr class="${cancelled?'cancelled-row':''}"><td class="check-col"><input class="schedule-check" type="checkbox" data-schedule-check="${x.id}" ${selectedScheduleIds.has(x.id)?'checked':''}></td><td><span class="schedule-date-desktop">${fmtDate(x.event_date)}</span><span class="schedule-date-mobile">${compactScheduleDate(x.event_date)}</span></td><td>${(x.event_time||'').slice(0,5)}</td><td>${tag(x.category)}</td><td><b>${esc(x.title)}</b></td><td>${x.people||'-'}명</td><td>${esc(x.manager||'')}</td><td><span class="schedule-status ${cancelled?'cancelled':''}">${scheduleStatusLabel(x.status)}</span></td><td>${scheduleWaitSummaryHtml(x)}</td><td><div class="actions"><button class="icon-btn" data-edit="${x.id}">✎</button><button class="icon-btn" data-del="${x.id}">♲</button></div></td></tr>`
     }).join('')||'<tr><td colspan="10">해당 일정이 없습니다.</td></tr>'}</tbody></table></div>`;
 
   document.getElementById('add').onclick=()=>scheduleModal();
@@ -388,7 +413,7 @@ function normalizeManualTime(v=''){
 
 function scheduleModal(x={}){
   const currentStatus=isCancelledStatus(x.status)?'취소':'예약';
-  showModal(x.id?'일정 수정':'일정 추가',`<div class="form-grid schedule-form"><div><label class="label">날짜</label><input id="f_date" class="field" type="date" value="${x.event_date||todayYmd()}"></div><div><label class="label">시간</label><input id="f_time" class="field" type="text" inputmode="numeric" maxlength="5" placeholder="예: 19:30" value="${esc((x.event_time||'18:00').slice(0,5))}"></div><div><label class="label">카테고리</label><select id="f_cat" class="field">${CFG.categories.map(c=>`<option value="${c.value}" ${x.category===c.value?'selected':''}>${c.label}</option>`).join('')}</select></div><div><label class="label">인원</label><input id="f_people" class="field" type="number" min="1" value="${x.people||4}"></div><div class="full"><label class="label">일정명</label><input id="f_title" class="field" value="${esc(x.title||'')}"></div><div><div class="label-row"><label class="label">벙주</label><span class="schedule-option-checks"><label class="venue-flex-check"><input id="f_venue_flexible" type="checkbox" ${x.venue_flexible?'checked':''}> 장소 이동 가능</label><label class="venue-flex-check wait-allow-check"><input id="f_wait_allowed" type="checkbox" ${x.wait_allowed?'checked':''}> 대기 허용</label></span></div><input id="f_manager" class="field" value="${esc(x.manager||'')}"></div><div><label class="label">상태</label><select id="f_status" class="field"><option value="예약" ${currentStatus==='예약'?'selected':''}>예약</option><option value="취소" ${currentStatus==='취소'?'selected':''}>취소</option></select></div><div class="full"><label class="label">메모</label><textarea id="f_note" class="field" rows="2">${esc(x.note||'')}</textarea></div></div>`,async m=>{
+  showModal(x.id?'일정 수정':'일정 추가',`<div class="form-grid schedule-form"><div><label class="label">날짜</label><input id="f_date" class="field" type="date" value="${x.event_date||todayYmd()}"></div><div><label class="label">시간</label><input id="f_time" class="field" type="text" inputmode="numeric" maxlength="5" placeholder="예: 19:30" value="${esc((x.event_time||'18:00').slice(0,5))}"></div><div><label class="label">카테고리</label><select id="f_cat" class="field">${CFG.categories.map(c=>`<option value="${c.value}" ${x.category===c.value?'selected':''}>${c.label}</option>`).join('')}</select></div><div><label class="label">인원</label><input id="f_people" class="field" type="number" min="1" value="${x.people||4}"></div><div class="full"><label class="label">일정명</label><input id="f_title" class="field" value="${esc(x.title||'')}"></div><div><div class="label-row"><label class="label">벙주</label><label class="venue-flex-check wait-allow-check"><input id="f_wait_allowed" type="checkbox" ${x.wait_allowed?'checked':''}> 대기 허용</label></div><input id="f_manager" class="field" value="${esc(x.manager||'')}"></div><div><label class="label">상태</label><select id="f_status" class="field"><option value="예약" ${currentStatus==='예약'?'selected':''}>예약</option><option value="취소" ${currentStatus==='취소'?'selected':''}>취소</option></select></div><div class="full"><label class="label">메모</label><textarea id="f_note" class="field" rows="2">${esc(x.note||'')}</textarea></div></div>`,async m=>{
     const row={
       event_date:m.querySelector('#f_date').value,
       event_time:normalizeManualTime(m.querySelector('#f_time').value),
@@ -396,7 +421,6 @@ function scheduleModal(x={}){
       title:m.querySelector('#f_title').value.trim(),
       people:+m.querySelector('#f_people').value||null,
       manager:m.querySelector('#f_manager').value.trim(),
-      venue_flexible:m.querySelector('#f_venue_flexible').checked,
       wait_allowed:m.querySelector('#f_wait_allowed').checked,
       status:m.querySelector('#f_status').value,
       note:m.querySelector('#f_note').value.trim()
