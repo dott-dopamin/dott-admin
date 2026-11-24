@@ -122,6 +122,7 @@ async function restWrite(method,table,{id=null,row=null,ids=null,query='',prefer
 
 window.DOTT_DB={
   async schedules(){return restSelect('schedules','select=*&order=event_date.asc,event_time.asc','일정')},
+  async scheduleWaits(){return restSelect('schedule_waits','select=*&order=created_at.asc','대기 요청',true)},
   async notices(){return restSelect('notices','select=*&order=created_at.asc','공지')},
   async attendance(){
     try{const rows=await restSelect('attendance_members','select=*&order=name.asc','출석',true);window.DOTT_ATTENDANCE_ERROR=null;return rows}
@@ -273,8 +274,9 @@ async function backupTable(table,label){
 }
 Object.assign(window.DOTT_DB,{
   async createFullBackup(){
-    const [schedules,notices,attendance,catalog_items,site_settings,fee_records,accounting_entries,accounting_receipts,accounting_month_closures,rental_loans]=await Promise.all([
+    const [schedules,schedule_waits,notices,attendance,catalog_items,site_settings,fee_records,accounting_entries,accounting_receipts,accounting_month_closures,rental_loans]=await Promise.all([
       backupTable('schedules','일정 백업'),
+      backupTable('schedule_waits','일정 대기 백업'),
       backupTable('notices','공지 백업'),
       backupTable('attendance_members','출석 백업'),
       backupTable('catalog_items','게임 목록 백업'),
@@ -287,9 +289,9 @@ Object.assign(window.DOTT_DB,{
     ]);
     return {
       format:'DOTT_FULL_BACKUP',
-      version:2,
+      version:3,
       created_at:new Date().toISOString(),
-      tables:{schedules,notices,attendance_members:attendance,catalog_items,site_settings,fee_records,accounting_entries,accounting_receipts,accounting_month_closures,rental_loans}
+      tables:{schedules,schedule_waits,notices,attendance_members:attendance,catalog_items,site_settings,fee_records,accounting_entries,accounting_receipts,accounting_month_closures,rental_loans}
     };
   }
 });
