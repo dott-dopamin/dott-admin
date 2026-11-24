@@ -1955,3 +1955,51 @@ body.recommend-open{overflow:hidden}
   .schedule-wait-admin-actions{width:100%}
   .wait-answer,.wait-delete{flex:1;font-size:11px}
 }
+
+
+/* ===== 2026-11-24 대시보드 일정 대기 현황 ===== */
+.dash-wait-card{margin-top:16px}
+.dash-wait-list{display:flex;flex-direction:column}
+.dash-wait-item{
+  display:grid;
+  grid-template-columns:74px minmax(180px,1.4fr) 58px minmax(150px,1fr) auto;
+  gap:12px;
+  align-items:center;
+  padding:12px 16px;
+  border-top:1px solid var(--line);
+}
+.dash-wait-item:first-child{border-top:0}
+.dash-wait-date{display:flex;flex-direction:column;gap:2px}
+.dash-wait-date b{font-size:12px}
+.dash-wait-date small{font-size:10px;color:var(--muted)}
+.dash-wait-event{display:flex;flex-direction:column;gap:3px;min-width:0}
+.dash-wait-event strong{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dash-wait-event span{font-size:10px;color:var(--muted)}
+.dash-wait-category{
+  display:inline-flex;align-items:center;justify-content:center;
+  border-radius:999px;padding:4px 7px;font-size:9px;font-weight:900;white-space:nowrap;
+}
+.dash-wait-category.board{background:#f8f1d8;color:#765b00}
+.dash-wait-category.strategy{background:#e7ecff;color:#405bb5}
+.dash-wait-request{display:flex;align-items:center;gap:7px;min-width:0}
+.dash-wait-request b{font-size:12px}
+.dash-wait-request span{font-size:10px;color:var(--muted);white-space:nowrap}
+.dash-wait-state{
+  display:inline-flex;align-items:center;justify-content:center;
+  border-radius:999px;padding:4px 7px;font-size:9px;font-weight:900;white-space:nowrap;
+}
+.dash-wait-state.ok{background:#e3f4e7;color:#2f7b46}
+.dash-wait-state.no{background:#f8e5e3;color:#b1433b}
+@media(max-width:700px){
+  .dash-wait-item{
+    grid-template-columns:54px minmax(0,1fr) auto;
+    gap:7px 8px;padding:10px 11px;
+  }
+  .dash-wait-date{grid-row:1 / span 2}
+  .dash-wait-event{grid-column:2}
+  .dash-wait-category{grid-column:3;grid-row:1}
+  .dash-wait-request{grid-column:2;grid-row:2;flex-wrap:wrap;gap:4px}
+  .dash-wait-state{grid-column:3;grid-row:2}
+  .dash-wait-event strong,.dash-wait-request b{font-size:11px}
+  .dash-wait-event span,.dash-wait-request span{font-size:9px}
+}
