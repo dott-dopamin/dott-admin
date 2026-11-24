@@ -47,6 +47,29 @@ function noticePublicHtml(v=''){
   v=String(v||'');
   return v.startsWith(NOTICE_RICH_PREFIX)?sanitizeNoticeRichHtml(v.slice(NOTICE_RICH_PREFIX.length)):nl2br(v);
 }
+
+/* Homepage text shares the notice editor's restricted rich-text format.
+   Flatten paragraph wrappers into line breaks so heading / badge markup stays inline. */
+function heroPublicHtml(value=''){
+  const v=String(value||'');
+  if(!v.startsWith(NOTICE_RICH_PREFIX))return nl2br(v);
+  const source=document.createElement('div');
+  source.innerHTML=sanitizeNoticeRichHtml(v.slice(NOTICE_RICH_PREFIX.length));
+  const target=document.createElement('div');
+  const appendInline=(node,container)=>{
+    [...node.childNodes].forEach(child=>{
+      if(child.nodeType===1&&(child.tagName==='DIV'||child.tagName==='P')){
+        if(container.childNodes.length&&container.lastChild.nodeName!=='BR')container.appendChild(document.createElement('br'));
+        appendInline(child,container);
+      }else{
+        container.appendChild(child.cloneNode(true));
+      }
+    });
+  };
+  appendInline(source,target);
+  return target.innerHTML;
+}
+
 function noticePlainText(v=''){
   v=String(v||'');
   if(!v.startsWith(NOTICE_RICH_PREFIX))return v;
