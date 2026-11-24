@@ -3,7 +3,7 @@
   const entry=bootScript?.dataset?.entry||'';
   const app=document.getElementById('app');
   const sleep=ms=>new Promise(r=>setTimeout(r,ms));
-  const BUILD='dott-admin-20261124-schedule-waits';
+  const BUILD='dott-admin-20261124-wait-ui-v2';
 
   function loadScript(src,{timeout=9000,retries=2}={}){
     return (async()=>{
