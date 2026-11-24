@@ -603,3 +603,43 @@ html:has(body.dott-admin){background:#f2f5fa}
     display:block;
   }
 }
+
+/* DOTT ADMIN: formatted homepage copy in site settings (2026-11-25) */
+.dott-admin .settings-rich-field .settings-rich-toolbar{
+  background:#f5f8fc;border-color:#d6e0ec;
+  border-radius:11px 11px 0 0;padding:8px;
+}
+.dott-admin .settings-rich-field .rich-tool,
+.dott-admin .settings-rich-field .rich-color{
+  background:#fff;border-color:#d6e0ec;color:#36516f;
+}
+.dott-admin .settings-rich-field .rich-tool:hover{
+  background:#ecf3fc;border-color:#9eb8dd;
+}
+.dott-admin .settings-rich-field .rich-help{color:#8293a9}
+.dott-admin .settings-rich-editor{
+  border:1px solid #d6e0ec;border-radius:0 0 11px 11px;
+  background:#fff;min-height:95px;padding:12px 13px;
+  font-size:13px;line-height:1.7;color:#263b52;
+  white-space:pre-wrap;overflow-wrap:anywhere;
+}
+.dott-admin .settings-rich-editor.settings-rich-single{
+  min-height:45px;
+}
+.dott-admin .settings-rich-editor:focus{
+  border-color:#5a80ba;
+  box-shadow:0 0 0 3px rgba(74,112,177,.13);
+}
+.dott-admin .settings-rich-editor b,
+.dott-admin .settings-rich-editor strong{font-weight:850}
+.dott-admin .settings-rich-editor p,
+.dott-admin .settings-rich-editor div{margin:0;line-height:inherit}
+.dott-admin .settings-preview h3 b,
+.dott-admin .settings-preview h3 strong{font-weight:900}
+.dott-admin .settings-preview p b,
+.dott-admin .settings-preview p strong{font-weight:800}
+@media(max-width:600px){
+  .dott-admin .settings-rich-field .settings-rich-toolbar{gap:5px;padding:7px}
+  .dott-admin .settings-rich-field .rich-tool{font-size:10.5px;padding:6px 8px}
+  .dott-admin .settings-rich-field .rich-help{flex-basis:100%;font-size:10px;margin:0}
+}
